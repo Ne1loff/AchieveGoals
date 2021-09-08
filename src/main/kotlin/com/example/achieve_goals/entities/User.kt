@@ -1,26 +1,73 @@
 package com.example.achieve_goals.entities
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+import javax.persistence.*
 
 @Entity
+@Table(name = "user_table")
 data class User(
 
     @Id
+    @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long = 1,
 
-    val name: String,
+    @Column(name="username")
+    var usernameSalt: String = "",
 
-    val surname: String,
+    @Column(name="name")
+    val name: String? = null,
 
-    val email: String,
+    @Column(name="surname")
+    val surname: String? = null,
 
-    val locality: String,
+    @Column(name="email")
+    val email: String = "",
 
-    val passwordHash: String,
+    @Column(name="locality")
+    var locality: Long = 1,
 
-    val userPhoto: Any //TODO (entities.UserPhoto)
-)
+    @Column(name="password")
+    var passwordHash: String = "",
+
+    @Column(name="admin")
+    var admin: Boolean = false
+
+    //val userPhoto: Any? //TODO (use s3 (MinIO))
+) : UserDetails {
+
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        val authorityList: MutableList<GrantedAuthority> = ArrayList()
+        authorityList.add(SimpleGrantedAuthority("ROLE_USER"))
+        if (admin)
+            authorityList.add(SimpleGrantedAuthority("ROLE_ADMIN"))
+        return authorityList
+    }
+
+    override fun getPassword(): String {
+        return passwordHash
+    }
+
+    override fun getUsername(): String {
+        return usernameSalt;
+    }
+
+    // TODO:
+    override fun isAccountNonExpired(): Boolean {
+        return true
+    }
+
+    override fun isAccountNonLocked(): Boolean {
+        return true
+    }
+
+    override fun isCredentialsNonExpired(): Boolean {
+        return true
+    }
+
+    override fun isEnabled(): Boolean {
+        return true
+    }
+}
