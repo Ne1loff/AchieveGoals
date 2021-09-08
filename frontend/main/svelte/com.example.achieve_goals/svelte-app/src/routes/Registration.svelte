@@ -15,43 +15,55 @@
 
     let selected;
 </script>
-
-<form class="box" method="post">
-    <div class="title">Registration</div>
-    <div class="user_details">
-        <input class="input_field" type="text" bind:value={username} placeholder="Username">
-        <input class="input_field" type="text" bind:value={email} placeholder="Email">
-        <select class="country_selector" bind:value={selected}>
-            {#each countries as country}
-                <option value={country}>
-                    {country.name}
-                </option>
-            {/each}
-        </select>
-        <input class="input_field" type="password" bind:value={password} placeholder="Password">
-        <input class="input_field" type="password" bind:value={confirm_pass} placeholder="Confirm password">
-        {#if password !== confirm_pass && confirm_pass}
-            <legend class="pass_match">Passwords do not match!</legend>
-        {/if}
-    </div>
-    <input class="submit_btn" type="submit" disabled={
+<div class="intro">
+    <form class="box" method="post">
+        <div class="title">Registration</div>
+        <div class="user_details">
+            <input class="input_field" type="text" bind:value={username} placeholder="Username">
+            <input class="input_field" type="text" bind:value={email} placeholder="Email">
+            <select class="country_selector" bind:value={selected}>
+                {#each countries as country}
+                    <option value={country}>
+                        {country.name}
+                    </option>
+                {/each}
+            </select>
+            <input class="input_field" type="password" bind:value={password} placeholder="Password">
+            <input class="input_field" type="password" bind:value={confirm_pass} placeholder="Confirm password">
+            {#if password !== confirm_pass && confirm_pass}
+                <legend class="pass_match">Passwords do not match!</legend>
+            {/if}
+        </div>
+        <input class="submit_btn" type="submit" disabled={
         !(password === confirm_pass && password && confirm_pass && selected.id !== 0)
         } value="Sign up">
-    <div class="sign_in_link">
-        Already have an account? <a href="/login">Sign in</a>
-    </div>
-</form>
+        <div class="sign_in_link">
+            Already have an account? <a href="/login">Sign in</a>
+        </div>
+    </form>
+</div>
 
 <style>
+
+    /* Intro */
+    .intro {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+
+        width: 100%;
+        height: 100vh;
+        bottom: 0;
+
+        background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    }
 
     /* Box */
     .box {
         width: 350px;
         padding: 20px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        position: center;
         background: white;
         border-radius: 10px;
         text-align: center;
@@ -65,16 +77,6 @@
         font-weight: 500;
     }
 
-    .title::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: -3px;
-        height: 3px;
-        width: 100%;
-        opacity: .4;
-        background: black;
-    }
 
     /* User Details */
     .user_details {
@@ -141,13 +143,9 @@
     @media (max-width: 584px) {
         .box {
             max-width: 100%;
-            padding: 0;
+            padding: 5px;
             margin: 0;
         }
-
-        /*.title {*/
-        /*    max-width: 80%;*/
-        /*}*/
 
         .input_field {
             max-width: 100%;
@@ -165,7 +163,7 @@
     @media (max-height: 470px) {
         .box {
             max-height: 100%;
-            padding: 0;
+            padding: 5px;
             margin: 0;
         }
 

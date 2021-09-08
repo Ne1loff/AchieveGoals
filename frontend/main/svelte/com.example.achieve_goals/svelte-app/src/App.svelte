@@ -4,7 +4,8 @@
     import Registration from "./routes/Registration.svelte"
     import Main from "./routes/Main.svelte"
 
-    export let url = '/test'
+    export let url = ""
+
 </script>
 
 

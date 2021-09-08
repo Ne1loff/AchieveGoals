@@ -1,11 +1,13 @@
 <script>
     import Kitchen from '@smui/snackbar/kitchen/index'
     import {navigate} from "svelte-routing"
+
     let login = ''
     let password = ''
     let kitchen;
     let kitchenReason = 'nothing yet';
     let kitchenAction = 'nothing yet';
+
     function getJwt() {
         fetch('/api/login', {
             method: 'POST',
@@ -18,14 +20,16 @@
             })
         }).then((response) => {
             if (response.status === 200) {
-                navigate("/")
+                navigate("/api/v1/users/")
             } else {
+                alert(response.status)
                 response.json().then((text) => {
                     pushToKitchen(text)
                 })
             }
         })
     }
+
     function pushToKitchen(text) {
         kitchen.push({
             props: {
@@ -35,6 +39,7 @@
             dismissButton: false,
         });
     }
+
     fetch(`/api/user`)
         .then((response) => {
             if (response.status === 200) {
@@ -43,32 +48,47 @@
         })
 </script>
 
-<Kitchen bind:this = {kitchen}/>
+<Kitchen bind:this={kitchen}/>
 
-<form class="box" method="post">
-    <h1>Login</h1>
-    <div class="user_details">
-        <input class="text_field" type="text" name="" placeholder="Email">
-        <input class="text_field" type="password" name="" placeholder="Password">
+<div class="intro">
+    <div class="intro__inner">
+        <form class="box" method="post">
+            <h1>Login</h1>
+            <div class="user_details">
+                <input class="text_field" type="text" name=""  bind:value={login} placeholder="Email">
+                <input class="text_field" type="password" name="" bind:value={password} placeholder="Password">
+            </div>
+            <input class="submit_btn" type="submit" on:click={getJwt} name="" value="Login">
+            <div class="signup_link">
+                Not a member? <a href="/registration">Sign up</a>
+            </div>
+        </form>
     </div>
-    <input class="submit_btn" type="submit" on:click={getJwt} name="" value="Login">
-    <div class="signup_link">
-        Not a member? <a href="/registration">Sign up</a>
-    </div>
-</form>
+</div>
 
 
 <style>
+
+    /* Intro */
+    .intro {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+
+        width: 100%;
+        height: 100vh;
+        bottom: 0;
+
+        background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    }
 
 
     /* Box */
     .box {
         width: 350px;
         padding: 20px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        position: center;
         background: white;
         border-radius: 10px;
         text-align: center;
@@ -132,7 +152,7 @@
     @media (max-width: 584px) {
         .box {
             max-width: 100%;
-            padding: 0;
+            padding: 5px;
             margin: 0;
         }
 
@@ -148,7 +168,7 @@
     @media (max-height: 370px) {
         .box {
             max-height: 100%;
-            padding: 0;
+            padding: 5px;
             margin: 0;
         }
 
