@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserRepository : CrudRepository<User, Long> {
 
-    //fun findUserById(id: Long) : UserDTO
-    //fun findUserByEmail(email: String) : UserDTO
+    fun findUserById(id: Long) : UserDTO
+    fun findUserByEmail(email: String) : UserDTO
     fun findUserByUsernameSalt(username: String) : User
 
     fun existsUserByEmail(email: String) : Boolean

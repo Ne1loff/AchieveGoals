@@ -26,10 +26,19 @@ class DevFrontendController(
         val requestUrl = request.requestURI
 
         var uri = URI("http", null, frontendAddress, frontendPort, null, null, null)
-        uri = UriComponentsBuilder.fromUri(uri)
-            .path(requestUrl)
-            .query(request.queryString)
-            .build(true).toUri()
+        uri = if (
+            requestUrl.contains("build") || requestUrl.contains("css") || requestUrl.contains("static")
+        ) {
+            UriComponentsBuilder.fromUri(uri)
+                .path(requestUrl)
+                .query(request.queryString)
+                .build(true).toUri()
+        } else {
+            UriComponentsBuilder.fromUri(uri)
+                .path("index.html")
+                .query(request.queryString)
+                .build(true).toUri()
+        }
 
         val restTemplate = RestTemplate()
         return try {

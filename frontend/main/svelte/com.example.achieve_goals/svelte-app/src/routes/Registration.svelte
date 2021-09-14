@@ -1,4 +1,6 @@
 <script>
+    import {navigate} from "svelte-routing";
+
     let username = ''
     let email = ''
     let password = ''
@@ -13,7 +15,12 @@
         {id: 5, name: 'Австрия'},
     ]
 
-    let selected;
+    let selected
+
+    let loginBtnEnabled
+
+    $: loginBtnEnabled = !(password === confirm_pass && password && confirm_pass && selected.id !== 0)
+
 </script>
 <div class="intro">
     <form class="box" method="post">
@@ -34,11 +41,9 @@
                 <legend class="pass_match">Passwords do not match!</legend>
             {/if}
         </div>
-        <input class="submit_btn" type="submit" disabled={
-        !(password === confirm_pass && password && confirm_pass && selected.id !== 0)
-        } value="Sign up">
+        <input class="submit_btn" type="submit" disabled={loginBtnEnabled} value="Sign up">
         <div class="sign_in_link">
-            Already have an account? <a href="/login">Sign in</a>
+            Already have an account? <a on:click={() => navigate('/login')}>Sign in</a>
         </div>
     </form>
 </div>

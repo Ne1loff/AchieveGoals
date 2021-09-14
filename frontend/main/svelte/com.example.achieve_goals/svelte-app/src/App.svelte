@@ -3,13 +3,14 @@
     import Login from "./routes/Login.svelte";
     import Registration from "./routes/Registration.svelte"
     import Main from "./routes/Main.svelte"
+    import Notfound from "./routes/Notfound.svelte";
+    import Home from "./routes/Home.svelte";
 
-    export let url = ""
 
 </script>
 
 
-<Router url="{url}">
+<Router>
     <div>
         <Route path="/login">
             <Login/>
@@ -17,8 +18,14 @@
         <Route path="/registration">
             <Registration/>
         </Route>
-        <Route path="/*">
+        <Route path="/home">
+            <Home/>
+        </Route>
+        <Route path="/">
             <Main/>
+        </Route>
+        <Route path="/*">
+            <Notfound/>
         </Route>
     </div>
 </Router>

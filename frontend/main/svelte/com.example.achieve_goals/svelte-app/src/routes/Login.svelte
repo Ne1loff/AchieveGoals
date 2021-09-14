@@ -1,12 +1,11 @@
 <script>
-    import Kitchen from '@smui/snackbar/kitchen/index'
     import {navigate} from "svelte-routing"
 
     let login = ''
     let password = ''
-    let kitchen;
-    let kitchenReason = 'nothing yet';
-    let kitchenAction = 'nothing yet';
+    let kitchen
+    let kitchenReason = 'nothing yet'
+    let kitchenAction = 'nothing yet'
 
     function getJwt() {
         fetch('/api/login', {
@@ -20,25 +19,13 @@
             })
         }).then((response) => {
             if (response.status === 200) {
-                navigate("/api/v1/users/")
+                alert("Login success")
             } else {
                 alert(response.status)
-                response.json().then((text) => {
-                    pushToKitchen(text)
-                })
             }
         })
     }
 
-    function pushToKitchen(text) {
-        kitchen.push({
-            props: {
-                variant: 'stacked'
-            },
-            label: text,
-            dismissButton: false,
-        });
-    }
 
     fetch(`/api/user`)
         .then((response) => {
@@ -47,8 +34,6 @@
             }
         })
 </script>
-
-<Kitchen bind:this={kitchen}/>
 
 <div class="intro">
     <div class="intro__inner">
@@ -60,7 +45,7 @@
             </div>
             <input class="submit_btn" type="submit" on:click={getJwt} name="" value="Login">
             <div class="signup_link">
-                Not a member? <a href="/registration">Sign up</a>
+                Not a member? <a on:click={() => navigate('/registration')}>Sign up</a>
             </div>
         </form>
     </div>

@@ -1,6 +1,6 @@
 package com.example.achieve_goals.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
@@ -36,10 +36,10 @@ class CustomUsernamePasswordAuthenticationFilter : UsernamePasswordAuthenticatio
                 while (reader.readLine().also { line = it } != null) {
                     builder.append(line)
                 }
-                val mapper = ObjectMapper()
-                val (login1, password1) = mapper.readValue(builder.toString(), LoginRequest::class.java)
-                login = login1
-                password = password1
+                val mapper = jacksonObjectMapper()
+                val loginRequest = mapper.readValue(builder.toString(), LoginRequest::class.java)
+                login = loginRequest.login
+                password = loginRequest.password
             } catch (e: IOException) {
                 throw AuthenticationServiceException("Unable to parse credentials!")
             }

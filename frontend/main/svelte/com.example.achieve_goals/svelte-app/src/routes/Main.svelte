@@ -1,17 +1,18 @@
 <script>
 
+import {navigate} from "svelte-routing";
 </script>
 
 <header class="header">
     <div class="container">
         <div class="header__inner">
-            <div class="header__logo"><img class="logo" src="logo_200x44.png" alt="logo"></div>
+            <div class="header__logo"><img class="logo" src="/static/logo_200x44.png" alt="logo"></div>
             <nav class="nav">
                 <li>
-                    <a class="nav__link" href="/login">Login</a>
+                    <a class="nav__link" on:click={() => navigate('/login')}>Login</a>
                 </li>
                 <li>
-                    <a class="nav__link" href="/registration">Registration</a>
+                    <a class="nav__link" on:click={() => navigate('/registration')}>Registration</a>
                 </li>
             </nav>
         </div>
@@ -29,7 +30,7 @@
 <style>
 
 
-    h1, h2, h3, h4, h5, h6 {
+    h1 {
         margin: 0;
     }
 
@@ -50,7 +51,7 @@
         height: 100vh;
         bottom: 0;
 
-        background: url("http://localhost:5000/intro.jpg") center no-repeat;
+        background: url("/static/intro.jpg") center no-repeat;
         -webkit-background-size: cover;
     }
 
