@@ -1,15 +1,18 @@
 package com.example.achieve_goals.controller
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import com.example.achieve_goals.config.RegistrationRequest
+import com.example.achieve_goals.dto.UserDTO
+import com.example.achieve_goals.service.UserService
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping(value = ["/api/users/"])
-class UserController {
+@RequestMapping(value = ["/api/"])
+class UserController(val userService: UserService) {
 
-    @GetMapping
-    fun hello() : String {
-        return "Hello World"
+    @PostMapping("registration")
+    fun registration(@RequestBody newUser: RegistrationRequest): HttpStatus {
+        return if (userService.saveUser(newUser)) HttpStatus.CREATED else HttpStatus.CONFLICT
     }
+
 }

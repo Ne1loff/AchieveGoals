@@ -1,5 +1,7 @@
 package com.example.achieve_goals
 
+import com.example.achieve_goals.controller.GoalController
+import com.example.achieve_goals.controller.UserController
 import com.example.achieve_goals.controller.frontend.DevFrontendController
 import com.example.achieve_goals.controller.frontend.ProductionFrontendController
 import com.example.achieve_goals.entities.User

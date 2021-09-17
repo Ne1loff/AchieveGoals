@@ -52,8 +52,8 @@ class WebSecurityConfig(
             ?.authorizeRequests { authorize ->
                 authorize
                     .antMatchers("/api/login").permitAll()
+                    .antMatchers("/api/registration").permitAll()
                     .antMatchers("/api/admin/**").hasRole("ADMIN")
-                    .antMatchers("/api/users/").hasRole("ADMIN")
                     .antMatchers("/api/**").hasRole("USER")
                     .antMatchers("/api/**").denyAll()
                     .antMatchers("/**").permitAll()

@@ -20,19 +20,13 @@
         }).then((response) => {
             if (response.status === 200) {
                 alert("Login success")
+                navigate('/home')
             } else {
                 alert(response.status)
             }
         })
     }
 
-
-    fetch(`/api/user`)
-        .then((response) => {
-            if (response.status === 200) {
-                window.location.replace("/")
-            }
-        })
 </script>
 
 <div class="intro">

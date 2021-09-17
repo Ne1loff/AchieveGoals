@@ -10,6 +10,6 @@ data class UserDTO(
 
     val email: String?,
 
-    val locality: String?,
+    val locality: String,
 
 )

@@ -18,13 +18,13 @@ data class User(
     var usernameSalt: String = "",
 
     @Column(name="name")
-    val name: String? = null,
+    var name: String? = null,
 
     @Column(name="surname")
-    val surname: String? = null,
+    var surname: String? = null,
 
     @Column(name="email")
-    val email: String = "",
+    var email: String = "",
 
     @Column(name="locality")
     var locality: Long = 1,

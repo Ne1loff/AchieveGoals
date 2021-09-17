@@ -15,11 +15,35 @@
         {id: 5, name: 'Австрия'},
     ]
 
+    function registration() {
+        fetch('/api/registration', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "username": username,
+                "email": email,
+                "locality": selected.id,
+                "password": password
+            })
+        }).then((response) => {
+            if (response.status === 201) {
+                alert("Registration success")
+                console.log(response.status)
+                navigate('/home')
+            } else {
+                alert(response.status)
+                console.log(response.status)
+            }
+        })
+    }
+
     let selected
 
-    let loginBtnEnabled
+    let clickable
 
-    $: loginBtnEnabled = !(password === confirm_pass && password && confirm_pass && selected.id !== 0)
+    $: clickable = (password === confirm_pass && password && confirm_pass && selected.id !== 0)
 
 </script>
 <div class="intro">
@@ -41,7 +65,7 @@
                 <legend class="pass_match">Passwords do not match!</legend>
             {/if}
         </div>
-        <input class="submit_btn" type="submit" disabled={loginBtnEnabled} value="Sign up">
+        <input class="submit_btn" type="submit" on:click={registration} disabled={!clickable} value="Sign up">
         <div class="sign_in_link">
             Already have an account? <a on:click={() => navigate('/login')}>Sign in</a>
         </div>
