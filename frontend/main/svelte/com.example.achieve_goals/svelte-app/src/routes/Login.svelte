@@ -3,11 +3,8 @@
 
     let login = ''
     let password = ''
-    let kitchen
-    let kitchenReason = 'nothing yet'
-    let kitchenAction = 'nothing yet'
 
-    function getJwt() {
+    async function getJwt() {
         fetch('/api/login', {
             method: 'POST',
             headers: {
@@ -17,27 +14,34 @@
                 login: login,
                 password: password,
             })
-        }).then((response) => {
-            if (response.status === 200) {
-                alert("Login success")
-                navigate('/home')
-            } else {
-                alert(response.status)
-            }
         })
+        .then(result => {
+            console.log(result.status)
+            navigate('/home')
+        })
+        .catch(error => console.log(error))
     }
 
 </script>
 
+<header class="header">
+    <div class="container">
+        <div class="header__inner">
+            <div class="header__logo">
+                <img class="logo" on:click={() => navigate('/')} src="/static/logo_200x44.png" alt="logo">
+            </div>
+        </div>
+    </div>
+</header>
 <div class="intro">
     <div class="intro__inner">
         <form class="box" method="post">
             <h1>Login</h1>
             <div class="user_details">
-                <input class="text_field" type="text" name=""  bind:value={login} placeholder="Email">
-                <input class="text_field" type="password" name="" bind:value={password} placeholder="Password">
+                <input class="text_field" type="text" autocomplete="1" name="" bind:value={login} placeholder="Email">
+                <input class="text_field" type="password" autocomplete="1" name="" bind:value={password} placeholder="Password">
             </div>
-            <input class="submit_btn" type="submit" on:click={getJwt} name="" value="Login">
+            <button class="submit_btn" type="button" on:click={getJwt}>Login</button>
             <div class="signup_link">
                 Not a member? <a on:click={() => navigate('/registration')}>Sign up</a>
             </div>
@@ -48,6 +52,52 @@
 
 <style>
 
+    /* Container */
+    .container {
+        height: 100%;
+        max-width: 99%;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+        width: 100%;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: 4rem;
+
+        background-color: white;
+    }
+    .header__inner {
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header::after {
+        content: "";
+        display: block;
+
+        width: 100%;
+        height: 5px;
+
+        background-color: #707070;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1;
+    }
+
+
+    .logo:hover {
+        cursor: pointer;
+    }
+
     /* Intro */
     .intro {
         display: flex;
@@ -55,11 +105,11 @@
         flex-direction: column;
         align-items: center;
 
+        background: linear-gradient(135deg, #71b7e6, #9b59b6);
+
         width: 100%;
         height: 100vh;
         bottom: 0;
-
-        background: linear-gradient(135deg, #71b7e6, #9b59b6);
     }
 
 

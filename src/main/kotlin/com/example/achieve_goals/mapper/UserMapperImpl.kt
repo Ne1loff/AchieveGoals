@@ -11,6 +11,7 @@ class UserMapperImpl : UserMapper {
         return User(
             id = -1,
             usernameSalt = newUser.username,
+            male = newUser.male,
             email = newUser.email,
             locality = newUser.locality,
             passwordHash = newUser.password,
@@ -25,6 +26,7 @@ class UserMapperImpl : UserMapper {
             username = user.username,
             name = user.name,
             surname = user.surname,
+            male = user.male,
             email = user.email,
             locality = locality
         )

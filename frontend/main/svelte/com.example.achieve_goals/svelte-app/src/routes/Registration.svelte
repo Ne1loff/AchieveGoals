@@ -3,6 +3,7 @@
 
     let username = ''
     let email = ''
+    let male = true
     let password = ''
     let confirm_pass = ''
 
@@ -23,6 +24,7 @@
             },
             body: JSON.stringify({
                 "username": username,
+                "male": male,
                 "email": email,
                 "locality": selected.id,
                 "password": password
@@ -46,6 +48,16 @@
     $: clickable = (password === confirm_pass && password && confirm_pass && selected.id !== 0)
 
 </script>
+
+<header class="header">
+    <div class="container">
+        <div class="header__inner">
+            <div class="header__logo">
+                <img class="logo" on:click={() => navigate('/')} src="/static/logo_200x44.png" alt="logo">
+            </div>
+        </div>
+    </div>
+</header>
 <div class="intro">
     <form class="box" method="post">
         <div class="title">Registration</div>
@@ -65,6 +77,16 @@
                 <legend class="pass_match">Passwords do not match!</legend>
             {/if}
         </div>
+        <div class="check__for__male">
+            <lable>
+                <input type="radio" bind:group={male} value={true}>
+                Male
+            </lable>
+            <lable>
+                <input type="radio" bind:group={male} value={false}>
+                Female
+            </lable>
+        </div>
         <input class="submit_btn" type="submit" on:click={registration} disabled={!clickable} value="Sign up">
         <div class="sign_in_link">
             Already have an account? <a on:click={() => navigate('/login')}>Sign in</a>
@@ -73,6 +95,56 @@
 </div>
 
 <style>
+
+    /* Container */
+    .container {
+        height: 100%;
+        max-width: 99%;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+        width: 100%;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: 4rem;
+
+        background-color: white;
+    }
+
+    .header__inner {
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header::after {
+        content: "";
+        display: block;
+
+        width: 100%;
+        height: 5px;
+
+        background-color: #707070;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1;
+    }
+
+    .header__inner {
+        height: 100%;
+    }
+
+    .logo:hover {
+        cursor: pointer;
+    }
 
     /* Intro */
     .intro {
@@ -144,6 +216,19 @@
         color: red;
     }
 
+    /* Check for male */
+    .check__for__male {
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 20%;
+
+        font-size: 18px;
+    }
+
+    .check__for__male label {
+    }
+
     /* Sign In Link */
     .sign_in_link {
         padding: 5px;
@@ -174,6 +259,10 @@
             max-width: 100%;
             padding: 5px;
             margin: 0;
+        }
+
+        .header__inner {
+            justify-content: center;
         }
 
         .input_field {

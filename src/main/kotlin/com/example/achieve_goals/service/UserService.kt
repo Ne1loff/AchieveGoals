@@ -3,6 +3,7 @@ package com.example.achieve_goals.service
 import com.example.achieve_goals.config.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
+import com.example.achieve_goals.exceptions.ApiBadRequestException
 import com.example.achieve_goals.mapper.UserMapperImpl
 import com.example.achieve_goals.repository.LocalityRepository
 import com.example.achieve_goals.repository.UserRepository
@@ -10,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
 
 @Service
 class UserService(
@@ -37,9 +37,9 @@ class UserService(
             .toMutableList()
     }
 
-    @Transactional
-    fun saveUser(newUser: RegistrationRequest) : Boolean { //TODO(Change on exception)
-        if (userRepository.existsUserByEmail(newUser.email)) return false
+    fun saveUser(newUser: RegistrationRequest) : Boolean {
+        if (userRepository.existsUserByEmail(newUser.email))
+            throw ApiBadRequestException("A user with such an email already exists")
         val user = mapper.userFromRegistrationRequest(newUser)
         user.passwordHash = passwordEncoder.encode(user.password)
         userRepository.save(user)

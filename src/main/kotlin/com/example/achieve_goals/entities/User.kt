@@ -23,6 +23,9 @@ data class User(
     @Column(name="surname")
     var surname: String? = null,
 
+    @Column(name="male")
+    val male: Boolean = true,
+
     @Column(name="email")
     var email: String = "",
 
@@ -31,6 +34,7 @@ data class User(
 
     @Column(name="password")
     var passwordHash: String = "",
+
 
     @Column(name="admin")
     var admin: Boolean = false
@@ -51,7 +55,7 @@ data class User(
     }
 
     override fun getUsername(): String {
-        return usernameSalt;
+        return usernameSalt
     }
 
     // TODO:

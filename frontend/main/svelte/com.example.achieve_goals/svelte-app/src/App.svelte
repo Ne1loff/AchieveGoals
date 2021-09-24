@@ -1,12 +1,10 @@
 <script>
-    import {navigate, Route, Router} from "svelte-routing";
+    import {Route, Router} from "svelte-routing";
     import Login from "./routes/Login.svelte";
     import Registration from "./routes/Registration.svelte"
     import Main from "./routes/Main.svelte"
     import Notfound from "./routes/Notfound.svelte";
     import Home from "./routes/Home.svelte";
-
-
 </script>
 
 

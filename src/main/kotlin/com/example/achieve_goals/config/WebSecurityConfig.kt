@@ -54,8 +54,8 @@ class WebSecurityConfig(
                     .antMatchers("/api/login").permitAll()
                     .antMatchers("/api/registration").permitAll()
                     .antMatchers("/api/admin/**").hasRole("ADMIN")
+                    .antMatchers("/api/**").hasRole("ADMIN")
                     .antMatchers("/api/**").hasRole("USER")
-                    .antMatchers("/api/**").denyAll()
                     .antMatchers("/**").permitAll()
             }
             ?.logout { logout: LogoutConfigurer<HttpSecurity?> ->

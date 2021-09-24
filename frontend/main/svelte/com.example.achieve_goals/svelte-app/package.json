@@ -19,7 +19,7 @@
     "svelte-routing": "^1.6.0"
   },
   "dependencies": {
-    "@smui/snackbar": "^5.0.0-beta.0",
-    "sirv-cli": "^1.0.0"
+    "sirv-cli": "^1.0.0",
+    "sv-bootstrap-dropdown": "^0.4.4"
   }
 }

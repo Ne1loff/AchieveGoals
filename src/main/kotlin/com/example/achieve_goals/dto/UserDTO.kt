@@ -8,6 +8,8 @@ data class UserDTO(
 
     val surname: String?,
 
+    val male: Boolean?,
+
     val email: String?,
 
     val locality: String,

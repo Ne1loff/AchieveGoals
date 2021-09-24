@@ -1,12 +1,13 @@
 <script>
-
-import {navigate} from "svelte-routing";
+    import {navigate} from "svelte-routing";
 </script>
 
 <header class="header">
     <div class="container">
         <div class="header__inner">
-            <div class="header__logo"><img class="logo" src="/static/logo_200x44.png" alt="logo"></div>
+            <div class="header__logo">
+                <img class="logo" on:click={() => navigate('/')} src="/static/logo_200x44.png" alt="logo">
+            </div>
             <nav class="nav">
                 <li>
                     <a class="nav__link" on:click={() => navigate('/login')}>Login</a>
@@ -37,7 +38,7 @@ import {navigate} from "svelte-routing";
     /* Container */
     .container {
         height: 100%;
-        max-width: 1200px;
+        max-width: 99%;
         margin: 0 auto;
     }
 
@@ -91,12 +92,24 @@ import {navigate} from "svelte-routing";
         align-items: center;
     }
 
-    .header__logo {
-        width: 150px;
-        height: 30px;
-        transform: translateY(-25%);
+    .header__inner:after {
+        content: "";
+        display: block;
+
+        width: 100%;
+        height: 5px;
+
+        background-color: #707070;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1;
     }
 
+
+    .logo:hover {
+        cursor: pointer;
+    }
 
     /* Nav */
     .nav {
@@ -113,22 +126,9 @@ import {navigate} from "svelte-routing";
         display: flex;
     }
 
-    .nav li:after {
-        content: "";
-        display: block;
-
-        width: 100%;
-        height: 5px;
-
-        background-color: #707070;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        z-index: 1;
-    }
-
     .nav li:hover {
         background-color: #e3e3e3;
+        cursor: pointer;
     }
 
     .nav__link {

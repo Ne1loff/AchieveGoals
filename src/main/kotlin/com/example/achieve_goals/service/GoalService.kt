@@ -2,6 +2,8 @@ package com.example.achieve_goals.service
 
 import com.example.achieve_goals.dto.GoalDTO
 import com.example.achieve_goals.entities.Goal
+import com.example.achieve_goals.exceptions.ApiBadRequestException
+import com.example.achieve_goals.exceptions.ApiNotfoundException
 import com.example.achieve_goals.mapper.GoalMapperImpl
 import com.example.achieve_goals.repository.GoalRepository
 import org.springframework.stereotype.Service
@@ -14,7 +16,7 @@ class GoalService(
     val mapper: GoalMapperImpl
 ) {
 
-    fun getAllGoals(): MutableList<GoalDTO> {
+    fun getAllGoals(): MutableList<GoalDTO> { // for admin in dev
         return goalRepository.findAll().map { goal -> mapper.dtoFromGoal(goal) }.toMutableList()
     }
 
@@ -27,7 +29,15 @@ class GoalService(
         return goals
     }
 
-    fun createRootGoal(goalDTO: GoalDTO): Boolean {
+    fun getUserGoalById(userId: Long, goalId: Long) : GoalDTO {
+        val goal = goalRepository.getGoalById(goalId)?: throw ApiNotfoundException("Goal not found!")
+        if (goal.uid == userId) {
+            return mapper.dtoFromGoal(goal)
+        }
+        throw ApiBadRequestException("User doesn't have this goal")
+    }
+
+    fun createMainGoal(goalDTO: GoalDTO): Boolean {
         val date = Date()
         try {
             val goal = Goal(
@@ -43,13 +53,13 @@ class GoalService(
             )
             goalRepository.save(goal)
         } catch (e: Exception) {
-            return false
+            throw ApiBadRequestException("Incorrect data")
         }
         return true
     }
 
     fun createSubGoal(goalDTO: GoalDTO): Boolean {
-        if (goalDTO.gid == null) return false
+        if (goalDTO.gid == null) throw ApiBadRequestException("SubGoal must have parent")
 
         val date = Date()
         try {
@@ -66,7 +76,7 @@ class GoalService(
             )
             goalRepository.save(goal)
         } catch (e: Exception) {
-            return false
+            throw ApiBadRequestException("Incorrect data")
         }
         return true
     }
@@ -74,8 +84,8 @@ class GoalService(
     @Transactional
     fun updateGoal(updGoal: GoalDTO): Boolean {
 
-        val goal = goalRepository.getGoalById(updGoal.id) ?: return false
-        if (goal.isDone) return false
+        val goal = goalRepository.getGoalById(updGoal.id) ?: throw ApiNotfoundException("Goal not found!")
+        if (goal.isDone) throw ApiBadRequestException("Goal has already been achieved")
 
         val date = Date()
 
