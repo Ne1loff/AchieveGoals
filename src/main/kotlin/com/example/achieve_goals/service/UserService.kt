@@ -3,18 +3,24 @@ package com.example.achieve_goals.service
 import com.example.achieve_goals.config.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
+import com.example.achieve_goals.entities.UserAvatar
 import com.example.achieve_goals.exceptions.ApiBadRequestException
 import com.example.achieve_goals.mapper.UserMapperImpl
 import com.example.achieve_goals.repository.LocalityRepository
+import com.example.achieve_goals.repository.UserAvatarRepository
 import com.example.achieve_goals.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.io.InputStream
+import javax.transaction.Transactional
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val userAvatarRepository: UserAvatarRepository,
+    private val minioService: MinioService,
     localityRepository: LocalityRepository,
     private val passwordEncoder: PasswordEncoder,
     private val mapper: UserMapperImpl
@@ -28,16 +34,49 @@ class UserService(
 
     fun getUserById(id: Long): UserDTO {
         val user = userRepository.findUserById(id)
-        return mapper.dtoFromUser(user, localityNames.getOrDefault(user.locality, ""))
+        val avatarLink = getUserAvatarLink(id)
+        return mapper.dtoFromUser(user, localityNames.getOrDefault(user.locality, ""), avatarLink)
+    }
+
+    fun getUserAvatarLink(id: Long): String {
+        val user = userRepository.findUserById(id)
+        val filename = if (user.male) "male_default_avatar.png" else "female_default_avatar.png"
+        if (user.userPhoto == null) return minioService.getPhoto(filename)
+        return minioService.getPhoto(user.id, user.userPhoto!!.fileExtension)
+    }
+
+    @Transactional
+    fun uploadUserAvatar(id: Long, file: InputStream, fileExtension: String) {
+        val user = userRepository.findUserById(id)
+        var userAvatar = user.userPhoto
+        if (userAvatar != null) {
+            minioService.deletePhoto(userAvatar.id, userAvatar.fileExtension)
+            userAvatar.fileExtension = fileExtension
+        } else {
+            userAvatar = UserAvatar(id, fileExtension)
+        }
+        minioService.uploadPhoto(id, file, fileExtension)
+        userAvatarRepository.save(userAvatar)
+    }
+
+    @Transactional
+    fun deleteUserPhoto(id: Long) {
+        val user = userRepository.findUserById(id)
+        val userAvatar = user.userPhoto
+        if (userAvatar != null) {
+            minioService.deletePhoto(userAvatar.id, userAvatar.fileExtension)
+            userAvatarRepository.deleteUserAvatarById(user.id)
+        }
     }
 
     fun getAllUsers(): MutableList<UserDTO> {
         return userRepository.findAll()
-            .map { user -> mapper.dtoFromUser(user, localityNames.getOrDefault(user.locality, "")) }
-            .toMutableList()
+            .map { user ->
+                mapper.dtoFromUser(user, localityNames.getOrDefault(user.locality, ""), null)
+            }.toMutableList()
     }
 
-    fun saveUser(newUser: RegistrationRequest) : Boolean {
+    fun saveUser(newUser: RegistrationRequest): Boolean {
         if (userRepository.existsUserByEmail(newUser.email))
             throw ApiBadRequestException("A user with such an email already exists")
         val user = mapper.userFromRegistrationRequest(newUser)
@@ -49,5 +88,34 @@ class UserService(
     fun saveAdmin(user: User) {
         user.passwordHash = passwordEncoder.encode(user.password)
         userRepository.save(user)
+    }
+
+    @Transactional
+    fun updateUser(userDTO: UserDTO, id: Long) {
+        val user = userRepository.findUserById(id)
+
+        if (userDTO.email != null)
+            if (userDTO.email != user.email)
+                if (userRepository.existsUserByEmail(userDTO.email))
+                    throw ApiBadRequestException("User with this email already exist!")
+        if (userDTO.username != null)
+            if (userDTO.username != user.usernameSalt)
+                if (userRepository.existsUserByUsernameSalt(userDTO.username))
+                    throw ApiBadRequestException("User with this username already exist!")
+
+        user.usernameSalt = userDTO.username ?: user.username
+        user.email = userDTO.email ?: user.email
+        user.name = userDTO.name ?: user.name
+        user.surname = userDTO.surname ?: user.surname
+        user.male = userDTO.male ?: user.male
+        if (userDTO.locality != null) {
+            val keyFromLocalityName = getKeyFromLocalityName(userDTO.locality)
+            user.locality = if (keyFromLocalityName == -1L) user.locality else keyFromLocalityName
+        }
+    }
+
+    fun getKeyFromLocalityName(name: String): Long {
+        localityNames.forEach { (t, u) -> if (u == name) return t }
+        return -1
     }
 }

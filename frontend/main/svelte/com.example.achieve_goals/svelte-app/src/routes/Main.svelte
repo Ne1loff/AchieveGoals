@@ -20,7 +20,7 @@
     </div>
 </header>
 
-<div class="intro">
+<div class="main-content">
     <div class="container">
         <div class="intro__inner">
             <h1 class="intro__title">Achieve your goals with us!</h1>
@@ -44,12 +44,13 @@
 
 
     /* Intro */
-    .intro {
+    .main-content {
         display: block;
         flex-direction: column;
+        position: absolute;
 
         width: 100%;
-        height: 100vh;
+        height: calc(100vh - 4rem - 5px);
         bottom: 0;
 
         background: url("/static/intro.jpg") center no-repeat;

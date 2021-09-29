@@ -4,6 +4,8 @@ import com.example.achieve_goals.config.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
 import org.springframework.stereotype.Component
+import java.io.File
+import java.io.InputStream
 
 @Component
 class UserMapperImpl : UserMapper {
@@ -17,18 +19,20 @@ class UserMapperImpl : UserMapper {
             passwordHash = newUser.password,
             admin = false,
             name = null,
-            surname = null
+            surname = null,
+            userPhoto = null
         )
     }
 
-    override fun dtoFromUser(user: User, locality: String): UserDTO {
+    override fun dtoFromUser(user: User, locality: String, avatar: String?): UserDTO {
         return UserDTO(
             username = user.username,
             name = user.name,
             surname = user.surname,
             male = user.male,
             email = user.email,
-            locality = locality
+            locality = locality,
+            avatar = avatar
         )
     }
 }

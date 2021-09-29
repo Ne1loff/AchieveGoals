@@ -15,11 +15,13 @@
                 password: password,
             })
         })
-        .then(result => {
-            console.log(result.status)
-            navigate('/home')
-        })
-        .catch(error => console.log(error))
+            .then(result => {
+                if (result.status !== 200) {
+                    alert("Login or password incorrect")
+                } else {
+                    navigate('/home')
+                }
+            })
     }
 
 </script>
@@ -33,13 +35,14 @@
         </div>
     </div>
 </header>
-<div class="intro">
+<div class="main-content">
     <div class="intro__inner">
         <form class="box" method="post">
             <h1>Login</h1>
             <div class="user_details">
                 <input class="text_field" type="text" autocomplete="1" name="" bind:value={login} placeholder="Email">
-                <input class="text_field" type="password" autocomplete="1" name="" bind:value={password} placeholder="Password">
+                <input class="text_field" type="password" autocomplete="1" name="" bind:value={password}
+                       placeholder="Password">
             </div>
             <button class="submit_btn" type="button" on:click={getJwt}>Login</button>
             <div class="signup_link">
@@ -72,6 +75,7 @@
 
         background-color: white;
     }
+
     .header__inner {
         height: 100%;
         display: flex;
@@ -99,7 +103,7 @@
     }
 
     /* Intro */
-    .intro {
+    .main-content {
         display: flex;
         justify-content: center;
         flex-direction: column;

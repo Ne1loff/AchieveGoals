@@ -1,5 +1,7 @@
 package com.example.achieve_goals.dto
 
+import java.io.File
+
 data class UserDTO(
 
     val username: String?,
@@ -12,6 +14,7 @@ data class UserDTO(
 
     val email: String?,
 
-    val locality: String,
+    val locality: String?,
 
+    val avatar: String?
 )

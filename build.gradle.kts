@@ -28,7 +28,8 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("com.vladmihalcea:hibernate-types-52:2.12.1")
 	implementation("commons-io:commons-io:2.11.0")
-
+	implementation("io.minio:minio:8.3.0")
+	implementation ("com.squareup.okhttp3:okhttp:4.3.1")
 
 	runtimeOnly("org.postgresql:postgresql")
 
@@ -37,6 +38,7 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 
 	compile("org.springframework.boot:spring-boot-configuration-processor")
+	compile("io.minio:minio:8.3.0")
 }
 
 tasks.withType<KotlinCompile> {

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import {navigate} from "svelte-routing";
 
     let username = ''
@@ -7,14 +7,15 @@
     let password = ''
     let confirm_pass = ''
 
-    let countries = [
-        {id: 0, name: 'Select country...'},
-        {id: 1, name: 'Россия'},
-        {id: 2, name: 'Украина'},
-        {id: 3, name: 'Абхазия'},
-        {id: 4, name: 'Австралия'},
-        {id: 5, name: 'Австрия'},
-    ]
+    let countries = [{id: 1, name: ""}];
+
+    fetch('/api/countries/')
+    .then(response => response.json())
+    .then(commit => {
+        countries = commit
+        countries.splice(0, 0, {id: 0, name: "Select country..."})
+        selected = countries[0]
+    })
 
     function registration() {
         fetch('/api/registration', {
@@ -30,7 +31,7 @@
                 "password": password
             })
         }).then((response) => {
-            if (response.status === 201) {
+            if (response.status === 201 || response.status === 200) {
                 alert("Registration success")
                 console.log(response.status)
                 navigate('/home')
@@ -41,11 +42,11 @@
         })
     }
 
-    let selected
+    let selected = countries[0];
 
-    let clickable
+    let clickable;
 
-    $: clickable = (password === confirm_pass && password && confirm_pass && selected.id !== 0)
+    $: clickable = (password === confirm_pass && password && confirm_pass && selected.id !== 0);
 
 </script>
 
@@ -58,7 +59,7 @@
         </div>
     </div>
 </header>
-<div class="intro">
+<div class="main-content">
     <form class="box" method="post">
         <div class="title">Registration</div>
         <div class="user_details">
@@ -87,7 +88,7 @@
                 Female
             </lable>
         </div>
-        <input class="submit_btn" type="submit" on:click={registration} disabled={!clickable} value="Sign up">
+        <button class="submit_btn" type="button" on:click={registration} disabled={!clickable}>Sign up</button>
         <div class="sign_in_link">
             Already have an account? <a on:click={() => navigate('/login')}>Sign in</a>
         </div>
@@ -147,7 +148,7 @@
     }
 
     /* Intro */
-    .intro {
+    .main-content {
         display: flex;
         justify-content: center;
         flex-direction: column;

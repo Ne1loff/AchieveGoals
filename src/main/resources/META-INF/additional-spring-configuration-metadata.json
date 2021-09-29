@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "app.frontendAddress",
+      "type": "java.lang.String",
+      "description": "Description for app.frontendAddress."
+    },
+    {
+      "name": "app.frontendPort",
+      "type": "java.lang.Integer",
+      "description": "Description for app.frontendAddress."
+    },
+    {
+      "name": "app.devMode",
+      "type": "java.lang.Boolean",
+      "description": "Description for app.frontendAddress."
+    }
+  ]
+}

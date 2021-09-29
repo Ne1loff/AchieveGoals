@@ -12,7 +12,7 @@ data class User(
     @Id
     @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 1,
+    val id: Long = -1,
 
     @Column(name="username")
     var usernameSalt: String = "",
@@ -24,7 +24,7 @@ data class User(
     var surname: String? = null,
 
     @Column(name="male")
-    val male: Boolean = true,
+    var male: Boolean = true,
 
     @Column(name="email")
     var email: String = "",
@@ -37,9 +37,12 @@ data class User(
 
 
     @Column(name="admin")
-    var admin: Boolean = false
+    var admin: Boolean = false,
 
-    //val userPhoto: Any? //TODO (use s3 (MinIO))
+    @OneToOne(fetch = FetchType.LAZY)
+    @PrimaryKeyJoinColumn
+    var userPhoto: UserAvatar? = null
+
 ) : UserDetails {
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {

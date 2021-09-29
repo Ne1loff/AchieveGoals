@@ -3,9 +3,10 @@ package com.example.achieve_goals.mapper
 import com.example.achieve_goals.config.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
+import java.io.File
 
 
 interface UserMapper {
     fun userFromRegistrationRequest(newUser: RegistrationRequest) : User
-    fun dtoFromUser(user: User, locality: String) : UserDTO
+    fun dtoFromUser(user: User, locality: String, avatar: String?) : UserDTO
 }

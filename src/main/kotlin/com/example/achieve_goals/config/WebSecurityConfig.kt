@@ -53,6 +53,7 @@ class WebSecurityConfig(
                 authorize
                     .antMatchers("/api/login").permitAll()
                     .antMatchers("/api/registration").permitAll()
+                    .antMatchers("/api/countries/").permitAll()
                     .antMatchers("/api/admin/**").hasRole("ADMIN")
                     .antMatchers("/api/**").hasRole("ADMIN")
                     .antMatchers("/api/**").hasRole("USER")
