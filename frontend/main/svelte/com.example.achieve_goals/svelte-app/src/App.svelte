@@ -10,26 +10,24 @@
 
 
 <Router>
-    <div>
-        <Route path="/login">
-            <Login/>
-        </Route>
-        <Route path="/registration">
-            <Registration/>
-        </Route>
-        <Route path="/home">
-            <Home/>
-        </Route>
-        <Route path="/user/profile">
-            <Profile/>
-        </Route>
-        <Route path="/">
-            <Main/>
-        </Route>
-        <Route path="/*">
-            <Notfound/>
-        </Route>
-    </div>
+    <Route path="/login">
+        <Login/>
+    </Route>
+    <Route path="/registration">
+        <Registration/>
+    </Route>
+    <Route path="/home">
+        <Home/>
+    </Route>
+    <Route path="/user/profile">
+        <Profile/>
+    </Route>
+    <Route path="/">
+        <Main/>
+    </Route>
+    <Route path="/*">
+        <Notfound/>
+    </Route>
 </Router>
 
 <style>

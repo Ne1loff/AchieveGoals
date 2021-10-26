@@ -1,6 +1,6 @@
 <script lang="ts">
     import {navigate} from "svelte-routing";
-    import {clickOutside} from "./js/clickOutside";
+    import {clickOutside} from "../js/clickOutside";
 
     let dropdownTrigger;
 
@@ -190,6 +190,7 @@
     .header {
         width: 100%;
 
+        display: block;
         position: absolute;
         top: 0;
         left: 0;

@@ -4,8 +4,6 @@ import com.example.achieve_goals.config.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
 import org.springframework.stereotype.Component
-import java.io.File
-import java.io.InputStream
 
 @Component
 class UserMapperImpl : UserMapper {

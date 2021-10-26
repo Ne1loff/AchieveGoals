@@ -1,10 +1,17 @@
-<script>
+<script lang="ts">
     import {navigate} from "svelte-routing"
 
     let login = ''
     let password = ''
 
-    async function getJwt() {
+    addEventListener('keydown', e => {
+        if (window.location.pathname !== "/login") return;
+        if (e.key !== 'Enter') return;
+        sigIn();
+    })
+
+
+    async function sigIn() {
         fetch('/api/login', {
             method: 'POST',
             headers: {
@@ -14,14 +21,15 @@
                 login: login,
                 password: password,
             })
+        }).then(response => {
+            if (response.status === 200)
+                navigate('/home')
+            else
+                alert("Login or password incorrect")
+        }).catch((err) => {
+
+            console.log(err)
         })
-            .then(result => {
-                if (result.status !== 200) {
-                    alert("Login or password incorrect")
-                } else {
-                    navigate('/home')
-                }
-            })
     }
 
 </script>
@@ -44,7 +52,7 @@
                 <input class="text_field" type="password" autocomplete="1" name="" bind:value={password}
                        placeholder="Password">
             </div>
-            <button class="submit_btn" type="button" on:click={getJwt}>Login</button>
+            <button class="submit_btn" type="button" on:click={sigIn}>Login</button>
             <div class="signup_link">
                 Not a member? <a on:click={() => navigate('/registration')}>Sign up</a>
             </div>

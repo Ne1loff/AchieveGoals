@@ -7,6 +7,7 @@ import com.example.achieve_goals.exceptions.ApiNotfoundException
 import com.example.achieve_goals.service.UserService
 import org.apache.commons.io.FilenameUtils
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -18,8 +19,10 @@ class UserController(
 ) {
 
     @PostMapping("registration")
-    fun registration(@RequestBody newUser: RegistrationRequest): HttpStatus {
-        return if (userService.saveUser(newUser)) HttpStatus.CREATED else HttpStatus.CONFLICT
+    fun registration(@RequestBody newUser: RegistrationRequest): ResponseEntity<Any> {
+        return ResponseEntity
+            .status(if (userService.saveUser(newUser)) HttpStatus.CREATED else HttpStatus.CONFLICT)
+            .build()
     }
 
     @GetMapping("user")
@@ -31,41 +34,53 @@ class UserController(
         throw ApiNotfoundException("User not found!")
     }
 
-    @GetMapping("user/avatar")
-    fun getUserAvatar(auth: Authentication): String {
+    @PutMapping("user/changePassword")
+    fun changePassword(auth: Authentication, @RequestBody newPassword: String): ResponseEntity<Any> {
         val principal = auth.principal
         if (principal is User) {
-            return userService.getUserAvatarLink(principal.id)
+            userService.changeUserPassword(principal.id, newPassword)
+            return ResponseEntity.ok().build()
+        }
+        throw ApiNotfoundException("User not found!")
+    }
+
+    @GetMapping("user/avatar")
+    fun getUserAvatar(auth: Authentication): ResponseEntity<String> {
+        val principal = auth.principal
+        if (principal is User) {
+            return ResponseEntity.ok()
+                .body(userService.getUserAvatarLink(principal.id))
         }
         throw ApiNotfoundException("User not found!")
     }
 
     @PutMapping("user/avatar")
-    fun updateAvatar(@RequestParam("avatar") avatar: MultipartFile, auth: Authentication): HttpStatus {
+    fun updateAvatar(@RequestParam("avatar") avatar: MultipartFile, auth: Authentication): ResponseEntity<Any> {
         val principal = auth.principal
         val fileExtension = FilenameUtils.getExtension(avatar.originalFilename)
         if (principal is User) {
             userService.uploadUserAvatar(principal.id, avatar.inputStream, fileExtension)
+            return ResponseEntity.ok().build()
         }
-        return HttpStatus.OK
+        throw ApiNotfoundException("User not found!")
     }
 
     @DeleteMapping("user/avatar")
-    fun deleteUserAvatar(auth: Authentication): HttpStatus {
+    fun deleteUserAvatar(auth: Authentication): ResponseEntity<Any> {
         val principal = auth.principal
         if (principal is User) {
             userService.deleteUserPhoto(principal.id)
-            return HttpStatus.OK
+            return ResponseEntity.ok().build()
         }
         throw ApiNotfoundException("User not found!")
     }
 
     @PutMapping("user")
-    fun updateUserInfo(@RequestBody userDTO: UserDTO, auth: Authentication): HttpStatus {
+    fun updateUserInfo(@RequestBody userDTO: UserDTO, auth: Authentication): ResponseEntity<Any> {
         val principal = auth.principal
         if (principal is User) {
             userService.updateUser(userDTO, principal.id)
-            return HttpStatus.OK
+            return ResponseEntity.ok().build()
         }
         throw ApiNotfoundException("User not found!")
     }

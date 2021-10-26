@@ -10,12 +10,12 @@
     let countries = [{id: 1, name: ""}];
 
     fetch('/api/countries/')
-    .then(response => response.json())
-    .then(commit => {
-        countries = commit
-        countries.splice(0, 0, {id: 0, name: "Select country..."})
-        selected = countries[0]
-    })
+        .then(response => response.json())
+        .then(commit => {
+            countries = commit
+            countries.splice(0, 0, {id: 0, name: "Select country..."})
+            selected = countries[0]
+        })
 
     function registration() {
         fetch('/api/registration', {
@@ -30,15 +30,30 @@
                 "locality": selected.id,
                 "password": password
             })
-        }).then((response) => {
+        }).then(response => {
             if (response.status === 201 || response.status === 200) {
-                alert("Registration success")
-                console.log(response.status)
-                navigate('/home')
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        login: username,
+                        password: password,
+                    })
+                }).then(response => {
+                    if (response.status === 200)
+                        navigate('/home')
+                    else
+                        alert("Login or password incorrect")
+                }).catch((err) => {
+                    alert(err)
+                })
             } else {
-                alert(response.status)
-                console.log(response.status)
+                alert("Registration failed")
             }
+        }).catch((err) => {
+            alert(err)
         })
     }
 
@@ -47,6 +62,12 @@
     let clickable;
 
     $: clickable = (password === confirm_pass && password && confirm_pass && selected.id !== 0);
+
+    addEventListener('keydown', e => {
+        if (window.location.pathname !== "/registration") return;
+        if (e.key !== 'Enter') return;
+        if (clickable) registration();
+    })
 
 </script>
 
@@ -72,8 +93,9 @@
                     </option>
                 {/each}
             </select>
-            <input class="input_field" type="password" bind:value={password} placeholder="Password">
-            <input class="input_field" type="password" bind:value={confirm_pass} placeholder="Confirm password">
+            <input class="input_field" type="password" autocomplete="true" bind:value={password} placeholder="Password">
+            <input class="input_field" type="password" autocomplete="true" bind:value={confirm_pass}
+                   placeholder="Confirm password">
             {#if password !== confirm_pass && confirm_pass}
                 <legend class="pass_match">Passwords do not match!</legend>
             {/if}
@@ -225,9 +247,6 @@
         padding: 5px 20%;
 
         font-size: 18px;
-    }
-
-    .check__for__male label {
     }
 
     /* Sign In Link */

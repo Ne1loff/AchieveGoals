@@ -114,6 +114,12 @@ class UserService(
         }
     }
 
+    fun changeUserPassword(id: Long, newPassword: String) {
+        val user = userRepository.findUserById(id)
+        user.passwordHash = passwordEncoder.encode(newPassword.trim())
+        userRepository.save(user)
+    }
+
     fun getKeyFromLocalityName(name: String): Long {
         localityNames.forEach { (t, u) -> if (u == name) return t }
         return -1
