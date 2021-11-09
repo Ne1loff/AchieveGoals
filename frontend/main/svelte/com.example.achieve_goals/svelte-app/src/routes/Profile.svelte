@@ -1,10 +1,16 @@
 <script lang="ts">
     import {navigate} from "svelte-routing";
+    import Icon from "@iconify/svelte"
     import Header from "./components/Header.svelte";
     import * as _ from 'lodash/fp';
 
+    let inputTypeBool = [false, false, false];
+
+    let oldPas = '';
+
     let changedPas = '';
     let confirmedChangedPas = '';
+
     let showConfirmWindow = false;
     let clickable;
     $:clickable = (changedPas === confirmedChangedPas && changedPas && confirmedChangedPas);
@@ -29,7 +35,7 @@
 
     function getCountries() {
         if (countries.length === 1) {
-            fetch('/api/countries/')
+            fetch('http://localhost:8080/api/countries/')
                 .then(response => response.json())
                 .then(commit => {
                     countries = commit
@@ -46,7 +52,7 @@
             let file = new FormData();
             file.append('avatar', fileVar)
 
-            fetch('/api/user/avatar', {
+            fetch('http://localhost:8080/api/user/avatar', {
                 method: 'PUT',
                 body: file
             }).then((response) => {
@@ -63,7 +69,7 @@
         fileVar = null;
 
         if (!_.isEqual(user, userViaChanges)) {
-            fetch('/api/user', {
+            fetch('http://localhost:8080/api/user', {
                 method: 'PUT',
                 headers: {
                     "Content-Type": "application/json"
@@ -78,7 +84,7 @@
                     console.log(response.status)
                 }
             }).then(() => {
-                fetch('/api/user')
+                fetch('http://localhost:8080/api/user')
                     .then(response => {
                         if (response.status === 200)
                             return response.json()
@@ -108,6 +114,7 @@
     }
 
     function resetPas() {
+        oldPas = "";
         changedPas = "";
         confirmedChangedPas = "";
         showConfirmWindow = false;
@@ -120,21 +127,40 @@
     }
 
     function savePas() {
-        fetch('/api/user/changePassword', {
+
+        fetch('http://localhost:8080/api/user/changePassword', {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(confirmedChangedPas)
+            body: JSON.stringify({
+                "oldPassword": oldPas,
+                "newPassword": confirmedChangedPas
+            })
         }).then(
-            (response) => console.log("All ok " + response.status)
+            response => {
+                showConfirmWindow = false;
+                if (response.ok) {
+                    return true
+                } else {
+                    alert("Old password incorrect")
+                    return false
+                }
+            }
+        ).then(
+            accept => {
+                if (accept) {
+                    oldPas = "";
+                    changedPas = "";
+                    confirmedChangedPas = "";
+                    cancel();
+                    alert("Password changed successfully!")
+                }
+            }
         ).catch(
             (err) => console.log("All bad " + err)
         )
-        changedPas = "";
-        confirmedChangedPas = "";
-        showConfirmWindow = false;
-        cancel();
+
     }
 
     let input;
@@ -171,7 +197,7 @@
     }
 
     function getUser() {
-        fetch('/api/user')
+        fetch('http://localhost:8080/api/user')
             .then(response => {
                 return response.json()
             })
@@ -179,10 +205,11 @@
                 user = commit
                 userViaChanges = JSON.parse(JSON.stringify(user))
             }).catch((err) => {
-                alert(err)
-                navigate('/login')
+            alert(err)
+            navigate('/login')
         })
     }
+
 
 </script>
 
@@ -215,7 +242,7 @@
                                             {#if !toChange[1]}
                                                 <div class="user-info-field">
                                                     <div>
-                                                        {userViaChanges.name === '' || userViaChanges.name === null ?
+                                                        {(user.name === null && !wasSave) || userViaChanges.name === '' || userViaChanges.name === null ?
                                                             "Not specified" : wasSave ?
                                                                 userViaChanges.name : user.name}
                                                     </div>
@@ -226,8 +253,10 @@
                                                 </div>
                                             {:else}
                                                 <div class="user-info-field-change">
-                                                    <input class="input_field" type="text"
-                                                           bind:value={userViaChanges.name}>
+                                                    <div class="input_container">
+                                                        <input class="input_field" type="text" placeholder="Name"
+                                                               bind:value={userViaChanges.name}>
+                                                    </div>
                                                     <div class="user-info-field-buttons">
                                                         <button class="save__button" type="button" on:click={save}>
                                                             Save
@@ -244,7 +273,7 @@
                                             {#if !toChange[2]}
                                                 <div class="user-info-field">
                                                     <div>
-                                                        {userViaChanges.surname === '' || userViaChanges.surname === null ?
+                                                        {(user.surname === null && !wasSave)|| userViaChanges.surname === '' || userViaChanges.surname === null ?
                                                             "Not specified" : wasSave ?
                                                                 userViaChanges.surname : user.surname}
                                                     </div>
@@ -255,13 +284,16 @@
                                                 </div>
                                             {:else}
                                                 <div class="user-info-field-change">
-                                                    <input class="input_field" type="text"
-                                                           bind:value={userViaChanges.surname}>
+                                                    <div class="input_container">
+                                                        <input class="input_field" type="text" placeholder="Surname"
+                                                               bind:value={userViaChanges.surname}>
+                                                    </div>
                                                     <div class="user-info-field-buttons">
                                                         <button class="save__button" type="button" on:click={save}>
                                                             Save
                                                         </button>
-                                                        <button class="cancel__button" type="button" on:click={cancel}>
+                                                        <button class="cancel__button" type="button"
+                                                                on:click={cancel}>
                                                             Cancel
                                                         </button>
                                                     </div>
@@ -281,12 +313,69 @@
                                                     }}>Change</a>
                                                 </div>
                                             {:else}
-                                                <!--TODO: Придумать интересную реализацию-->
                                                 <div class="user-info-field-change">
-                                                    <input class="input_field" type="password"
-                                                           placeholder="********" bind:value={changedPas}>
-                                                    <input class="input_field" type="password"
-                                                           placeholder="********" bind:value={confirmedChangedPas}>
+                                                    <form class="user-info-form">
+                                                        <div class="input_box">
+                                                            <div class="input_container">
+                                                                {#if inputTypeBool[0]}
+                                                                    <input class="input_field" type="text"
+                                                                           placeholder="Old password"
+                                                                           bind:value={oldPas}
+                                                                           autocomplete="on">
+                                                                {:else}
+                                                                    <input class="input_field" type="password"
+                                                                           placeholder="Old password"
+                                                                           bind:value={oldPas}
+                                                                           autocomplete="on">
+                                                                {/if}
+                                                                <div class="icon_holder"
+                                                                     on:click={() => {inputTypeBool[0] = !inputTypeBool[0]}}>
+                                                                    <Icon class="input_box_icon"
+                                                                          icon="akar-icons:eye-{inputTypeBool[0] ? 'open' : 'closed'}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="input_box">
+                                                            <div class="input_container">
+                                                                {#if inputTypeBool[1]}
+                                                                    <input class="input_field" type="text"
+                                                                           placeholder="New password"
+                                                                           bind:value={changedPas}
+                                                                           autocomplete="new-password">
+                                                                {:else}
+                                                                    <input class="input_field" type="password"
+                                                                           placeholder="New password"
+                                                                           bind:value={changedPas}
+                                                                           autocomplete="new-password">
+                                                                {/if}
+                                                                <div class="icon_holder"
+                                                                     on:click={() => {inputTypeBool[1] = !inputTypeBool[1]}}>
+                                                                    <Icon class="input_box_icon"
+                                                                          icon="akar-icons:eye-{inputTypeBool[1] ? 'open' : 'closed'}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="input_box">
+                                                            <div class="input_container">
+                                                                {#if inputTypeBool[2]}
+                                                                    <input class="input_field" type="text"
+                                                                           placeholder="Confirm new password"
+                                                                           bind:value={confirmedChangedPas}
+                                                                           autocomplete="new-password">
+                                                                {:else}
+                                                                    <input class="input_field" type="password"
+                                                                           placeholder="Confirm new password"
+                                                                           bind:value={confirmedChangedPas}
+                                                                           autocomplete="new-password">
+                                                                {/if}
+                                                                <div class="icon_holder"
+                                                                     on:click={() => {inputTypeBool[2] = !inputTypeBool[2]}}>
+                                                                    <Icon class="input_box_icon"
+                                                                          icon="akar-icons:eye-{inputTypeBool[2] ? 'open' : 'closed'}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                     {#if changedPas !== confirmedChangedPas && confirmedChangedPas}
                                                         <legend class="pass_match">Passwords do not match!</legend>
                                                     {/if}
@@ -326,7 +415,9 @@
                                             {#if !toChange[4]}
                                                 <div class="user-info-field">
                                                     <div>
-                                                        {userViaChanges.male ? "Male" : "Female"}
+                                                        {user.male === userViaChanges.male ?
+                                                            user.male ? "Male" : "Female"
+                                                            : userViaChanges.male ? "Male" : "Female"}
                                                     </div>
                                                     <a on:click={() => {
                                                         cancel()
@@ -408,13 +499,13 @@
                                            on:change={onChange}>
                                 </div>
                             </div>
+                            {#if wasChanged}
+                                <div class="user-info-field-buttons">
+                                    <button class="save__button" type="button" on:click={mainSave}>Save</button>
+                                    <button class="cancel__button" type="button" on:click={mainCancel}>Cancel</button>
+                                </div>
+                            {/if}
                         </div>
-                        {#if wasChanged}
-                            <div class="user-info-field-buttons">
-                                <button class="save__button" type="button" on:click={mainSave}>Save</button>
-                                <button class="cancel__button" type="button" on:click={mainCancel}>Cancel</button>
-                            </div>
-                        {/if}
                     </div>
                 </div>
             </div>
@@ -435,6 +526,7 @@
     .main-content {
         display: block;
         flex-direction: column;
+
         position: absolute;
 
         bottom: 0;
@@ -446,6 +538,7 @@
     .main-content-wrapper {
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         height: 100%;
     }
 
@@ -457,9 +550,11 @@
     .container {
         margin: 0 auto;
         padding: 0 20px;
-        min-width: 75vw;
+        min-width: 70vw;
+        width: 80vw;
+        max-width: 98vw;
         box-sizing: border-box;
-        min-height: 70vh;
+        min-height: calc(100vh - 4rem - 5px - 200px)
     }
 
     .row-content {
@@ -474,19 +569,18 @@
         width: 100%;
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
+        justify-content: space-evenly;
     }
 
     .content-right-block {
         display: flex;
         justify-content: normal;
-
     }
 
     .content-block-name {
         max-width: 970px;
         width: 100%;
-        margin: 8px 0;
+        margin: 8px 8px;
         box-sizing: border-box;
     }
 
@@ -500,11 +594,11 @@
     }
 
     .content-block-user-info {
-        width: calc(100% - 4rem);
+        width: calc(100%);
     }
 
     .content-block-user-photo {
-        padding: 0 8px;
+        padding: 0 8px 0 8px;
         box-sizing: border-box;
     }
 
@@ -514,14 +608,39 @@
         border-radius: 0;
     }
 
-    .input_field {
-        border-radius: 0;
-        width: 300px;
-        height: 40px;
+    .icon_holder {
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
     }
 
-    .input_field::placeholder {
-        color: black;
+    .icon_holder:hover {
+        background: rgba(0, 0, 0, .05);
+    }
+
+    :global(.input_box_icon) {
+        width: 20px;
+        height: 20px;
+    }
+
+    .input_field {
+        height: 100%;
+        width: 85%;
+        max-width: 90%;
+        border: none;
+
+        padding: 0;
+        margin: 0;
+    }
+
+    .input_field:focus {
+        outline: none;
     }
 
     .user-info-top {
@@ -561,6 +680,33 @@
         width: 60%;
         justify-content: space-between;
         padding: 0 15px;
+    }
+
+    .user-info-form {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+    }
+
+    .input_box {
+        padding: 6px 0;
+        user-select: none;
+    }
+
+    .input_container {
+        background: white;
+        height: 22px;
+        max-width: 70%;
+
+        padding: 12px 14px;
+        font-size: 17px;
+        border: 1px solid #dddfe2;
+        border-radius: 6px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .country_selector {
@@ -678,7 +824,7 @@
     }
 
     .content-block-user-photo {
-        height: 355px;
+        max-height: 100%;
     }
 
     .content-container {
@@ -700,16 +846,19 @@
 
     .user-photo {
         height: 300px;
-        /* todo: */
     }
 
     /* Footer */
     .footer {
-        height: calc(100vh - 70vh - 4rem - 5px);
+        min-height: 200px;
         width: 100%;
         bottom: 0;
-        position: absolute;
         background: rgba(17, 17, 17, 0.99);
     }
 
+    @media (max-width: 1160px) {
+        .content-block {
+            flex-wrap: wrap;
+        }
+    }
 </style>

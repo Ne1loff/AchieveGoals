@@ -1,5 +1,6 @@
 package com.example.achieve_goals.entities
 
+import org.hibernate.Hibernate
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -76,5 +77,20 @@ data class User(
 
     override fun isEnabled(): Boolean {
         return true
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as User
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    @Override
+    override fun toString(): String {
+        return this::class.simpleName + "(id = $id , usernameSalt = $usernameSalt , name = $name , surname = $surname , male = $male , email = $email , locality = $locality , passwordHash = $passwordHash , admin = $admin )"
     }
 }

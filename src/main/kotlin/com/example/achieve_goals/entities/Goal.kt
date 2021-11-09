@@ -1,6 +1,7 @@
 package com.example.achieve_goals.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.hibernate.Hibernate
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.util.*
@@ -45,4 +46,19 @@ data class Goal(
 
     @Temporal(TemporalType.TIMESTAMP)
     var deadline: Date
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Goal
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    @Override
+    override fun toString(): String {
+        return this::class.simpleName + "(id = $id , uid = $uid , title = $title , description = $description , isDone = $isDone , gid = $gid , createdAt = $createdAt , updatedAt = $updatedAt , deadline = $deadline )"
+    }
+}

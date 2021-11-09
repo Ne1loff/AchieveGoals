@@ -4,8 +4,6 @@
 
     let dropdownTrigger;
 
-    let avatarUrl = ["/static/img_avatar.png", "/static/img_avatar2.png"];
-
     export let activePage;
 
     export let user = {
@@ -19,7 +17,7 @@
     };
 
     function logOut() {
-        fetch('/api/logout', {
+        fetch('http://localhost:8080/api/logout', {
             method: 'POST'
         })
             .then(_ => navigate('/'))
@@ -64,10 +62,10 @@
                             <button class="dropdown-item" type="button" disabled={activePage === "Reference"}>
                                 Reference
                             </button>
-                            <button class="dropdown-item" type="button" disabled = {activePage === "Settings"}>
+                            <button class="dropdown-item" type="button" disabled={activePage === "Settings"}>
                                 Settings
                             </button>
-                            <button class="dropdown-item" type="button" disabled = {activePage === "Send feedback"}>
+                            <button class="dropdown-item" type="button" disabled={activePage === "Send feedback"}>
                                 Send feedback
                             </button>
                         </div>

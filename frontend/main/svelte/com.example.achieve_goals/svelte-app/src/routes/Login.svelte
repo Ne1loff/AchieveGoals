@@ -1,6 +1,7 @@
 <script lang="ts">
     import {navigate} from "svelte-routing"
 
+
     let login = ''
     let password = ''
 
@@ -12,7 +13,7 @@
 
 
     async function sigIn() {
-        fetch('/api/login', {
+        fetch('http://localhost:8080/api/login', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"

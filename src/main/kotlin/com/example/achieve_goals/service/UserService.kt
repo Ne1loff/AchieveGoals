@@ -5,6 +5,7 @@ import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.entities.UserAvatar
 import com.example.achieve_goals.exceptions.ApiBadRequestException
+import com.example.achieve_goals.exceptions.ApiInvalidLoginOrPasswordException
 import com.example.achieve_goals.mapper.UserMapperImpl
 import com.example.achieve_goals.repository.LocalityRepository
 import com.example.achieve_goals.repository.UserAvatarRepository
@@ -28,8 +29,9 @@ class UserService(
 
     private val localityNames = localityRepository.findAll().associate { it.id to it.name }
 
-    override fun loadUserByUsername(username: String): UserDetails {
-        return userRepository.findUserByUsernameSalt(username) // TODO*(Пересмотреть реализацию!)
+    override fun loadUserByUsername(login: String): UserDetails {
+        return userRepository.findUserByUsernameSalt(login) ?: userRepository.findUserByEmail(login)
+        ?: throw ApiInvalidLoginOrPasswordException("Invalid login or password")
     }
 
     fun getUserById(id: Long): UserDTO {
@@ -114,10 +116,14 @@ class UserService(
         }
     }
 
-    fun changeUserPassword(id: Long, newPassword: String) {
+    fun changeUserPassword(id: Long, oldPassword: String, newPassword: String): Boolean {
         val user = userRepository.findUserById(id)
-        user.passwordHash = passwordEncoder.encode(newPassword.trim())
-        userRepository.save(user)
+        if (passwordEncoder.matches(oldPassword, user.password)) {
+            user.passwordHash = passwordEncoder.encode(newPassword)
+            userRepository.save(user)
+            return true
+        }
+        return false
     }
 
     fun getKeyFromLocalityName(name: String): Long {

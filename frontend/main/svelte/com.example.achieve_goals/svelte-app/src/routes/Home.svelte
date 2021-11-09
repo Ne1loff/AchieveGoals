@@ -14,7 +14,7 @@
     };
 
 
-    fetch('/api/user')
+    fetch('http://localhost:8080/api/user')
         .then(response => {
             console.log(response.status)
             if (response.status === 200)

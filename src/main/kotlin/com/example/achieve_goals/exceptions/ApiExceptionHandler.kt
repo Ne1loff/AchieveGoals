@@ -31,4 +31,15 @@ class ApiExceptionHandler {
         )
         return ResponseEntity(apiException, httpStatus)
     }
+
+    @ExceptionHandler(value = [(ApiInvalidLoginOrPasswordException::class)])
+    fun handleApiIncorrectLoginOrPasswordException(exception: ApiInvalidLoginOrPasswordException): ResponseEntity<Any> {
+        val httpStatus = HttpStatus.UNAUTHORIZED
+        val apiException = ApiException(
+            message = exception.message,
+            httpStatus = httpStatus,
+            timestamp = ZonedDateTime.now(ZoneId.of("Z"))
+        )
+        return ResponseEntity(apiException, httpStatus)
+    }
 }

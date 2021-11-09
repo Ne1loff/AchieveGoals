@@ -1,6 +1,8 @@
 <script lang="ts">
     import {navigate} from "svelte-routing";
 
+
+
     let username = ''
     let email = ''
     let male = true
@@ -9,7 +11,7 @@
 
     let countries = [{id: 1, name: ""}];
 
-    fetch('/api/countries/')
+    fetch('http://localhost:8080/api/countries/')
         .then(response => response.json())
         .then(commit => {
             countries = commit
@@ -18,7 +20,7 @@
         })
 
     function registration() {
-        fetch('/api/registration', {
+        fetch('http://localhost:8080/api/registration', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"
@@ -32,7 +34,7 @@
             })
         }).then(response => {
             if (response.status === 201 || response.status === 200) {
-                fetch('/api/login', {
+                fetch('http://localhost:8080/api/login', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json"

@@ -1,6 +1,7 @@
 package com.example.achieve_goals.controller
 
 import com.example.achieve_goals.config.RegistrationRequest
+import com.example.achieve_goals.dto.ChangePasswordDTO
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.exceptions.ApiNotfoundException
@@ -35,11 +36,16 @@ class UserController(
     }
 
     @PutMapping("user/changePassword")
-    fun changePassword(auth: Authentication, @RequestBody newPassword: String): ResponseEntity<Any> {
+    fun changePassword(
+        auth: Authentication,
+        @RequestBody passwordDTO: ChangePasswordDTO
+    ): ResponseEntity<Any> {
         val principal = auth.principal
         if (principal is User) {
-            userService.changeUserPassword(principal.id, newPassword)
-            return ResponseEntity.ok().build()
+            return if (userService.changeUserPassword(principal.id, passwordDTO.oldPassword, passwordDTO.newPassword))
+                ResponseEntity.ok().build()
+            else
+                ResponseEntity.badRequest().build()
         }
         throw ApiNotfoundException("User not found!")
     }
