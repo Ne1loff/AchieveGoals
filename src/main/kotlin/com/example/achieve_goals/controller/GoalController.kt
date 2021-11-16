@@ -23,25 +23,34 @@ class GoalController(
         throw ApiNotfoundException("User not found!")
     }
 
-    @GetMapping("{gid}")
-    fun getUserGoalById(@PathVariable gid: Long, auth: Authentication): GoalDTO {
+    @GetMapping("{id}")
+    fun getUserGoalById(@PathVariable id: Long, auth: Authentication): GoalDTO {
         val principal = auth.principal
         if (principal is User) {
-            return goalService.getUserGoalById(principal.id, gid)
+            return goalService.getUserGoalById(principal.id, id)
         }
         throw ApiNotfoundException("User not found!")
     }
 
+
     @PostMapping
-    fun createMainGoal(@RequestBody goalDTO: GoalDTO): HttpStatus {
-        goalService.createMainGoal(goalDTO)
-        return HttpStatus.CREATED
+    fun createMainGoal(@RequestBody goalDTO: GoalDTO, auth: Authentication): HttpStatus {
+        val principal = auth.principal
+        if (principal is User) {
+            goalService.createMainGoal(goalDTO, principal.id)
+            return HttpStatus.CREATED
+        }
+        throw ApiNotfoundException("User not found!")
     }
 
     @PostMapping("sub-goals")
-    fun createSubGoal(@RequestBody goalDTO: GoalDTO): HttpStatus {
-        goalService.createSubGoal(goalDTO)
-        return HttpStatus.CREATED
+    fun createSubGoal(@RequestBody goalDTO: GoalDTO, auth: Authentication): HttpStatus {
+        val principal = auth.principal
+        if (principal is User) {
+            goalService.createSubGoal(goalDTO, principal.id)
+            return HttpStatus.CREATED
+        }
+        throw ApiNotfoundException("User not found!")
     }
 
     @PutMapping

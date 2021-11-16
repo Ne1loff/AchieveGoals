@@ -1,9 +1,15 @@
 <script lang="ts">
     import {navigate} from "svelte-routing"
+    import PasswordField from "./components/PasswordField.svelte";
+    import InputField from "./components/InputField.svelte";
 
 
     let login = ''
     let password = ''
+
+    $: {
+        console.log(password)
+    }
 
     addEventListener('keydown', e => {
         if (window.location.pathname !== "/login") return;
@@ -49,9 +55,13 @@
         <form class="box" method="post">
             <h1>Login</h1>
             <div class="user_details">
-                <input class="text_field" type="text" autocomplete="1" name="" bind:value={login} placeholder="Email">
-                <input class="text_field" type="password" autocomplete="1" name="" bind:value={password}
-                       placeholder="Password">
+                <div class="input_box">
+                    <InputField bind:bindText={login} placeholderText="Username/Email"/>
+                </div>
+                <div class="input_box">
+                    <PasswordField bind:password={password} placeholderText="Password"
+                                   newPass="{false}"/>
+                </div>
             </div>
             <button class="submit_btn" type="button" on:click={sigIn}>Login</button>
             <div class="signup_link">
@@ -63,6 +73,7 @@
 
 
 <style>
+
 
     /* Container */
     .container {
@@ -145,26 +156,15 @@
 
     /* User Details*/
     .user_details {
-        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    /* Text Field */
-    .text_field {
-        border-color: #A9A9A9;
-        border-radius: 12px;
-        display: block;
-        margin: 12px auto;
-        outline: none;
-        padding: 10px 14px;
-        color: black;
-        text-align: center;
+    .input_box {
+        padding: 6px 0;
+        max-width: 90%;
     }
-
-    .text_field::placeholder {
-        color: black;
-        opacity: .6;
-    }
-
 
     /* Submit Button */
     .submit_btn {

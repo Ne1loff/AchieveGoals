@@ -37,12 +37,12 @@ class GoalService(
         throw ApiBadRequestException("User doesn't have this goal")
     }
 
-    fun createMainGoal(goalDTO: GoalDTO): Boolean {
+    fun createMainGoal(goalDTO: GoalDTO, uid: Long): Boolean {
         val date = Date()
         try {
             val goal = Goal(
                 id = -1,
-                uid = goalDTO.uid!!,
+                uid = uid,
                 title = goalDTO.title!!,
                 description = goalDTO.description,
                 isDone = false,
@@ -58,14 +58,14 @@ class GoalService(
         return true
     }
 
-    fun createSubGoal(goalDTO: GoalDTO): Boolean {
+    fun createSubGoal(goalDTO: GoalDTO, uid: Long): Boolean {
         if (goalDTO.gid == null) throw ApiBadRequestException("SubGoal must have parent")
 
         val date = Date()
         try {
             val goal = Goal(
                 id = -1,
-                uid = goalDTO.uid!!,
+                uid = uid,
                 title = goalDTO.title!!,
                 description = goalDTO.description,
                 isDone = false,

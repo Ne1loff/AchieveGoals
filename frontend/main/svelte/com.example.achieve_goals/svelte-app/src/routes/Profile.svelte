@@ -13,7 +13,7 @@
 
     let showConfirmWindow = false;
     let clickable;
-    $:clickable = (changedPas === confirmedChangedPas && changedPas && confirmedChangedPas);
+    $:clickable = (changedPas === confirmedChangedPas && changedPas && confirmedChangedPas && oldPas);
 
     let user = {
         username: '',
@@ -215,7 +215,7 @@
 
 <Header {user} activePage="Profile"/>
 
-<div class="main-content">
+<div id="app">
     <div class="main-content-wrapper">
         <div class="content">
             <div class="container">
@@ -523,9 +523,10 @@
     }
 
     /* Main content */
-    .main-content {
+    #app {
         display: block;
         flex-direction: column;
+        background: #F8F8F8;
 
         position: absolute;
 
@@ -646,7 +647,7 @@
     .user-info-top {
         width: 100%;
         padding: 20px 0;
-        background: #f9f9f9;
+        background: #f1f1f1;
         border-top: 1px solid #e5e5e5;
         border-bottom: 1px solid #e5e5e5;
         display: flex;
@@ -656,7 +657,7 @@
     .user-info {
         width: 100%;
         padding: 20px 0;
-        background: #f9f9f9;
+        background: #f1f1f1;
         border-bottom: 1px solid #e5e5e5;
         display: flex;
         justify-content: space-between;

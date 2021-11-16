@@ -9,7 +9,6 @@ class GoalMapperImpl : GoalMapper {
     override fun dtoFromGoal(goal: Goal): GoalDTO {
         return GoalDTO(
             id= goal.id,
-            uid = goal.uid,
             title = goal.title,
             description = goal.description,
             isDone = goal.isDone,
