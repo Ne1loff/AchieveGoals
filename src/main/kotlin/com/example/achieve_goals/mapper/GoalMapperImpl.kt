@@ -13,6 +13,7 @@ class GoalMapperImpl : GoalMapper {
             description = goal.description,
             isDone = goal.isDone,
             gid = goal.gid,
+            priority= goal.priority,
             createdAt = goal.createdAt,
             updatedAt = goal.updatedAt,
             deadline = goal.deadline

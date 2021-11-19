@@ -29,8 +29,8 @@ class GoalService(
         return goals
     }
 
-    fun getUserGoalById(userId: Long, goalId: Long) : GoalDTO {
-        val goal = goalRepository.getGoalById(goalId)?: throw ApiNotfoundException("Goal not found!")
+    fun getUserGoalById(userId: Long, goalId: Long): GoalDTO {
+        val goal = goalRepository.getGoalByIdOrderByCreatedAt(goalId) ?: throw ApiNotfoundException("Goal not found!")
         if (goal.uid == userId) {
             return mapper.dtoFromGoal(goal)
         }
@@ -47,6 +47,7 @@ class GoalService(
                 description = goalDTO.description,
                 isDone = false,
                 gid = null,
+                priority = goalDTO.priority!!,
                 createdAt = date,
                 updatedAt = date,
                 deadline = goalDTO.deadline!!
@@ -70,6 +71,7 @@ class GoalService(
                 description = goalDTO.description,
                 isDone = false,
                 gid = goalDTO.gid,
+                priority = goalDTO.priority!!,
                 createdAt = date,
                 updatedAt = date,
                 deadline = goalDTO.deadline!!
@@ -82,22 +84,20 @@ class GoalService(
     }
 
     @Transactional
-    fun updateGoal(updGoal: GoalDTO): Boolean {
+    fun updateGoal(updGoals: List<GoalDTO>): Boolean {
 
-        val goal = goalRepository.getGoalById(updGoal.id) ?: throw ApiNotfoundException("Goal not found!")
-        if (goal.isDone) throw ApiBadRequestException("Goal has already been achieved")
+        for (updGoal in updGoals) {
+            val goal =
+                goalRepository.getGoalByIdOrderByCreatedAt(updGoal.id) ?: throw ApiNotfoundException("Goal not found!")
 
-        val date = Date()
+            val date = Date()
 
-        goal.title = updGoal.title ?: goal.title
-        goal.description = updGoal.description ?: goal.description
-        goal.isDone = if (checkForChildren(goal)) updGoal.isDone ?: goal.isDone else goal.isDone
-        goal.updatedAt = date
-        goal.deadline = updGoal.deadline ?: goal.deadline
+            goal.title = updGoal.title ?: goal.title
+            goal.description = updGoal.description ?: goal.description
+            goal.isDone = updGoal.isDone ?: goal.isDone
+            goal.updatedAt = date
+            goal.deadline = updGoal.deadline ?: goal.deadline
+        }
         return true
-    }
-
-    private fun checkForChildren(goal: Goal): Boolean {
-        return goalRepository.getGoalsByGidAndDone(goal.id, false).isEmpty()
     }
 }

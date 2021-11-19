@@ -26,7 +26,7 @@
     };
 
     let countries = [{id: 1, name: ""}];
-    let selected;
+    let selected = {id: 1, name: ""};
 
     let userViaChanges = JSON.parse(JSON.stringify(user));
 
@@ -170,7 +170,10 @@
     let wasChanged;
     getUser()
 
-    $:userViaChanges.locality = selected
+    $:{
+        selected = selected;
+        userViaChanges.locality = selected.name;
+    }
 
     $:{
         wasChanged = (!(_.isEqual(user, userViaChanges)) && wasSave) || showImage;

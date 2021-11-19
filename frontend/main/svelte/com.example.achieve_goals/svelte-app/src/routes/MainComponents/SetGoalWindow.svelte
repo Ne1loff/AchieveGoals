@@ -1,13 +1,15 @@
 <script>
     import {createEventDispatcher, onDestroy} from 'svelte';
 
+    export let anotherModal = false;
+
     const dispatch = createEventDispatcher();
     const close = () => dispatch('close');
 
     let modal;
 
     const handle_keydown = e => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && !anotherModal) {
             close();
             return;
         }

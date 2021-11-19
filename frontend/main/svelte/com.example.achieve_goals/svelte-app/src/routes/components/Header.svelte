@@ -4,7 +4,7 @@
 
     let dropdownTrigger;
 
-    export let activePage;
+    export let activePage = '';
 
     export let user = {
         username: '',

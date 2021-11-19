@@ -34,6 +34,8 @@ data class Goal(
 
     val gid: Long? = null,
 
+    var priority: Int,
+
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     @Column(name = "created_at")

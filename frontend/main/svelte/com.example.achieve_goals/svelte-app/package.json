@@ -23,6 +23,8 @@
   "dependencies": {
     "@iconify/svelte": "^2.0.0",
     "bootstrap-icons": "^1.6.1",
+    "date-fns": "^2.25.0",
+    "date-picker-svelte": "^1.1.0",
     "dayjs": "^1.10.7",
     "lodash": "^4.17.21",
     "sirv-cli": "^1.0.0",

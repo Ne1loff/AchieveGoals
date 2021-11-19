@@ -1,5 +1,6 @@
 <script lang="ts">
     import {navigate} from "svelte-routing"
+    import { onDestroy } from 'svelte';
     import PasswordField from "./components/PasswordField.svelte";
     import InputField from "./components/InputField.svelte";
 
@@ -11,12 +12,10 @@
         console.log(password)
     }
 
-    addEventListener('keydown', e => {
-        if (window.location.pathname !== "/login") return;
+    const handleKeydown = (e) => {
         if (e.key !== 'Enter') return;
         sigIn();
-    })
-
+    }
 
     async function sigIn() {
         fetch('http://localhost:8080/api/login', {
@@ -40,6 +39,8 @@
     }
 
 </script>
+
+<svelte:window on:keydown={handleKeydown}/>
 
 <header class="header">
     <div class="container">

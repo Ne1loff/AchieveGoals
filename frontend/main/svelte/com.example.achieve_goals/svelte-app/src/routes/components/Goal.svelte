@@ -1,6 +1,7 @@
 <script>
     import Icon from "@iconify/svelte"
-    import { createEventDispatcher } from 'svelte';
+    import {createEventDispatcher} from 'svelte';
+    import dayjs from 'dayjs';
 
     const dispatch = createEventDispatcher();
 
@@ -14,11 +15,36 @@
             total: 1,
             completed: 1
         },
+        priority: 1,
         createdAt: 11,
         updatedAt: 11,
         deadline: '11 январь'
     };
+
+    const priorityColors = {
+        1: {
+            icon: '#de4c4a',
+            background: '#faeceb'
+        },
+        2: {
+            icon : '#f49c18',
+            background: '#fdf3e6'
+        },
+        3: {
+            icon : '#3077e1',
+            background: '#e9f1fc'
+        },
+        4: {
+            icon : '#808080',
+            background: 'none'
+        }
+    }
+
     export let indent = 1;
+
+    const createSubtask = () => {
+        dispatch('createSub', goal.id);
+    }
 
     let showSubtasks = false;
     let hoverCheckBtn = false;
@@ -38,7 +64,7 @@
                 <Icon class="action-left-btn" icon="uil:angle-right-b" rotate="{showSubtasks ? '45' : '0'}"/>
             </button>
         {/if}
-        <div class="container-checkbox"
+        <div class="container-checkbox" style="background: {priorityColors[goal.priority].background}; border-color: {priorityColors[goal.priority].icon}"
              on:mouseenter={() => hoverCheckBtn = true}
              on:mouseleave={() => hoverCheckBtn = false}
              on:click={() => {
@@ -46,11 +72,12 @@
                  dispatch('done', goal);
              }}>
             {#if hoverCheckBtn && !goal.isDone}
-                <Icon class="done_btn" icon="akar-icons:circle-check"/>
+                <Icon class="done_btn" icon="akar-icons:circle-check" style="color: {priorityColors[goal.priority].icon};"/>
             {:else if goal.isDone}
-                <Icon class="done_btn" icon="akar-icons:circle-check-fill"/>
+                <Icon class="done_btn" icon="akar-icons:circle-check-fill"
+                      style="color: {priorityColors[goal.priority].icon}"/>
             {:else}
-                <Icon class="done_btn" icon="akar-icons:circle"/>
+                <Icon class="done_btn" icon="akar-icons:circle" style="color: {priorityColors[goal.priority].icon}"/>
             {/if}
         </div>
         <div class="container-content">
@@ -68,7 +95,7 @@
                     <div class="info-tags-icon">
                         <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
                     </div>
-                    <div class="info-tags-text">{goal.deadline}</div>
+                    <div class="info-tags-text">{dayjs(goal.deadline).format('DD ddd HH:mm')}</div>
                 </div>
             </div>
         </div>
@@ -79,7 +106,7 @@
             <button class="action-btn">
                 <Icon class="action-icons" icon="bi:calendar-event"/>
             </button>
-            <button class="action-btn">
+            <button class="action-btn" on:click={createSubtask}>
                 <Icon class="action-icons" icon="bi:three-dots"/>
             </button>
         </div>
@@ -144,15 +171,20 @@
     }
 
     .container-checkbox {
-        height: 18px;
-        width: 18px;
+        height: 16px;
+        width: 16px;
         cursor: pointer;
         background: #faeceb;
 
         margin: 8px 6px 0 -3px;
         z-index: 1;
 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
         border-radius: 50%;
+        border: 1px solid #fff;
     }
 
     .container-checkbox:hover {
@@ -262,6 +294,6 @@
     :global(.done_btn) {
         height: 18px;
         width: 18px;
-        color: #f00;
+        overflow: visible;
     }
 </style>

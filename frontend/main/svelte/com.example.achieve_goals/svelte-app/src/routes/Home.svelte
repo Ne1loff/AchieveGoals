@@ -1,19 +1,42 @@
-<script lang="ts">
+<script>
     import {navigate} from "svelte-routing";
     import dayjs from 'dayjs';
-    import 'dayjs/locale/de';
 
-    import {Datepicker} from 'svelte-calendar';
+    import {DatePicker, localeFromDateFnsLocale} from 'date-picker-svelte'
+    import {ru} from 'date-fns/locale'
+
     import Icon from "@iconify/svelte"
     import Header from "./components/Header.svelte";
     import Goal from "./components/Goal.svelte";
     import SetGoalWindow from "./MainComponents/SetGoalWindow.svelte";
+    import SchedulerWindow from "./MainComponents/SchedulerWindow.svelte";
     import TextAreaViaAutosize from "./components/TextAreaViaAutosize.svelte";
-    import {flatMap} from "lodash";
 
-    let store;
+    const daysName = (dayNum) => {
+        let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+        return days[dayNum];
+    }
 
-    dayjs.locale('ru')
+    console.log(daysName(dayjs().add(1, 'week').day()))
+
+    const dates = {
+        today: new Date(),
+        todayNum: dayjs().date(),
+        tomorrow: dayjs().add(1, 'day').toDate(),
+        weekends: dayjs().set('day', 6).toDate(),
+        nextWeek: dayjs().add(1, 'week').toDate()
+    }
+
+    let locale = localeFromDateFnsLocale(ru)
+
+    const newGoal = {
+        title: '',
+        description: '',
+        gid: null,
+        priority: '',
+        deadline: new Date(),
+        deadlineTime: ''
+    }
 
     let user = {
         username: '',
@@ -30,6 +53,7 @@
         description: '',
         isDone: false,
         gid: null,
+        priority: 1,
         subtasks: {
             total: 1,
             completed: 1
@@ -38,14 +62,70 @@
         updatedAt: 11,
         deadline: '11 январь'
     };
-
     let userGoals = [goal];
+    let updatedGoals = [];
 
     let showSubtasks = {1: false}
 
     let showSetGoalWindow = false;
     let showScheduler = false;
 
+    const createSubtask = (id) => {
+        newGoal.gid = id.detail;
+        showSetGoalWindow = true;
+    }
+
+    const clearNewGoal = () => {
+        newGoal['title'] = '';
+        newGoal['description'] = '';
+        newGoal['gid'] = null;
+        newGoal['priority'] = '';
+        newGoal['deadline'] = new Date();
+        newGoal['deadlineTime'] = '';
+    }
+
+    const setGoal = () => {
+        let regx = new RegExp(' p[1-4]', 'gm');
+        let match = regx.exec(newGoal.title);
+        newGoal.priority = match ? match[0].substr(2, 1) : 4;
+        newGoal.title = newGoal.title.slice(0, match ? match.index : newGoal.title.length);
+        if (newGoal.deadlineTime === '') newGoal.deadlineTime = '23:59'
+        newGoal.deadline = dayjs(newGoal.deadline)
+            .set('h', Number(newGoal.deadlineTime.substr(0, 2)))
+            .set('m', Number(newGoal.deadlineTime.substr(3, 2)))
+            .toDate();
+
+        showSetGoalWindow = false;
+
+        let rest = newGoal.gid ? '/api/goals/sub-goals' : '/api/goals/';
+
+        fetch(rest, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newGoal, (key, value) => key === 'deadlineTime' ? undefined : value)
+        }).then(response => {
+            if (response.status !== 201) alert('Goal doesn\'t set');
+            getGoals();
+        })
+
+        clearNewGoal();
+    }
+
+    const updateGoals = () => {
+        //console.log(JSON.stringify(updatedGoals, (key, value) => key === 'subtasks' ? undefined : value))
+        fetch('/api/goals/', {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedGoals, (key, value) => key === 'subtasks' ? undefined : value)
+        }).then(response => {
+            if (response.status !== 202) alert('Goal doesn\'t set');
+            getGoals();
+        })
+    }
 
     const update = () => {
         for (let i = 0; i < userGoals.length; i++) {
@@ -55,6 +135,7 @@
     }
 
     const complete = (goal) => {
+        updatedGoals = [];
         for (let i = 0; i < userGoals.length; i++) {
             if (userGoals[i].id === goal.detail.id) {
                 if (goal.detail.isDone) {
@@ -62,15 +143,18 @@
                 } else {
                     uncompleteSubs(goal.detail.gid)
                 }
+                updatedGoals.push(userGoals[i]);
                 update();
             }
         }
+        updateGoals();
     }
 
     const completeSubs = (id) => {
         userGoals.filter(e => e.gid === id).forEach(e => {
             completeSubs(e.id);
             e.isDone = true;
+            updatedGoals.push(e);
         })
     }
 
@@ -79,6 +163,7 @@
             if (e.isDone) {
                 uncompleteSubs(e.gid);
                 e.isDone = false;
+                updatedGoals.push(e);
             }
         })
     }
@@ -87,21 +172,9 @@
         showSubtasks[id.detail] = !showSubtasks[id.detail];
     }
 
-    fetch('http://localhost:8080/api/user')
-        .then(response => {
-            console.log(response.status)
-            if (response.status === 200)
-                return response.json()
-            else {
-                navigate('/login')
-            }
-        }).then(commit => {
-        user = commit
-        console.log(user)
-    }).then(_ => {
+    const getGoals = () => {
         fetch('http://localhost:8080/api/goals/')
             .then(response => {
-                console.log(response.status)
                 if (response.status === 200)
                     return response.json()
                 else
@@ -115,10 +188,23 @@
                     completed: userGoals.filter(e => e.gid === userGoal.id && e.isDone).length,
                 }
                 if (userGoal.subtasks.total > 0) {
-                    showSubtasks[userGoal.id] = false;
+                    if (!showSubtasks[userGoal.id]) showSubtasks[userGoal.id] = false;
                 }
             }
         })
+    }
+
+    fetch('http://localhost:8080/api/user')
+        .then(response => {
+            if (response.status === 200)
+                return response.json()
+            else {
+                navigate('/login')
+            }
+        }).then(commit => {
+        user = commit
+    }).then(_ => {
+        getGoals();
     })
 </script>
 
@@ -184,19 +270,21 @@
                         <div class="container-content-list">
                             <div class="content-list-inner">
                                 {#each userGoals.filter(e => !e.gid) as goal}
-                                    <Goal {goal} on:showSub={changeShowSub} on:done={complete}/>
+                                    <Goal {goal} on:showSub={changeShowSub} on:done={complete}
+                                          on:createSub={createSubtask}/>
                                     {#if showSubtasks[goal.id]}
                                         {#each userGoals.filter(e => e.gid === goal.id) as subtask_1}
                                             <Goal goal="{subtask_1}" indent="2" on:showSub={changeShowSub}
-                                                  on:done={complete}/>
+                                                  on:done={complete} on:createSub={createSubtask}/>
                                             {#if showSubtasks[subtask_1.id]}
                                                 {#each userGoals.filter(e => e.gid === subtask_1.id) as subtask_2}
                                                     <Goal goal="{subtask_2}" indent="3" on:showSub={changeShowSub}
-                                                          on:done={complete}/>
+                                                          on:done={complete} on:createSub={createSubtask}/>
                                                     {#if showSubtasks[subtask_2.id]}
                                                         {#each userGoals.filter(e => e.gid === subtask_2.id) as subtask_3}
                                                             <Goal goal="{subtask_3}" indent="4"
-                                                                  on:showSub={changeShowSub} on:done={complete}/>
+                                                                  on:showSub={changeShowSub} on:done={complete}
+                                                                  on:createSub={createSubtask}/>
                                                             {#if showSubtasks[subtask_3.id]}
                                                                 {#each userGoals.filter(e => e.gid === subtask_3.id) as subtask_4}
                                                                     <Goal goal="{subtask_4}" on:done={complete}
@@ -226,23 +314,24 @@
 <div class="popper__overlay">
     <div class="set__goal__window__popper">
         {#if showSetGoalWindow}
-            <SetGoalWindow on:close="{() => showSetGoalWindow = false}">
+            <SetGoalWindow on:close="{() => {showSetGoalWindow = false; clearNewGoal();}}"
+                           bind:anotherModal={showScheduler}>
                 <div class="set-goal-window-main">
                     <div class="set-goal-window-main-inner">
                         <input class="set-goal-window-input" type="text" placeholder="Цель"
-                               bind:value={goal.title}/>
-                        <TextAreaViaAutosize bind:value={goal.description}
+                               bind:value={newGoal.title}/>
+                        <TextAreaViaAutosize bind:value={newGoal.description}
                                              placeholder="Описание"
                                              minRows="2"/>
                     </div>
                     <div class="set-goal-window-buttons">
-                        <button class="calendar_button" type="button">
+                        <button class="calendar_button" type="button" on:click={() => showScheduler = true}>
                             <Icon class="calendar_button_icon" icon="bi:calendar-week"/>
-                            <span class="calendar_button_span">Срок</span>
+                            <span class="calendar_button_span">{dayjs(newGoal.deadline).format('DD ddd ') + newGoal.deadlineTime}</span>
                         </button>
                     </div>
                 </div>
-                <button class="set_goal_button" slot="button" disabled="{goal.title === ''}">
+                <button class="set_goal_button" slot="button" disabled={newGoal.title === ''} on:click={setGoal}>
                     Поставить цель
                 </button>
             </SetGoalWindow>
@@ -250,21 +339,49 @@
     </div>
     <div class="scheduler__popper">
         {#if showScheduler}
-            <div class="scheduler">
-                <div class="scheduler-suggestion">
-                    <button class="scheduler-suggestion-item" type="button">
-                        <Icon/>
-                        <span>Сегодня</span>
-                        <span>{dayjs().toString()}</span>
+            <SchedulerWindow on:close="{() => showScheduler = false}">
+                <div class="scheduler-title" slot="header">
+                    <span>{dayjs(newGoal.deadline).format('DD ddd ') + newGoal.deadlineTime}</span>
+                </div>
+                <div class="scheduler-suggestion" slot="suggestion">
+                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.today}>
+                        <span class="scheduler-suggestion-item-icon">
+                            <Icon icon="bi:calendar" style="width: 18px; height: 18px; color: #058527;"/>
+                            <span>{dates.todayNum}</span>
+                        </span>
+                        <span class="scheduler-suggestion-item-label">Сегодня</span>
+                        <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().day())}</span>
+                    </button>
+                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.tomorrow}>
+                        <span class="scheduler-suggestion-item-icon">
+                            <Icon icon="bi:sun" style="width: 18px; height: 18px; color: #ad6200;"/>
+                        </span>
+                        <span class="scheduler-suggestion-item-label">Завтра</span>
+                        <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().add(1, 'day').day())}</span>
+                    </button>
+                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.weekends}>
+                        <span class="scheduler-suggestion-item-icon">
+                            <Icon icon="mdi:sofa-outline" style="width: 18px; height: 18px; color: #246fe0;"/>
+                        </span>
+                        <span class="scheduler-suggestion-item-label">На выходных</span>
+                        <span class="scheduler-suggestion-item-weekend">Сб</span>
+                    </button>
+                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.nextWeek}>
+                        <span class="scheduler-suggestion-item-icon">
+                            <Icon icon="gg:calendar-next" style="width: 18px; height: 18px; color: #692fc2;"/>
+                        </span>
+                        <span class="scheduler-suggestion-item-label">След.неделя</span>
+                        <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().add(1, 'week').day())}</span>
                     </button>
                 </div>
-                <div class="date-picker">
-
+                <div class="scheduler-date-picker" slot="date">
+                    <DatePicker bind:value={newGoal.deadline} {locale} min="{dayjs().toDate()}"/>
                 </div>
-                <div class="scheduler-actions">
-
+                <div class="scheduler-action" slot="time">
+                    <span class="scheduler-action-label">Время</span>
+                    <input type="time" bind:value={newGoal.deadlineTime}/>
                 </div>
-            </div>
+            </SchedulerWindow>
         {/if}
     </div>
 </div>
@@ -422,7 +539,6 @@
         margin: 0 8px;
     }
 
-
     .set_goal_button {
         margin: 12px 0 0 12px;
         background: #db4c3f;
@@ -509,6 +625,114 @@
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
+    }
+
+    .scheduler-title {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        padding: 8px 10px;;
+    }
+
+    .scheduler-suggestion {
+        display: flex;
+        flex-direction: column;
+
+        padding: 4px 0;
+    }
+
+    .scheduler-suggestion-item {
+        border: 0;
+        background: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        padding: 4px 10px;
+        line-height: 24px;
+        outline: none;
+
+        width: 100%;
+    }
+
+    .scheduler-suggestion-item:hover {
+        background: #f1f1f1;
+    }
+
+    .scheduler-suggestion-item-icon {
+        display: flex;
+        position: relative;
+        margin-right: 10px;
+        color: grey;
+    }
+
+    .scheduler-suggestion-item-icon span {
+        width: 9px;
+        height: 9px;
+
+        position: absolute;
+        transform: translate(3.5px, -1px);
+
+        color: #058527;
+        font-size: 10px;
+        font-weight: 500;
+    }
+
+    .scheduler-suggestion-item-label {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        margin-right: 4px;
+
+        font-size: 13px;
+        font-weight: 400;
+        color: #202020;
+    }
+
+    .scheduler-suggestion-item-weekend {
+        margin-left: auto;
+        color: grey;
+    }
+
+    .scheduler-date-picker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    :root {
+        --date-picker-highlight-border: none;
+        --date-picker-highlight-shadow: none;
+    }
+
+    .scheduler-action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 8px 10px;
+    }
+
+    .scheduler-action-label {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        margin-right: 4px;
+
+        font-size: 14px;
+        font-weight: 400;
+        color: #202020;
+    }
+
+    .scheduler-action input {
+        line-height: 22px;
+        padding: 0 4px;
+        margin: 0;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        outline: none;
+        box-sizing: border-box;
     }
 
     .footer {
