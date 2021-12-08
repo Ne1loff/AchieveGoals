@@ -24,15 +24,23 @@ class GoalController(
         throw ApiNotfoundException("User not found!")
     }
 
-    @GetMapping("{id}")
-    fun getUserGoalById(@PathVariable id: Long, auth: Authentication): GoalDTO {
+    @GetMapping("{gid}")
+    fun getGoalById(@PathVariable gid: Long, auth: Authentication): GoalDTO {
         val principal = auth.principal
         if (principal is User) {
-            return goalService.getUserGoalById(principal.id, id)
+            return goalService.getUserGoalById(principal.id, gid)
         }
         throw ApiNotfoundException("User not found!")
     }
 
+    @GetMapping("{gid}/sub")
+    fun getSubGoalsByParentId(@PathVariable gid: Long, auth: Authentication): List<GoalDTO> {
+        val principal = auth.principal
+        if (principal is User) {
+            return goalService.getSubGoalsByGid(principal.id, gid)
+        }
+        throw ApiNotfoundException("User not found!")
+    }
 
     @PostMapping
     fun createMainGoal(@RequestBody goalDTO: GoalDTO, auth: Authentication): ResponseEntity<HttpStatus> {
@@ -55,8 +63,22 @@ class GoalController(
     }
 
     @PutMapping
-    fun updateGoal(@RequestBody goalsDTO: List<GoalDTO>): ResponseEntity<HttpStatus> {
-        goalService.updateGoal(goalsDTO)
-        return ResponseEntity.accepted().build();
+    fun updateGoal(@RequestBody goalsDTO: List<GoalDTO>, auth: Authentication): ResponseEntity<HttpStatus> {
+        val principal = auth.principal
+        if (principal is User) {
+            goalService.updateGoal(goalsDTO, principal.id)
+            return ResponseEntity.accepted().build()
+        }
+        throw ApiNotfoundException("User not found!")
+    }
+
+    @DeleteMapping
+    fun deleteGoal(@RequestBody ids: List<Long>, auth: Authentication): ResponseEntity<HttpStatus> {
+        val principal = auth.principal
+        if (principal is User) {
+            goalService.deleteGoal(ids, principal.id)
+            return ResponseEntity.ok().build()
+        }
+        throw ApiNotfoundException("User not found!")
     }
 }

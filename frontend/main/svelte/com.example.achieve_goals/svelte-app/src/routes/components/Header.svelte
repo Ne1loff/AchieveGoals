@@ -54,19 +54,19 @@
                         <div class="dropdown-item-navigate">
                             <button class="dropdown-item" type="button" on:click={() => navigate('/user/profile')}
                                     disabled={activePage === "Profile"}>
-                                Profile
+                                Профиль
                             </button>
-                            <button class="dropdown-item" type="button" on:click={logOut}>Log out</button>
+                            <button class="dropdown-item" type="button" on:click={logOut}>Выход</button>
                         </div>
                         <div class="dropdown-item-setup">
                             <button class="dropdown-item" type="button" disabled={activePage === "Reference"}>
-                                Reference
+                                Справка
                             </button>
                             <button class="dropdown-item" type="button" disabled={activePage === "Settings"}>
-                                Settings
+                                Настройки
                             </button>
                             <button class="dropdown-item" type="button" disabled={activePage === "Send feedback"}>
-                                Send feedback
+                                Оставить отзыв
                             </button>
                         </div>
                     </div>

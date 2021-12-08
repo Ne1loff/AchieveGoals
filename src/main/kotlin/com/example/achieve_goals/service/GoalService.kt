@@ -21,18 +21,25 @@ class GoalService(
     }
 
     fun getUserGoals(userId: Long): MutableList<GoalDTO> {
-        val goals = goalRepository.getGoalsByUid(userId)
+        return goalRepository.getGoalsByUidOrderByCreatedAt(userId)
             .map { goal -> mapper.dtoFromGoal(goal) }
             .toMutableList()
-        goals.sortBy { it.gid }
-
-        return goals
     }
 
     fun getUserGoalById(userId: Long, goalId: Long): GoalDTO {
-        val goal = goalRepository.getGoalByIdOrderByCreatedAt(goalId) ?: throw ApiNotfoundException("Goal not found!")
+        val goal = goalRepository.getGoalById(goalId) ?: throw ApiNotfoundException("Goal not found!")
         if (goal.uid == userId) {
             return mapper.dtoFromGoal(goal)
+        }
+        throw ApiBadRequestException("User doesn't have this goal")
+    }
+
+
+    fun getSubGoalsByGid(userId: Long, gid: Long): MutableList<GoalDTO> {
+        val goal = goalRepository.getGoalById(gid) ?: throw ApiNotfoundException("Goal not found!")
+        if (goal.uid == userId) {
+            val goals = goalRepository.getGoalsByGid(gid)
+            return goals.map { mapper.dtoFromGoal(it) }.toMutableList()
         }
         throw ApiBadRequestException("User doesn't have this goal")
     }
@@ -84,11 +91,14 @@ class GoalService(
     }
 
     @Transactional
-    fun updateGoal(updGoals: List<GoalDTO>): Boolean {
+    fun updateGoal(updGoals: List<GoalDTO>, userId: Long) {
 
         for (updGoal in updGoals) {
             val goal =
-                goalRepository.getGoalByIdOrderByCreatedAt(updGoal.id) ?: throw ApiNotfoundException("Goal not found!")
+                goalRepository.getGoalById(updGoal.id) ?: throw ApiNotfoundException("Goal not found!")
+
+            if (goal.uid != userId)
+                throw ApiBadRequestException("User doesn't have this goal(goal_id=${goal.id})")
 
             val date = Date()
 
@@ -98,6 +108,19 @@ class GoalService(
             goal.updatedAt = date
             goal.deadline = updGoal.deadline ?: goal.deadline
         }
-        return true
+
     }
+
+    @Transactional
+    fun deleteGoal(ids: List<Long>, userId: Long) {
+
+        for (id in ids) {
+            if (goalRepository.existsGoalByIdAndUid(id, userId))
+                goalRepository.deleteById(id)
+            else
+                throw ApiBadRequestException("The task doesn't exist or doesn't belong to a user")
+        }
+
+    }
+
 }

@@ -35,7 +35,7 @@
 
     function getCountries() {
         if (countries.length === 1) {
-            fetch('http://localhost:8080/api/countries/')
+            fetch('/api/countries/')
                 .then(response => response.json())
                 .then(commit => {
                     countries = commit
@@ -52,16 +52,14 @@
             let file = new FormData();
             file.append('avatar', fileVar)
 
-            fetch('http://localhost:8080/api/user/avatar', {
+            fetch('/api/user/avatar', {
                 method: 'PUT',
                 body: file
             }).then((response) => {
                 if (response.status === 200) {
-                    alert("Profile avatar has been update")
-                    console.log(response.status)
+
                 } else {
                     alert(response.status)
-                    console.log(response)
                 }
             })
         }
@@ -69,7 +67,7 @@
         fileVar = null;
 
         if (!_.isEqual(user, userViaChanges)) {
-            fetch('http://localhost:8080/api/user', {
+            fetch('/api/user', {
                 method: 'PUT',
                 headers: {
                     "Content-Type": "application/json"
@@ -77,14 +75,12 @@
                 body: JSON.stringify(userViaChanges)
             }).then((response) => {
                 if (response.status === 200) {
-                    alert("Profile has been update")
-                    console.log(response.status)
+                    alert("Профиль успешно изменен")
                 } else {
                     alert(response.status)
-                    console.log(response.status)
                 }
             }).then(() => {
-                fetch('http://localhost:8080/api/user')
+                fetch('/api/user')
                     .then(response => {
                         if (response.status === 200)
                             return response.json()
@@ -128,7 +124,7 @@
 
     function savePas() {
 
-        fetch('http://localhost:8080/api/user/changePassword', {
+        fetch('/api/user/changePassword', {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json"
@@ -143,7 +139,7 @@
                 if (response.ok) {
                     return true
                 } else {
-                    alert("Old password incorrect")
+                    alert("Введен неверный старый пароль")
                     return false
                 }
             }
@@ -154,11 +150,11 @@
                     changedPas = "";
                     confirmedChangedPas = "";
                     cancel();
-                    alert("Password changed successfully!")
+                    alert("Пароль успешно изменен!")
                 }
             }
         ).catch(
-            (err) => console.log("All bad " + err)
+            (err) => console.error("Все плохо: " + err)
         )
 
     }
@@ -177,7 +173,6 @@
 
     $:{
         wasChanged = (!(_.isEqual(user, userViaChanges)) && wasSave) || showImage;
-        console.log(userViaChanges)
     }
 
     function onChange() {
@@ -200,7 +195,7 @@
     }
 
     function getUser() {
-        fetch('http://localhost:8080/api/user')
+        fetch('/api/user')
             .then(response => {
                 return response.json()
             })
@@ -226,7 +221,7 @@
                     <div class="content-block">
                         <div class="content-block-name">
                             <div class="content-container-text">
-                                <span class="content-block-name-text">Profile</span>
+                                <span class="content-block-name-text">Профиль</span>
                             </div>
                             <div class="content-right-block">
                                 <div class="content-block-user-info">
@@ -241,70 +236,70 @@
                                             </div>
                                         </div>
                                         <div class="user-info">
-                                            <div class="user-info-text">Name</div>
+                                            <div class="user-info-text">Имя</div>
                                             {#if !toChange[1]}
                                                 <div class="user-info-field">
                                                     <div>
                                                         {(user.name === null && !wasSave) || userViaChanges.name === '' || userViaChanges.name === null ?
-                                                            "Not specified" : wasSave ?
+                                                            "Не задано" : wasSave ?
                                                                 userViaChanges.name : user.name}
                                                     </div>
                                                     <a on:click={() => {
                                                         cancel()
                                                         toChange[1] = true
-                                                    }}>Change</a>
+                                                    }}>Изменить</a>
                                                 </div>
                                             {:else}
                                                 <div class="user-info-field-change">
                                                     <div class="input_container">
-                                                        <input class="input_field" type="text" placeholder="Name"
+                                                        <input class="input_field" type="text" placeholder="Имя"
                                                                bind:value={userViaChanges.name}>
                                                     </div>
                                                     <div class="user-info-field-buttons">
                                                         <button class="save__button" type="button" on:click={save}>
-                                                            Save
+                                                            Сохранить
                                                         </button>
                                                         <button class="cancel__button" type="button" on:click={cancel}>
-                                                            Cancel
+                                                            Отмена
                                                         </button>
                                                     </div>
                                                 </div>
                                             {/if}
                                         </div>
                                         <div class="user-info">
-                                            <div class="user-info-text">Surname</div>
+                                            <div class="user-info-text">Фамилия</div>
                                             {#if !toChange[2]}
                                                 <div class="user-info-field">
                                                     <div>
                                                         {(user.surname === null && !wasSave)|| userViaChanges.surname === '' || userViaChanges.surname === null ?
-                                                            "Not specified" : wasSave ?
+                                                            "Не задано" : wasSave ?
                                                                 userViaChanges.surname : user.surname}
                                                     </div>
                                                     <a on:click={() => {
                                                         cancel()
                                                         toChange[2] = true
-                                                    }}>Change</a>
+                                                    }}>Изменить</a>
                                                 </div>
                                             {:else}
                                                 <div class="user-info-field-change">
                                                     <div class="input_container">
-                                                        <input class="input_field" type="text" placeholder="Surname"
+                                                        <input class="input_field" type="text" placeholder="Фамилия"
                                                                bind:value={userViaChanges.surname}>
                                                     </div>
                                                     <div class="user-info-field-buttons">
                                                         <button class="save__button" type="button" on:click={save}>
-                                                            Save
+                                                            Сохранить
                                                         </button>
                                                         <button class="cancel__button" type="button"
                                                                 on:click={cancel}>
-                                                            Cancel
+                                                            Отмена
                                                         </button>
                                                     </div>
                                                 </div>
                                             {/if}
                                         </div>
                                         <div class="user-info">
-                                            <div class="user-info-text">Password</div>
+                                            <div class="user-info-text">Пароль</div>
                                             {#if !toChange[3]}
                                                 <div class="user-info-field">
                                                     <div>
@@ -313,7 +308,7 @@
                                                     <a on:click={() => {
                                                         cancel()
                                                         toChange[3] = true
-                                                    }}>Change</a>
+                                                    }}>Изменить</a>
                                                 </div>
                                             {:else}
                                                 <div class="user-info-field-change">
@@ -322,12 +317,12 @@
                                                             <div class="input_container">
                                                                 {#if inputTypeBool[0]}
                                                                     <input class="input_field" type="text"
-                                                                           placeholder="Old password"
+                                                                           placeholder="Старый пароль"
                                                                            bind:value={oldPas}
                                                                            autocomplete="on">
                                                                 {:else}
                                                                     <input class="input_field" type="password"
-                                                                           placeholder="Old password"
+                                                                           placeholder="Старый пароль"
                                                                            bind:value={oldPas}
                                                                            autocomplete="on">
                                                                 {/if}
@@ -342,12 +337,12 @@
                                                             <div class="input_container">
                                                                 {#if inputTypeBool[1]}
                                                                     <input class="input_field" type="text"
-                                                                           placeholder="New password"
+                                                                           placeholder="Новый пароль"
                                                                            bind:value={changedPas}
                                                                            autocomplete="new-password">
                                                                 {:else}
                                                                     <input class="input_field" type="password"
-                                                                           placeholder="New password"
+                                                                           placeholder="Новый пароль"
                                                                            bind:value={changedPas}
                                                                            autocomplete="new-password">
                                                                 {/if}
@@ -362,12 +357,12 @@
                                                             <div class="input_container">
                                                                 {#if inputTypeBool[2]}
                                                                     <input class="input_field" type="text"
-                                                                           placeholder="Confirm new password"
+                                                                           placeholder="Подтвердите новый пароль"
                                                                            bind:value={confirmedChangedPas}
                                                                            autocomplete="new-password">
                                                                 {:else}
                                                                     <input class="input_field" type="password"
-                                                                           placeholder="Confirm new password"
+                                                                           placeholder="Подтвердите новый пароль"
                                                                            bind:value={confirmedChangedPas}
                                                                            autocomplete="new-password">
                                                                 {/if}
@@ -380,17 +375,17 @@
                                                         </div>
                                                     </form>
                                                     {#if changedPas !== confirmedChangedPas && confirmedChangedPas}
-                                                        <legend class="pass_match">Passwords do not match!</legend>
+                                                        <legend class="pass_match">Пароли не совпадают!</legend>
                                                     {/if}
                                                     <div class="user-info-field-buttons">
                                                         <button class="save__button" type="button"
                                                                 disabled={!clickable}
                                                                 on:click={() => showConfirmWindow = true}>
-                                                            Change
+                                                            Изменить
                                                         </button>
                                                         <button class="cancel__button" type="button"
                                                                 on:click={resetPas}>
-                                                            Cancel
+                                                            Отмена
                                                         </button>
                                                     </div>
                                                 </div>
@@ -399,33 +394,33 @@
                                                  style="display: {showConfirmWindow ? 'block' : 'none'}">
                                                 <div class="confirm_window_box">
                                                     <h1 class="confirm_window_text">
-                                                        Are you sure you want to change your password?
+                                                        Вы уверены что хотите изменить пароль?
                                                     </h1>
                                                     <div class="confirm_window_buttons">
                                                         <button class="save__button" type="button" on:click={savePas}>
-                                                            Yes
+                                                            Да
                                                         </button>
                                                         <button class="cancel__button" type="button"
                                                                 on:click={resetPas}>
-                                                            No
+                                                            Нет
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="user-info">
-                                            <div class="user-info-text">Gender</div>
+                                            <div class="user-info-text">Пол</div>
                                             {#if !toChange[4]}
                                                 <div class="user-info-field">
                                                     <div>
                                                         {user.male === userViaChanges.male ?
-                                                            user.male ? "Male" : "Female"
-                                                            : userViaChanges.male ? "Male" : "Female"}
+                                                            user.male ? "Мужской" : "Женский"
+                                                            : userViaChanges.male ? "Мужской" : "Женский"}
                                                     </div>
                                                     <a on:click={() => {
                                                         cancel()
                                                         toChange[4] = true
-                                                    }}>Change</a>
+                                                    }}>Изменить</a>
                                                 </div>
                                             {:else}
                                                 <div class="user-info-field-change">
@@ -433,27 +428,27 @@
                                                         <lable>
                                                             <input type="radio" bind:group={userViaChanges.male}
                                                                    value={true}>
-                                                            Male
+                                                            Мужской
                                                         </lable>
                                                         <lable>
                                                             <input type="radio" bind:group={userViaChanges.male}
                                                                    value={false}>
-                                                            Female
+                                                            Женский
                                                         </lable>
                                                     </div>
                                                     <div class="user-info-field-buttons">
                                                         <button class="save__button" type="button" on:click={save}>
-                                                            Save
+                                                            Сохранить
                                                         </button>
                                                         <button class="cancel__button" type="button" on:click={cancel}>
-                                                            Cancel
+                                                            Отмена
                                                         </button>
                                                     </div>
                                                 </div>
                                             {/if}
                                         </div>
                                         <div class="user-info">
-                                            <div class="user-info-text">Locality</div>
+                                            <div class="user-info-text">Страна</div>
                                             {#if !toChange[5]}
                                                 <div class="user-info-field">
                                                     <div>
@@ -463,7 +458,7 @@
                                                         cancel()
                                                         getCountries()
                                                         toChange[5] = true
-                                                    }}>Change</a>
+                                                    }}>Изменить</a>
                                                 </div>
                                             {:else}
                                                 <div class="user-info-field-change">
@@ -476,10 +471,10 @@
                                                     </select>
                                                     <div class="user-info-field-buttons">
                                                         <button class="save__button" type="button" on:click={save}>
-                                                            Save
+                                                            Сохранить
                                                         </button>
                                                         <button class="cancel__button" type="button" on:click={cancel}>
-                                                            Cancel
+                                                            Отмена
                                                         </button>
                                                     </div>
                                                 </div>
@@ -491,7 +486,7 @@
                         </div>
                         <div class="content-block-user-photo">
                             <div class="content-container-text">
-                                <span class="user-photo-text">Avatar</span>
+                                <span class="user-photo-text">Фото</span>
                             </div>
                             <div class="user-photo-container">
                                 <div class="content-container">
@@ -504,8 +499,8 @@
                             </div>
                             {#if wasChanged}
                                 <div class="user-info-field-buttons">
-                                    <button class="save__button" type="button" on:click={mainSave}>Save</button>
-                                    <button class="cancel__button" type="button" on:click={mainCancel}>Cancel</button>
+                                    <button class="save__button" type="button" on:click={mainSave}>Сохранить</button>
+                                    <button class="cancel__button" type="button" on:click={mainCancel}>Отмена</button>
                                 </div>
                             {/if}
                         </div>
@@ -514,7 +509,6 @@
             </div>
         </div>
         <div class="footer">
-            Footer
         </div>
     </div>
 </div>

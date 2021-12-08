@@ -47,7 +47,6 @@
     <div class="modal-container">
         <slot name="header"></slot>
         <slot></slot>
-        <!-- svelte-ignore a11y-autofocus -->
         <div class="buttons">
             <div class="buttons-inner">
             <slot name="button"></slot>
@@ -65,6 +64,7 @@
         width: 100%;
         height: 100%;
         background: none;
+        z-index: 100;
     }
 
     .modal {
@@ -72,25 +72,21 @@
         left: 50%;
         top: 50%;
         width: calc(100vw - 4em);
+        max-width: 550px;
         max-height: 335px;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -60%);
         padding: 1em;
         background: none;
 
         background: white;
         border-radius: 10px;
 
-        max-width: 550px;
         box-shadow: 0 15px 50px 0 rgb(0 0 0 / 35%);
         flex-grow: 0;
 
         overflow-y: hidden;
 
-        z-index: 100;
-    }
-
-    .modal-container {
-
+        z-index: 102;
     }
 
     .buttons {

@@ -15,7 +15,7 @@
         .then(response => response.json())
         .then(commit => {
             countries = commit
-            countries.splice(0, 0, {id: 0, name: "Select country..."})
+            countries.splice(0, 0, {id: 0, name: "Выберите страну..."})
             selected = countries[0]
         })
 
@@ -52,7 +52,7 @@
                     alert(err)
                 })
             } else {
-                alert("Registration failed")
+                alert("Произошла ошибка при регистрации")
             }
         }).catch((err) => {
             alert(err)
@@ -95,26 +95,26 @@
                     </option>
                 {/each}
             </select>
-            <input class="input_field" type="password" autocomplete="true" bind:value={password} placeholder="Password">
+            <input class="input_field" type="password" autocomplete="true" bind:value={password} placeholder="Пароль">
             <input class="input_field" type="password" autocomplete="true" bind:value={confirm_pass}
-                   placeholder="Confirm password">
+                   placeholder="Подтвердите пароль">
             {#if password !== confirm_pass && confirm_pass}
-                <legend class="pass_match">Passwords do not match!</legend>
+                <legend class="pass_match">Пароли не совпадают!</legend>
             {/if}
         </div>
         <div class="check__for__male">
             <lable>
                 <input type="radio" bind:group={male} value={true}>
-                Male
+                Мужчина
             </lable>
             <lable>
                 <input type="radio" bind:group={male} value={false}>
-                Female
+                Женщина
             </lable>
         </div>
-        <button class="submit_btn" type="button" on:click={registration} disabled={!clickable}>Sign up</button>
+        <button class="submit_btn" type="button" on:click={registration} disabled={!clickable}>Регистрация</button>
         <div class="sign_in_link">
-            Already have an account? <a on:click={() => navigate('/login')}>Sign in</a>
+            Уже есть аккаунт? <a on:click={() => navigate('/login')}>Войти</a>
         </div>
     </form>
 </div>

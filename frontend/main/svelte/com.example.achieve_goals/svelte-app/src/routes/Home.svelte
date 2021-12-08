@@ -1,42 +1,34 @@
-<script>
+<script lang="ts">
     import {navigate} from "svelte-routing";
-    import dayjs from 'dayjs';
+    import dayjs from "dayjs";
+    import {writable} from "svelte/store";
 
-    import {DatePicker, localeFromDateFnsLocale} from 'date-picker-svelte'
-    import {ru} from 'date-fns/locale'
+    import 'dayjs/locale/ru'
 
+    dayjs.locale('ru')
+
+    import Scheduler from "./components/Scheduler.svelte";
+    import EditGoal from "./components/EditGoal.svelte";
     import Icon from "@iconify/svelte"
     import Header from "./components/Header.svelte";
     import Goal from "./components/Goal.svelte";
-    import SetGoalWindow from "./MainComponents/SetGoalWindow.svelte";
-    import SchedulerWindow from "./MainComponents/SchedulerWindow.svelte";
-    import TextAreaViaAutosize from "./components/TextAreaViaAutosize.svelte";
+    import GoalInfo from "./components/GoalInfo.svelte";
 
-    const daysName = (dayNum) => {
-        let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-        return days[dayNum];
+    const inDev = () => {
+        alert("В разработке)");
     }
 
-    console.log(daysName(dayjs().add(1, 'week').day()))
+    let sidebarActive = false;
 
-    const dates = {
-        today: new Date(),
-        todayNum: dayjs().date(),
-        tomorrow: dayjs().add(1, 'day').toDate(),
-        weekends: dayjs().set('day', 6).toDate(),
-        nextWeek: dayjs().add(1, 'week').toDate()
-    }
-
-    let locale = localeFromDateFnsLocale(ru)
-
-    const newGoal = {
+    const newGoal = writable({
         title: '',
         description: '',
         gid: null,
         priority: '',
         deadline: new Date(),
         deadlineTime: ''
-    }
+    })
+    let create = true;
 
     let user = {
         username: '',
@@ -46,7 +38,6 @@
         email: '',
         locality: '',
     };
-
     let goal = {
         id: 1,
         title: 'Убраться дома',
@@ -64,57 +55,60 @@
     };
     let userGoals = [goal];
     let updatedGoals = [];
+    let deleteGoals = [];
 
     let showSubtasks = {1: false}
 
     let showSetGoalWindow = false;
     let showScheduler = false;
+    let bounding;
+
+    let showGoalInfo = false;
+    let infoAbout;
+
+    const showInfo = (sub) => {
+        showGoalInfo = true;
+        infoAbout = sub;
+    }
+
+    const editGoal = (goal) => {
+        $newGoal = JSON.parse(JSON.stringify(goal.detail));
+        $newGoal.deadline = new Date($newGoal.deadline)
+        showSetGoalWindow = true;
+        create = false;
+    }
+
+    const createGoal = () => {
+        showSetGoalWindow = true
+    }
 
     const createSubtask = (id) => {
-        newGoal.gid = id.detail;
+        $newGoal.gid = id.detail;
         showSetGoalWindow = true;
     }
 
     const clearNewGoal = () => {
-        newGoal['title'] = '';
-        newGoal['description'] = '';
-        newGoal['gid'] = null;
-        newGoal['priority'] = '';
-        newGoal['deadline'] = new Date();
-        newGoal['deadlineTime'] = '';
+        $newGoal['title'] = '';
+        $newGoal['description'] = '';
+        $newGoal['gid'] = null;
+        $newGoal['priority'] = '';
+        $newGoal['deadline'] = new Date();
+        $newGoal['deadlineTime'] = '';
     }
 
-    const setGoal = () => {
-        let regx = new RegExp(' p[1-4]', 'gm');
-        let match = regx.exec(newGoal.title);
-        newGoal.priority = match ? match[0].substr(2, 1) : 4;
-        newGoal.title = newGoal.title.slice(0, match ? match.index : newGoal.title.length);
-        if (newGoal.deadlineTime === '') newGoal.deadlineTime = '23:59'
-        newGoal.deadline = dayjs(newGoal.deadline)
-            .set('h', Number(newGoal.deadlineTime.substr(0, 2)))
-            .set('m', Number(newGoal.deadlineTime.substr(3, 2)))
+    const updateGoal = (g) => {
+        let upd_goal = g.detail
+        if (upd_goal.deadlineTime === '') upd_goal.deadlineTime = '23:59'
+        upd_goal.deadline = dayjs(upd_goal.deadline)
+            .set('h', Number(upd_goal.deadlineTime.substr(0, 2)))
+            .set('m', Number(upd_goal.deadlineTime.substr(3, 2)))
             .toDate();
-
-        showSetGoalWindow = false;
-
-        let rest = newGoal.gid ? '/api/goals/sub-goals' : '/api/goals/';
-
-        fetch(rest, {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newGoal, (key, value) => key === 'deadlineTime' ? undefined : value)
-        }).then(response => {
-            if (response.status !== 201) alert('Goal doesn\'t set');
-            getGoals();
-        })
-
-        clearNewGoal();
+        updatedGoals = []
+        updatedGoals.push(upd_goal)
+        updateGoals()
     }
 
     const updateGoals = () => {
-        //console.log(JSON.stringify(updatedGoals, (key, value) => key === 'subtasks' ? undefined : value))
         fetch('/api/goals/', {
             method: 'PUT',
             headers: {
@@ -122,7 +116,7 @@
             },
             body: JSON.stringify(updatedGoals, (key, value) => key === 'subtasks' ? undefined : value)
         }).then(response => {
-            if (response.status !== 202) alert('Goal doesn\'t set');
+            if (response.status !== 202) alert('Не удалось обновить цель');
             getGoals();
         })
     }
@@ -168,12 +162,40 @@
         })
     }
 
+    const deleteGoal = (goal) => {
+        let id = goal.detail
+        deleteGoals = []
+        deleteGoals.push(userGoals.find(g => g.id === id).id)
+        deleteGoals = deleteGoals.concat(findSubs(id))
+
+        fetch('api/goals/', {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(deleteGoals)
+            }
+        ).then(response => {
+            if (response.status !== 200) alert('Не удалось обновить цель');
+            getGoals();
+        })
+    }
+
+    const findSubs = (gid) => {
+        let subs = []
+        userGoals.filter(g => g.gid === gid).forEach(g => {
+            subs.push(g.id)
+            subs = subs.concat(findSubs(g.id))
+        })
+        return subs
+    }
+
     const changeShowSub = (id) => {
         showSubtasks[id.detail] = !showSubtasks[id.detail];
     }
 
     const getGoals = () => {
-        fetch('http://localhost:8080/api/goals/')
+        fetch('/api/goals/')
             .then(response => {
                 if (response.status === 200)
                     return response.json()
@@ -187,6 +209,9 @@
                     total: userGoals.filter(e => e.gid === userGoal.id).length,
                     completed: userGoals.filter(e => e.gid === userGoal.id && e.isDone).length,
                 }
+                let time = new Date(userGoal.deadline)
+                userGoal.deadline = time;
+                userGoal['deadlineTime'] = dayjs(time).format("HH:mm");
                 if (userGoal.subtasks.total > 0) {
                     if (!showSubtasks[userGoal.id]) showSubtasks[userGoal.id] = false;
                 }
@@ -194,7 +219,7 @@
         })
     }
 
-    fetch('http://localhost:8080/api/user')
+    fetch('/api/user')
         .then(response => {
             if (response.status === 200)
                 return response.json()
@@ -212,51 +237,72 @@
     <div class="root_page">
         <Header {user}/>
         <div class="root_wrapper">
-            <div class="sidebar">
+            <div class="sidebar" on:mouseover={() => sidebarActive = true} on:mouseout={() => sidebarActive = false}>
                 <div class="sidebar_buttons">
-                    <div class="create_goal_button">
-                        <div class="button_icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-journal-plus" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                      d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
-                                <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
-                                <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
-                            </svg>
+                    <button class="create_button" type="button" on:click={createGoal}>
+                        <div class="create_button-icon">
+                            <Icon icon="eos-icons:package-upgrade-outlined"
+                                  style="height: 24px; width: 24px; color: #000;"/>
                         </div>
-                        <div class="button_text">
-                            <div class="create_goal">
-                                <button class="create_button" type="button" on:click={() => showSetGoalWindow = true}>
-                                    Create goal
+                        <span class="create_button-title">
+                                Создать цель
+                        </span>
+                    </button>
+                    <button class="create_button" type="button" on:click|once={inDev}>
+                        <div class="create_button-icon">
+                            <Icon icon="carbon:task-add" style="height: 24px; width: 24px; color: #000;"/>
+                        </div>
+                        <span class="create_button-title">
+                                Создать задачу
+                        </span>
+                    </button>
+                </div>
+                <div class="sidebar_navigation">
+                    <div class="navigation_panel">
+                        <div class="navigation_panel-header">
+                            <button class="navigation_panel-header-btn" on:click|once={inDev}>
+                                <Icon icon="uil:angle-right-b" style="width: 20px; height: 20px; margin-right: 4px;"/>
+                                Проекты
+                            </button>
+                            <div class="navigation_panel-header-icon{sidebarActive ? '--active' : ''}">
+                                <button class="navigation_panel-header-icon-btn">
+                                    <Icon icon="akar-icons:plus"/>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="create_task_button">
-                        <div class="button_icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-journal-plus" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                      d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
-                                <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
-                                <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
-                            </svg>
+                    <div class="navigation_panel">
+                        <div class="navigation_panel-header">
+                            <button class="navigation_panel-header-btn" on:click|once={inDev}>
+                                <Icon icon="uil:angle-right-b" style="width: 20px; height: 20px; margin-right: 4px;"/>
+                                Метки
+                            </button>
+                            <div class="navigation_panel-header-icon{sidebarActive ? '--active' : ''}">
+                                <button class="navigation_panel-header-icon-btn">
+                                    <Icon icon="akar-icons:plus"/>
+                                </button>
+                            </div>
                         </div>
-                        <div class="button_text">
-                            <div class="create_goal">
-                                <button class="create_button" type="button">Create goal</button>
+                    </div>
+                    <div class="navigation_panel">
+                        <div class="navigation_panel-header">
+                            <button class="navigation_panel-header-btn">
+                                <Icon icon="uil:angle-right-b" style="width: 20px; height: 20px; margin-right: 4px;"/>
+                                Фильтры
+                            </button>
+                            <div class="navigation_panel-header-icon{sidebarActive ? '--active' : ''}">
+                                <button class="navigation_panel-header-icon-btn">
+                                    <Icon icon="akar-icons:plus"/>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="sidebar_navigation">
-                    <div>OLa</div>
-                    <div>OLa</div>
-                    <div>OLa</div>
-                    <div>OLa</div>
-                </div>
                 <div class="sidebar_app-link-wrapper">
-                    <a href="https://google.com">Hello world!</a>
+                    <div class="app-link-wrapper-container">
+                        <Icon icon="fluent:phone-laptop-24-regular" style="width: 24px; height: 24px; color: #000"/>
+                        <a href="#" on:click|once={inDev}>Установить приложение</a>
+                    </div>
                 </div>
             </div>
             <div class="root_content">
@@ -270,25 +316,62 @@
                         <div class="container-content-list">
                             <div class="content-list-inner">
                                 {#each userGoals.filter(e => !e.gid) as goal}
-                                    <Goal {goal} on:showSub={changeShowSub} on:done={complete}
-                                          on:createSub={createSubtask}/>
+                                    <Goal {goal}
+                                          on:showSub={changeShowSub}
+                                          on:done={complete}
+                                          on:createGoal={createGoal}
+                                          on:createSub={createSubtask}
+                                          on:click={showInfo(goal)}
+                                          on:edit={editGoal}
+                                          on:update={updateGoal}
+                                          on:delete={deleteGoal}
+                                    />
                                     {#if showSubtasks[goal.id]}
                                         {#each userGoals.filter(e => e.gid === goal.id) as subtask_1}
-                                            <Goal goal="{subtask_1}" indent="2" on:showSub={changeShowSub}
-                                                  on:done={complete} on:createSub={createSubtask}/>
+                                            <Goal goal="{subtask_1}" indent="2"
+                                                  on:showSub={changeShowSub}
+                                                  on:done={complete}
+                                                  on:createGoal={createGoal}
+                                                  on:createSub={createSubtask}
+                                                  on:click={showInfo(subtask_1)}
+                                                  on:edit={editGoal}
+                                                  on:update={updateGoal}
+                                                  on:delete={deleteGoal}
+                                            />
                                             {#if showSubtasks[subtask_1.id]}
                                                 {#each userGoals.filter(e => e.gid === subtask_1.id) as subtask_2}
-                                                    <Goal goal="{subtask_2}" indent="3" on:showSub={changeShowSub}
-                                                          on:done={complete} on:createSub={createSubtask}/>
+                                                    <Goal goal="{subtask_2}" indent="3"
+                                                          on:showSub={changeShowSub}
+                                                          on:done={complete}
+                                                          on:createGoal={createGoal}
+                                                          on:createSub={createSubtask}
+                                                          on:click={showInfo(subtask_2)}
+                                                          on:edit={editGoal}
+                                                          on:update={updateGoal}
+                                                          on:delete={deleteGoal}
+                                                    />
                                                     {#if showSubtasks[subtask_2.id]}
                                                         {#each userGoals.filter(e => e.gid === subtask_2.id) as subtask_3}
                                                             <Goal goal="{subtask_3}" indent="4"
-                                                                  on:showSub={changeShowSub} on:done={complete}
-                                                                  on:createSub={createSubtask}/>
+                                                                  on:showSub={changeShowSub}
+                                                                  on:done={complete}
+                                                                  on:createGoal={createGoal}
+                                                                  on:createSub={createSubtask}
+                                                                  on:click={showInfo(subtask_3)}
+                                                                  on:edit={editGoal}
+                                                                  on:update={updateGoal}
+                                                                  on:delete={deleteGoal}
+                                                            />
                                                             {#if showSubtasks[subtask_3.id]}
                                                                 {#each userGoals.filter(e => e.gid === subtask_3.id) as subtask_4}
-                                                                    <Goal goal="{subtask_4}" on:done={complete}
-                                                                          indent="5"/>
+                                                                    <Goal goal="{subtask_4}" indent="5"
+                                                                          on:done={complete}
+                                                                          on:click={showInfo(subtask_4)}
+                                                                          on:createGoal={createGoal}
+                                                                          on:edit={editGoal}
+                                                                          on:update={updateGoal}
+                                                                          on:delete={deleteGoal}
+                                                                    />
                                                                 {/each}
                                                             {/if}
                                                         {/each}
@@ -303,9 +386,7 @@
                     </div>
                 </div>
                 <footer class="footer">
-                    <div>
-                        Some info!
-                    </div>
+                    <div></div>
                 </footer>
             </div>
         </div>
@@ -314,78 +395,22 @@
 <div class="popper__overlay">
     <div class="set__goal__window__popper">
         {#if showSetGoalWindow}
-            <SetGoalWindow on:close="{() => {showSetGoalWindow = false; clearNewGoal();}}"
-                           bind:anotherModal={showScheduler}>
-                <div class="set-goal-window-main">
-                    <div class="set-goal-window-main-inner">
-                        <input class="set-goal-window-input" type="text" placeholder="Цель"
-                               bind:value={newGoal.title}/>
-                        <TextAreaViaAutosize bind:value={newGoal.description}
-                                             placeholder="Описание"
-                                             minRows="2"/>
-                    </div>
-                    <div class="set-goal-window-buttons">
-                        <button class="calendar_button" type="button" on:click={() => showScheduler = true}>
-                            <Icon class="calendar_button_icon" icon="bi:calendar-week"/>
-                            <span class="calendar_button_span">{dayjs(newGoal.deadline).format('DD ddd ') + newGoal.deadlineTime}</span>
-                        </button>
-                    </div>
-                </div>
-                <button class="set_goal_button" slot="button" disabled={newGoal.title === ''} on:click={setGoal}>
-                    Поставить цель
-                </button>
-            </SetGoalWindow>
+            <EditGoal bind:showSetGoalWindow bind:showScheduler bind:bounding bind:goal={$newGoal} bind:create
+                      on:clear={clearNewGoal} on:getGoals={getGoals} on:update={updateGoal}/>
         {/if}
     </div>
     <div class="scheduler__popper">
         {#if showScheduler}
-            <SchedulerWindow on:close="{() => showScheduler = false}">
-                <div class="scheduler-title" slot="header">
-                    <span>{dayjs(newGoal.deadline).format('DD ddd ') + newGoal.deadlineTime}</span>
-                </div>
-                <div class="scheduler-suggestion" slot="suggestion">
-                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.today}>
-                        <span class="scheduler-suggestion-item-icon">
-                            <Icon icon="bi:calendar" style="width: 18px; height: 18px; color: #058527;"/>
-                            <span>{dates.todayNum}</span>
-                        </span>
-                        <span class="scheduler-suggestion-item-label">Сегодня</span>
-                        <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().day())}</span>
-                    </button>
-                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.tomorrow}>
-                        <span class="scheduler-suggestion-item-icon">
-                            <Icon icon="bi:sun" style="width: 18px; height: 18px; color: #ad6200;"/>
-                        </span>
-                        <span class="scheduler-suggestion-item-label">Завтра</span>
-                        <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().add(1, 'day').day())}</span>
-                    </button>
-                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.weekends}>
-                        <span class="scheduler-suggestion-item-icon">
-                            <Icon icon="mdi:sofa-outline" style="width: 18px; height: 18px; color: #246fe0;"/>
-                        </span>
-                        <span class="scheduler-suggestion-item-label">На выходных</span>
-                        <span class="scheduler-suggestion-item-weekend">Сб</span>
-                    </button>
-                    <button class="scheduler-suggestion-item" on:click={() => newGoal.deadline = dates.nextWeek}>
-                        <span class="scheduler-suggestion-item-icon">
-                            <Icon icon="gg:calendar-next" style="width: 18px; height: 18px; color: #692fc2;"/>
-                        </span>
-                        <span class="scheduler-suggestion-item-label">След.неделя</span>
-                        <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().add(1, 'week').day())}</span>
-                    </button>
-                </div>
-                <div class="scheduler-date-picker" slot="date">
-                    <DatePicker bind:value={newGoal.deadline} {locale} min="{dayjs().toDate()}"/>
-                </div>
-                <div class="scheduler-action" slot="time">
-                    <span class="scheduler-action-label">Время</span>
-                    <input type="time" bind:value={newGoal.deadlineTime}/>
-                </div>
-            </SchedulerWindow>
+            <Scheduler bind:goal={$newGoal} bind:bounding isCreate={create}
+                       on:close={() => showScheduler = false}/>
+        {/if}
+    </div>
+    <div class="goal-info__popper">
+        {#if showGoalInfo}
+            <GoalInfo bind:showInfo={showGoalInfo} bind:goal={infoAbout}/>
         {/if}
     </div>
 </div>
-
 
 <style>
 
@@ -426,7 +451,7 @@
     }
 
     .sidebar_buttons {
-        margin: 1px 32px 10px 8px;
+        margin: 32px auto;
         padding-top: 1px;
 
         display: flex;
@@ -434,141 +459,136 @@
         justify-content: space-between;
 
         height: 90px;
-        width: calc(186px - 16px);
-    }
-
-    .create_goal_button, .create_task_button {
-        width: 100%;
-        border-radius: 5px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        height: 40px;
-        margin: 8px 0;
-        background: #f4f4f4;
-    }
-
-    .button_icon {
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        display: block;
-    }
-
-    .button_text {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 70%;
-    }
-
-    .create_goal {
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .create_button {
         height: 40px;
-        width: 186px;
+        width: 200px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         margin: 0;
         border: none;
         padding: 0;
-        font-size: 20px;
-        font-weight: 500;
+        font-size: 16px;
+        font-weight: 700;
+        background: #dcdcdc;
     }
 
-    .set-goal-window-main {
-        background: white;
-        border-radius: 10px;
-        margin-bottom: 16px;
+    .create_button:hover {
+        background: #b4b4b4;
     }
 
-    .set-goal-window-main-inner {
-        max-height: 200px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        margin-bottom: 10px;
-    }
-
-    .set-goal-window-input {
-        margin: 0 0 8px 0;
+    .create_button-icon {
         padding: 0;
+        margin-left: 8px;
+    }
+
+    .create_button-title {
+        margin-left: 16px;
+    }
+
+    .sidebar_navigation {
+        margin: 0 28px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+    }
+
+    .navigation_panel {
+        margin-top: 12px;
         width: 100%;
         border: none;
     }
 
-    .set-goal-window-input:focus {
-        outline: none;
-    }
-
-    .set-goal-window-buttons {
+    .navigation_panel-header {
         display: flex;
+        align-items: center;
+        cursor: pointer;
+        height: 36px;
     }
 
-    .calendar_button {
-        background: #fff;
-        font-size: 1.2em;
+    .navigation_panel-header-btn {
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        margin: 0;
+        background: #f8f8f8;
+        border: none;
         cursor: pointer;
 
-        height: 28px;
+        text-align: left;
+        font-size: 14px;
+        color: #333;
+        font-weight: 700;
+        padding: 10px 0;
+    }
+
+    .navigation_panel-header-icon, .navigation_panel-header-icon--active {
+        display: flex;
+        align-items: center;
+        opacity: 1;
+    }
+
+    .navigation_panel-header-icon {
+        opacity: 0;
+    }
+
+    .navigation_panel-header-icon-btn {
+        height: 24px;
+        width: 24px;
+
+        padding: 0;
+        margin: 0;
 
         display: flex;
-        flex-shrink: 0;
         align-items: center;
-        color: #555;
+        justify-content: center;
+        border-radius: 3px;
 
-        border: 1px solid #ccc;
-        border-radius: 5px;
-
-        padding: 0 8px;
+        background: #f8f8f8;
+        border: none;
+        cursor: pointer;
     }
 
-    .calendar_button:hover {
-        background: #eee;
+    .navigation_panel-header-icon-btn:hover {
+        background: #f0f0f0;
     }
 
-    :global(.calendar_button_icon) {
-        width: 16px;
-        height: 16px;
+    .sidebar_app-link-wrapper {
+        width: 100%;
+        display: flex;
+        align-content: center;
+        justify-content: center;
     }
 
-    .calendar_button_span {
-        margin: 0 8px;
+    .app-link-wrapper-container {
+        display: flex;
+        align-items: center;
     }
 
-    .set_goal_button {
-        margin: 12px 0 0 12px;
-        background: #db4c3f;
-        border: 1px solid rgba(0, 0, 0, .1);
-
-        line-height: 18px;
-        padding: 6px 10px;
-        height: 32px;
-
-        font-weight: 500;
-        font-size: 14px;
-        border-radius: 5px;
-        box-sizing: border-box;
-
-        color: white;
+    .app-link-wrapper-container a {
+        text-decoration: none;
+        color: #3a3a3a
     }
 
-    .set_goal_button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
+    .app-link-wrapper-container a:hover {
+        color: #000;
     }
 
     .root_content {
         height: 100%;
         width: calc(100% - 256px);
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
     .root_content-inner {
         min-height: calc(100% - 4rem - 8px);
+        min-width: calc(460px + 64px);
         margin-top: 8px;
         margin-right: 2rem;
         margin-left: 4px;
@@ -616,128 +636,34 @@
     .container-content-list {
         width: 100%;
 
+        padding-left: 20px;
+        padding-right: 40px;
+        box-sizing: border-box;
+
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
     .content-list-inner {
-        display: flex;
-        justify-content: flex-start;
-        flex-direction: column;
-    }
-
-    .scheduler-title {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-
-        padding: 8px 10px;;
-    }
-
-    .scheduler-suggestion {
-        display: flex;
-        flex-direction: column;
-
-        padding: 4px 0;
-    }
-
-    .scheduler-suggestion-item {
-        border: 0;
-        background: none;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        padding: 4px 10px;
-        line-height: 24px;
-        outline: none;
-
         width: 100%;
-    }
+        max-width: 800px;
 
-    .scheduler-suggestion-item:hover {
-        background: #f1f1f1;
-    }
-
-    .scheduler-suggestion-item-icon {
         display: flex;
-        position: relative;
-        margin-right: 10px;
-        color: grey;
-    }
-
-    .scheduler-suggestion-item-icon span {
-        width: 9px;
-        height: 9px;
-
-        position: absolute;
-        transform: translate(3.5px, -1px);
-
-        color: #058527;
-        font-size: 10px;
-        font-weight: 500;
-    }
-
-    .scheduler-suggestion-item-label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        margin-right: 4px;
-
-        font-size: 13px;
-        font-weight: 400;
-        color: #202020;
-    }
-
-    .scheduler-suggestion-item-weekend {
-        margin-left: auto;
-        color: grey;
-    }
-
-    .scheduler-date-picker {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    :root {
-        --date-picker-highlight-border: none;
-        --date-picker-highlight-shadow: none;
-    }
-
-    .scheduler-action {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        padding: 8px 10px;
-    }
-
-    .scheduler-action-label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        margin-right: 4px;
-
-        font-size: 14px;
-        font-weight: 400;
-        color: #202020;
-    }
-
-    .scheduler-action input {
-        line-height: 22px;
-        padding: 0 4px;
-        margin: 0;
-        border-radius: 3px;
-        border: 1px solid #ccc;
-        outline: none;
-        box-sizing: border-box;
+        justify-content: flex-start;
+        flex-direction: column;
     }
 
     .footer {
         height: 4rem;
         width: 100%;
+    }
+
+    /*TODO*/
+    @media (max-width: 815px) {
+    }
+
+    @media (max-height: 550px) {
     }
 
 </style>

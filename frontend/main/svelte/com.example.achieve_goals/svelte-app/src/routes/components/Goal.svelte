@@ -1,5 +1,7 @@
 <script>
     import Icon from "@iconify/svelte"
+    import Scheduler from "./Scheduler.svelte";
+    import GoalMenu from "./GoalMenu.svelte";
     import {createEventDispatcher} from 'svelte';
     import dayjs from 'dayjs';
 
@@ -21,34 +23,51 @@
         deadline: '11 январь'
     };
 
+    export let indent = 1;
+
     const priorityColors = {
         1: {
             icon: '#de4c4a',
             background: '#faeceb'
         },
         2: {
-            icon : '#f49c18',
+            icon: '#f49c18',
             background: '#fdf3e6'
         },
         3: {
-            icon : '#3077e1',
+            icon: '#3077e1',
             background: '#e9f1fc'
         },
         4: {
-            icon : '#808080',
+            icon: '#808080',
             background: 'none'
         }
     }
 
-    export let indent = 1;
-
+    const createGoal = () => {
+        dispatch('createGoal')
+    }
     const createSubtask = () => {
         dispatch('createSub', goal.id);
+    }
+    const editGoal = () => {
+        dispatch('edit', goal)
+    }
+    const updateGoal = () => {
+      dispatch('update', goal)
+    }
+    const deleteGoal = () => {
+      dispatch('delete', goal.id)
     }
 
     let showSubtasks = false;
     let hoverCheckBtn = false;
+    let showActions = false;
     let active = false;
+    let showScheduler = false;
+
+    let schedulerBounding;
+    let menuBounding;
 
 </script>
 
@@ -64,7 +83,8 @@
                 <Icon class="action-left-btn" icon="uil:angle-right-b" rotate="{showSubtasks ? '45' : '0'}"/>
             </button>
         {/if}
-        <div class="container-checkbox" style="background: {priorityColors[goal.priority].background}; border-color: {priorityColors[goal.priority].icon}"
+        <div class="container-checkbox"
+             style="background: {priorityColors[goal.priority].background}; border-color: {priorityColors[goal.priority].icon}"
              on:mouseenter={() => hoverCheckBtn = true}
              on:mouseleave={() => hoverCheckBtn = false}
              on:click={() => {
@@ -72,15 +92,14 @@
                  dispatch('done', goal);
              }}>
             {#if hoverCheckBtn && !goal.isDone}
-                <Icon class="done_btn" icon="akar-icons:circle-check" style="color: {priorityColors[goal.priority].icon};"/>
+                <Icon class="done_btn" icon="akar-icons:circle-check"
+                      style="color: {priorityColors[goal.priority].icon};"/>
             {:else if goal.isDone}
                 <Icon class="done_btn" icon="akar-icons:circle-check-fill"
                       style="color: {priorityColors[goal.priority].icon}"/>
-            {:else}
-                <Icon class="done_btn" icon="akar-icons:circle" style="color: {priorityColors[goal.priority].icon}"/>
             {/if}
         </div>
-        <div class="container-content">
+        <div class="container-content" on:click>
             <div class="content-title">{goal.title}</div>
             <div class="content-info-tags">
                 {#if goal.subtasks.total > 0}
@@ -95,49 +114,64 @@
                     <div class="info-tags-icon">
                         <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
                     </div>
-                    <div class="info-tags-text">{dayjs(goal.deadline).format('DD ddd HH:mm')}</div>
+                    <div class="info-tags-text">{dayjs(goal.deadline).format('DD dd ') + goal.deadlineTime}</div>
                 </div>
             </div>
         </div>
         <div class="container-actions-right{active? '--active' : ''}">
-            <button class="action-btn">
+            <button class="action-btn" on:click={editGoal}>
                 <Icon class="action-icons" icon="feather:edit-3"/>
             </button>
-            <button class="action-btn">
+            <button class="action-btn" bind:this={schedulerBounding} on:click={() => showScheduler = true}>
                 <Icon class="action-icons" icon="bi:calendar-event"/>
             </button>
-            <button class="action-btn" on:click={createSubtask}>
+            <button class="action-btn" bind:this={menuBounding} on:click={() => showActions = true}>
                 <Icon class="action-icons" icon="bi:three-dots"/>
             </button>
         </div>
     </div>
+    {#if showActions}
+        <GoalMenu bind:bounding={menuBounding} bind:goal
+                    on:newGoal={createGoal}
+                    on:newSub={createSubtask}
+                    on:edit={editGoal}
+                    on:close={() => {showActions = false; active = false; updateGoal()}}
+                    on:delete={deleteGoal}/>
+    {/if}
+    {#if showScheduler}
+        <Scheduler bind:bounding={schedulerBounding} bind:goal isCreate={false} fromGoalCard={true}
+                   on:close={() => {showScheduler = false; active = false; updateGoal()}}/>
+    {/if}
+
 </div>
+
 
 <style>
 
     .goal-body-1, .goal-body-2, .goal-body-3, .goal-body-4, .goal-body-5 {
-        width: 800px;
+        min-width: 400px;
+        width: 100%;
         border-bottom: 1px solid #f4f4f4;
         user-select: none;
     }
 
     .goal-body-2 {
-        width: calc(800px - (28px * 1));
+        width: calc(100% - (28px * 1));
         margin-left: 28px;
     }
 
     .goal-body-3 {
-        width: calc(800px - (28px * 2));
+        width: calc(100% - (28px * 2));
         margin-left: calc(28px * 2);
     }
 
     .goal-body-4 {
-        width: calc(800px - (28px * 3));
+        width: calc(100% - (28px * 3));
         margin-left: calc(28px * 3);
     }
 
     .goal-body-5 {
-        width: calc(800px - (28px * 4));
+        width: calc(100% - (28px * 4));
         margin-left: calc(28px * 4);
     }
 
@@ -184,11 +218,7 @@
         justify-content: center;
 
         border-radius: 50%;
-        border: 1px solid #fff;
-    }
-
-    .container-checkbox:hover {
-        background: #f6dad8;
+        border: 2px solid #fff;
     }
 
     .container-content {
@@ -292,8 +322,8 @@
     }
 
     :global(.done_btn) {
-        height: 18px;
-        width: 18px;
+        height: 20px;
+        width: 20px;
         overflow: visible;
     }
 </style>

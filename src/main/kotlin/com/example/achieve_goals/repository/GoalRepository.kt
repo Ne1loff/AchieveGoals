@@ -10,11 +10,13 @@ interface GoalRepository : CrudRepository<Goal, Long> {
 
     fun getGoalsByGid(gid: Long): MutableList<Goal>
 
-    fun getGoalsByUid(uid: Long): MutableList<Goal>
+    fun getGoalsByUidOrderByCreatedAt(uid: Long): MutableList<Goal>
 
     fun existsGoalById(id: Long): Boolean
 
-    fun getGoalByIdOrderByCreatedAt(id: Long): Goal?
+    fun existsGoalByIdAndUid(id: Long, uid: Long): Boolean
+
+    fun getGoalById(id: Long): Goal?
 
     @Query(value = "SELECT * FROM goal_table WHERE gid IS NULL", nativeQuery = true)
     fun getRootGoals(): MutableList<Goal>

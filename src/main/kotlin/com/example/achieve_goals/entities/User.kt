@@ -1,6 +1,8 @@
 package com.example.achieve_goals.entities
 
 import org.hibernate.Hibernate
+import org.hibernate.annotations.Cache
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -8,6 +10,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "user_table")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 data class User(
 
     @Id

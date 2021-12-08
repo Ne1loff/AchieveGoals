@@ -1,16 +1,10 @@
 <script lang="ts">
     import {navigate} from "svelte-routing"
-    import { onDestroy } from 'svelte';
     import PasswordField from "./components/PasswordField.svelte";
     import InputField from "./components/InputField.svelte";
 
-
     let login = ''
     let password = ''
-
-    $: {
-        console.log(password)
-    }
 
     const handleKeydown = (e) => {
         if (e.key !== 'Enter') return;
@@ -31,7 +25,7 @@
             if (response.status === 200)
                 navigate('/home')
             else
-                alert("Login or password incorrect")
+                alert("Не верный логин или пароль!")
         }).catch((err) => {
 
             console.log(err)
@@ -60,13 +54,13 @@
                     <InputField bind:bindText={login} placeholderText="Username/Email"/>
                 </div>
                 <div class="input_box">
-                    <PasswordField bind:password={password} placeholderText="Password"
+                    <PasswordField bind:password={password} placeholderText="Пароль"
                                    newPass="{false}"/>
                 </div>
             </div>
-            <button class="submit_btn" type="button" on:click={sigIn}>Login</button>
+            <button class="submit_btn" type="button" on:click={sigIn}>Вход</button>
             <div class="signup_link">
-                Not a member? <a on:click={() => navigate('/registration')}>Sign up</a>
+                Нет аккаунта? <a on:click={() => navigate('/registration')}>Зарегистрироваться</a>
             </div>
         </form>
     </div>

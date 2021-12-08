@@ -10,10 +10,10 @@
             </div>
             <nav class="nav">
                 <li>
-                    <a class="nav__link" on:click={() => navigate('/login')}>Login</a>
+                    <a class="nav__link" on:click={() => navigate('/login')}>Вход</a>
                 </li>
                 <li>
-                    <a class="nav__link" on:click={() => navigate('/registration')}>Registration</a>
+                    <a class="nav__link" on:click={() => navigate('/registration')}>Регистрация</a>
                 </li>
             </nav>
         </div>
@@ -23,7 +23,7 @@
 <div class="main-content">
     <div class="container">
         <div class="intro__inner">
-            <h1 class="intro__title">Achieve your goals with us!</h1>
+            <h1 class="intro__title">Достигай своих целей вместе с нами!</h1>
         </div>
     </div>
 </div>
@@ -45,7 +45,9 @@
 
     /* Intro */
     .main-content {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         flex-direction: column;
         position: absolute;
 
@@ -59,9 +61,12 @@
 
     .intro__inner {
         width: 100%;
+        height: 100%;
         max-width: 880px;
         margin: 0 auto;
-        transform: translateY(50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .intro__title {
