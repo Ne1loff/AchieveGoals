@@ -79,7 +79,7 @@
         update();
     }
     const cancel = () => {
-        activeBtn = false;
+        edit = false;
         goal = JSON.parse(JSON.stringify(goalCopy))
     }
     const close = () => {
