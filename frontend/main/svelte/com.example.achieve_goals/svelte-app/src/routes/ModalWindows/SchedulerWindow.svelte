@@ -25,7 +25,7 @@
             let sch_coords = scheduler.getBoundingClientRect();
 
             let y = (coords.y + coords.height + 1);
-            let x = coords.right;
+            let x = coords.left;
 
             while (y + sch_coords.height >= window.innerHeight) {
                 y -= sch_coords.height * .25
