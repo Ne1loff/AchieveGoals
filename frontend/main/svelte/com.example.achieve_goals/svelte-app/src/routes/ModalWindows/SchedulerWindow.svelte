@@ -9,7 +9,9 @@
 
     const dispatch = createEventDispatcher();
 
-    const close = () => { if (!anotherModal) dispatch('close') };
+    const close = () => {
+        if (!anotherModal) dispatch('close')
+    };
 
     const handle_keydown = e => {
         if (e.key === 'Escape') {
@@ -23,14 +25,13 @@
             let sch_coords = scheduler.getBoundingClientRect();
 
             let y = (coords.y + coords.height + 1);
-            let x = coords.left;
+            let x = coords.right;
 
-            if (y + sch_coords.height >= window.innerHeight ) {
-                fromGoalCard ? y -= sch_coords.height * .35: y -= sch_coords.height * .4;
-                x -= (sch_coords.width);
-            } else if (x + sch_coords.width >= window.innerWidth) x -= sch_coords.width * .9;
+            while (y + sch_coords.height >= window.innerHeight) {
+                y -= sch_coords.height * .25
+            }
+            if (x + sch_coords.width >= window.innerWidth) x -= sch_coords.width * 2 - coords.width + 5;
             if (fromGoalCard) y -= 70;
-
 
             if (x <= 0) x += sch_coords.width * .9;
 
@@ -52,12 +53,12 @@
         width: 100%;
         height: 100%;
         background: none;
-        z-index: 102;
+        z-index: 1020;
     }
 
     .scheduler {
         position: absolute;
-        
+
         max-width: 550px;
 
         inset: 0 auto auto 0;
@@ -78,7 +79,7 @@
         border-bottom: 1px solid #ddd;
         margin: 0;
     }
-    
+
 </style>
 
 <svelte:window on:keydown={handle_keydown} on:resize={updWindow}/>

@@ -64,7 +64,7 @@
         width: 100%;
         height: 100%;
         background: none;
-        z-index: 100;
+        z-index: 201;
     }
 
     .modal {
@@ -86,7 +86,7 @@
 
         overflow-y: hidden;
 
-        z-index: 102;
+        z-index: 1002;
     }
 
     .buttons {

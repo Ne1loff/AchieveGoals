@@ -26,7 +26,7 @@
     const setGoal = () => {
         let regx = new RegExp(' p[1-4]', 'gm');
         let match = regx.exec(goal.title);
-        goal.priority = match ? match[0].substr(2, 1) : 4;
+        goal.priority = match ? match[0].substr(2, 1) : goal.priority ? goal.priority : 4;
         goal.title = goal.title.slice(0, match ? match.index : goal.title.length);
         if (goal.deadlineTime === '') goal.deadlineTime = '23:59'
         goal.deadline = dayjs(goal.deadline)
@@ -65,6 +65,7 @@
 <style>
 
     .set-goal-window-main {
+        width: 100%;
         background: white;
         border-radius: 10px;
         margin-bottom: 16px;

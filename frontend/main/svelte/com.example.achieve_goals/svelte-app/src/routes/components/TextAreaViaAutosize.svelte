@@ -11,7 +11,7 @@
     $: maxHeight = maxRows ? `${1 + maxRows * 1.2}em` : `auto`;
 </script>
 
-<div class="container">
+<div class="container" on:click>
 	<pre
             aria-hidden="true"
             style="min-height: {minHeight}; max-height: {maxHeight}"
@@ -50,6 +50,7 @@
         box-sizing: border-box;
         border: none;
         line-height: 1.2;
+        font-size: 13px;
         overflow: hidden;
     }
 

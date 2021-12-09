@@ -10,6 +10,7 @@
 
     export let bounding;
     export let goal;
+    export let fromGoalCard = true;
 
     let showScheduler;
     let menuBounding;
@@ -148,7 +149,7 @@
 
 </style>
 
-<SchedulerWindow on:close={close} bind:bounding bind:anotherModal={showScheduler} fromGoalCard={true}>
+<SchedulerWindow on:close={close} bind:bounding bind:anotherModal={showScheduler} fromGoalCard={fromGoalCard}>
     <div class="menu-actions" slot="header">
         <button class="actions-btn" on:click={newGoal}>
             <Icon icon="bx:bx-arrow-to-top" style="width: 20px; height: 20px"/>
@@ -224,6 +225,6 @@
     </div>
 </SchedulerWindow>
 {#if showScheduler}
-    <Scheduler bind:bounding={menuBounding} bind:goal isCreate={false} fromGoalCard={true}
+    <Scheduler bind:bounding={menuBounding} bind:goal isCreate={false} fromGoalCard={fromGoalCard}
                on:close={() => showScheduler = false}/>
 {/if}

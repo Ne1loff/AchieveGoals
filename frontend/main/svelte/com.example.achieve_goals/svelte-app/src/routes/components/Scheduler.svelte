@@ -172,7 +172,8 @@
         </button>
     </div>
     <div class="scheduler-date-picker" slot="date">
-        <DatePicker bind:value={goal.deadline} {locale} min="{isCreate? dayjs().toDate() : new Date('1970')}"
+        <DatePicker bind:value={goal.deadline} {locale}
+                    min="{isCreate? dayjs().toDate() : dayjs(goal.deadline).isAfter(dayjs()) ? dayjs().toDate() : goal.deadline}"
                     max="{new Date(new Date().getFullYear() + 250, 11, 31)}"/>
     </div>
     <div class="scheduler-action" slot="time">

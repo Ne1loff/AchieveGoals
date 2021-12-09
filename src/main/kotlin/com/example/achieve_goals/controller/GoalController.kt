@@ -24,20 +24,21 @@ class GoalController(
         throw ApiNotfoundException("User not found!")
     }
 
-    @GetMapping("{gid}")
-    fun getGoalById(@PathVariable gid: Long, auth: Authentication): GoalDTO {
+    @GetMapping("{id}")
+    fun getGoalById(@PathVariable id: Long, auth: Authentication): GoalDTO {
         val principal = auth.principal
         if (principal is User) {
-            return goalService.getUserGoalById(principal.id, gid)
+            return goalService.getUserGoalById(principal.id, id)
         }
         throw ApiNotfoundException("User not found!")
     }
 
-    @GetMapping("{gid}/sub")
-    fun getSubGoalsByParentId(@PathVariable gid: Long, auth: Authentication): List<GoalDTO> {
+
+    @GetMapping("{id}/sub")
+    fun getSubGoalsByParentId(@PathVariable id: Long, auth: Authentication): List<GoalDTO> {
         val principal = auth.principal
         if (principal is User) {
-            return goalService.getSubGoalsByGid(principal.id, gid)
+            return goalService.getSubGoalsByGid(principal.id, id)
         }
         throw ApiNotfoundException("User not found!")
     }

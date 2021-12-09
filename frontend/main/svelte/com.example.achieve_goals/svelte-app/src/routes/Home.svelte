@@ -199,6 +199,8 @@
             .then(response => {
                 if (response.status === 200)
                     return response.json()
+                else if (response.status === 403)
+                    navigate('/login')
                 else
                     console.error("Can't upload goals")
             }).then(commit => {
@@ -393,6 +395,18 @@
     </div>
 </div>
 <div class="popper__overlay">
+    <div class="goal-info__popper">
+        {#if showGoalInfo}
+            <GoalInfo bind:showInfo={showGoalInfo} bind:goal={infoAbout} bind:userGoals
+                      on:done={complete}
+                      on:createGoal={createGoal}
+                      on:createSub={createSubtask}
+                      on:edit={editGoal}
+                      on:update={updateGoal}
+                      on:delete={deleteGoal}
+            />
+        {/if}
+    </div>
     <div class="set__goal__window__popper">
         {#if showSetGoalWindow}
             <EditGoal bind:showSetGoalWindow bind:showScheduler bind:bounding bind:goal={$newGoal} bind:create
@@ -403,11 +417,6 @@
         {#if showScheduler}
             <Scheduler bind:goal={$newGoal} bind:bounding isCreate={create}
                        on:close={() => showScheduler = false}/>
-        {/if}
-    </div>
-    <div class="goal-info__popper">
-        {#if showGoalInfo}
-            <GoalInfo bind:showInfo={showGoalInfo} bind:goal={infoAbout}/>
         {/if}
     </div>
 </div>

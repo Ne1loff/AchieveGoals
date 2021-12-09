@@ -22,8 +22,9 @@
         updatedAt: 11,
         deadline: '11 январь'
     };
-
     export let indent = 1;
+    export let showSub = true;
+    export let fromGoalCard = true;
 
     const priorityColors = {
         1: {
@@ -75,7 +76,7 @@
      on:mouseenter={() => active = true}
      on:mouseleave={() => active = false}>
     <div class="body-container">
-        {#if goal.subtasks.total > 0}
+        {#if goal.subtasks.total > 0 && showSub}
             <button class="container-actions-left" on:click={() => {
                 showSubtasks = !showSubtasks;
                 dispatch('showSub', goal.id);
@@ -131,7 +132,7 @@
         </div>
     </div>
     {#if showActions}
-        <GoalMenu bind:bounding={menuBounding} bind:goal
+        <GoalMenu bind:bounding={menuBounding} bind:goal fromGoalCard={fromGoalCard}
                     on:newGoal={createGoal}
                     on:newSub={createSubtask}
                     on:edit={editGoal}
@@ -139,12 +140,11 @@
                     on:delete={deleteGoal}/>
     {/if}
     {#if showScheduler}
-        <Scheduler bind:bounding={schedulerBounding} bind:goal isCreate={false} fromGoalCard={true}
+        <Scheduler bind:bounding={schedulerBounding} bind:goal isCreate={false} fromGoalCard={fromGoalCard}
                    on:close={() => {showScheduler = false; active = false; updateGoal()}}/>
     {/if}
 
 </div>
-
 
 <style>
 

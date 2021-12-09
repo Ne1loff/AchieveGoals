@@ -193,7 +193,7 @@
         top: 0;
         left: 0;
         right: 0;
-        z-index: 1000;
+        z-index: 120;
         height: 4rem;
 
         background-color: black;

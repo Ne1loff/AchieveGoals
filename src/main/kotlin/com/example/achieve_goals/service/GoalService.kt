@@ -107,6 +107,7 @@ class GoalService(
             goal.isDone = updGoal.isDone ?: goal.isDone
             goal.updatedAt = date
             goal.deadline = updGoal.deadline ?: goal.deadline
+            goal.priority = updGoal.priority ?: goal.priority
         }
 
     }
