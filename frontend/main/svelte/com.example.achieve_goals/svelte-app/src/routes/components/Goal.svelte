@@ -55,10 +55,10 @@
         dispatch('edit', goal)
     }
     const updateGoal = () => {
-      dispatch('update', goal)
+        dispatch('update', goal)
     }
     const deleteGoal = () => {
-      dispatch('delete', goal.id)
+        dispatch('delete', goal.id)
     }
 
     let showSubtasks = false;
@@ -67,6 +67,12 @@
     let active = false;
     let showScheduler = false;
 
+    let diff;
+    let color;
+    $: {
+        diff = dayjs(goal.deadline).diff(dayjs(), 'day');
+        color = diff === 0 ? "#06c03a" : diff === 1 ? "#d97c01" : diff > 1 && diff < 8 ? "#246fe0" : diff < 0 || isNaN(diff) ? "#dc231f" : "#838383"
+    }
     let schedulerBounding;
     let menuBounding;
 
@@ -115,7 +121,7 @@
                     <div class="info-tags-icon">
                         <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
                     </div>
-                    <div class="info-tags-text">{dayjs(goal.deadline).format('DD dd ') + goal.deadlineTime}</div>
+                    <div class="info-tags-text" style="color: {color}">{dayjs(goal.deadline).format('DD dd ') + goal.deadlineTime}</div>
                 </div>
             </div>
         </div>
@@ -133,11 +139,11 @@
     </div>
     {#if showActions}
         <GoalMenu bind:bounding={menuBounding} bind:goal fromGoalCard={fromGoalCard}
-                    on:newGoal={createGoal}
-                    on:newSub={createSubtask}
-                    on:edit={editGoal}
-                    on:close={() => {showActions = false; active = false; updateGoal()}}
-                    on:delete={deleteGoal}/>
+                  on:newGoal={createGoal}
+                  on:newSub={createSubtask}
+                  on:edit={editGoal}
+                  on:close={() => {showActions = false; active = false; updateGoal()}}
+                  on:delete={deleteGoal}/>
     {/if}
     {#if showScheduler}
         <Scheduler bind:bounding={schedulerBounding} bind:goal isCreate={false} fromGoalCard={fromGoalCard}

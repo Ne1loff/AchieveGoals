@@ -34,6 +34,13 @@ class UserService(
         ?: throw ApiInvalidLoginOrPasswordException("Invalid login or password")
     }
 
+    fun getAllUsers(): MutableList<UserDTO> {
+        return userRepository.findAll()
+            .map { user ->
+                mapper.dtoFromUser(user, localityNames.getOrDefault(user.locality, ""), getUserAvatarLink(user.id))
+            }.toMutableList()
+    }
+
     fun getUserById(id: Long): UserDTO {
         val user = userRepository.findUserById(id)
         val avatarLink = getUserAvatarLink(id)
@@ -71,12 +78,6 @@ class UserService(
         }
     }
 
-    fun getAllUsers(): MutableList<UserDTO> {
-        return userRepository.findAll()
-            .map { user ->
-                mapper.dtoFromUser(user, localityNames.getOrDefault(user.locality, ""), null)
-            }.toMutableList()
-    }
 
     fun saveUser(newUser: RegistrationRequest): Boolean {
         if (userRepository.existsUserByEmail(newUser.email))

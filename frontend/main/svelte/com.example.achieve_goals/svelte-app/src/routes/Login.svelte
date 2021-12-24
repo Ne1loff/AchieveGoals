@@ -167,15 +167,14 @@
         width: 130px;
         border-radius: 12px;
         border-color: #A9A9A9;
-        color: black;
-        background: none;
+        color: #fff;
+        background: #1877f2;
     }
 
     .submit_btn:hover {
         background: darkgray;
         transition: 0.3s;
     }
-
 
     /* Sign Up Link */
     .signup_link {

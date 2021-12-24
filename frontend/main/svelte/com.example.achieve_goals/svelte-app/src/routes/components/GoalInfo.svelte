@@ -1,6 +1,7 @@
 <script lang="ts">
     import GoalInfoWindow from "../ModalWindows/GoalInfoWindow.svelte";
     import TextAreaViaAutosize from "./TextAreaViaAutosize.svelte";
+    import Priority from "./Priority.svelte";
     import Scheduler from "./Scheduler.svelte";
     import Goal from "./Goal.svelte"
     import Icon from "@iconify/svelte";
@@ -44,6 +45,22 @@
     let showScheduler = false;
     let activeBtn = false;
 
+    let showPriorities = false;
+    const priorities = [
+        {
+            priority: 1, icon: "bi:flag-fill", color: "#de4c4a"
+        },
+        {
+            priority: 2, icon: "bi:flag-fill", color: "#f49c18"
+        },
+        {
+            priority: 3, icon: "bi:flag-fill", color: "#3077e1"
+        },
+        {
+            priority: 4, icon: "bi:flag", color: ""
+        },
+    ]
+
     const done = () => {
         goal.isDone = !goal.isDone;
         dispatch('done', goal);
@@ -57,6 +74,7 @@
         dispatch('createSub', goal.id)
     }
     const update = () => {
+        //TODO: Спарсить приоретет
         dispatch('update', goal)
     }
     const getParent = () => {
@@ -156,6 +174,22 @@
         background: white;
         border-radius: 10px;
         margin-bottom: 16px;
+    }
+
+    .property {
+        height: 28px;
+        width: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        padding: 0;
+        margin: 0;
+        background: #fff;
+    }
+
+    .property:hover {
+        background: #eee;
     }
 
     .save-btn, .cancel-btn {
@@ -271,6 +305,7 @@
     .set-goal-window-buttons {
         padding: 8px 0 0 4px;
         display: flex;
+        justify-content: space-between;
     }
 
     .calendar_button {
@@ -353,6 +388,10 @@
                         <Icon class="calendar_button_icon" icon="bi:calendar-week"/>
                         <span class="calendar_button_span">{dayjs(goal.deadline).format('DD dd ') + goal.deadlineTime}</span>
                     </button>
+                    <button class="property" type="button" bind:this={bounding}
+                            on:click={() => showPriorities = true}>
+                        <Icon icon={priorities[goal.priority - 1].icon} style="width: 20px; height: 20px; color: {priorities[goal.priority - 1].color};"/>
+                    </button>
                 </div>
             </div>
             {#if edit}
@@ -383,6 +422,7 @@
                     />
                 {/each}
             {/if}
+
             <div class="children-content-add"
                  on:mouseenter={() => activeBtn = true}
                  on:mouseleave={() => activeBtn = false}>
@@ -411,4 +451,7 @@
 {#if showScheduler}
     <Scheduler bind:bounding bind:goal isCreate={false} fromGoalCard={false}
                on:close={() => {showScheduler = false; update()}}/>
+{/if}
+{#if showPriorities}
+    <Priority bind:priority={goal.priority} {bounding} on:close={() => showPriorities = false}/>
 {/if}

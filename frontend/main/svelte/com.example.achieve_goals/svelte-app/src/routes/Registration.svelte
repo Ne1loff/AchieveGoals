@@ -2,7 +2,6 @@
     import {navigate} from "svelte-routing";
 
 
-
     let username = ''
     let email = ''
     let male = true
@@ -15,7 +14,7 @@
         .then(response => response.json())
         .then(commit => {
             countries = commit
-            countries.splice(0, 0, {id: 0, name: "Выберите страну..."})
+            countries.splice(0, 0, {id: -1, name: "Выберите страну..."})
             selected = countries[0]
         })
 
@@ -63,7 +62,7 @@
 
     let clickable;
 
-    $: clickable = (password === confirm_pass && password && confirm_pass && selected.id !== 0);
+    $:clickable = (password === confirm_pass && password && confirm_pass && selected.id !== -1);
 
     addEventListener('keydown', e => {
         if (window.location.pathname !== "/registration") return;
@@ -265,7 +264,8 @@
         width: 130px;
         border-radius: 12px;
         border-color: #A9A9A9;
-        background: none;
+        background: #1877f2;
+        color: #fff;
 
     }
 
@@ -274,6 +274,10 @@
         transition: 0.3s;
     }
 
+    .submit_btn:disabled {
+        color: #a0a0a0;
+        background: none;
+    }
 
     /* Media */
     @media (max-width: 584px) {

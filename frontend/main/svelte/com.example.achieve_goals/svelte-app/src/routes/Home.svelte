@@ -7,6 +7,7 @@
 
     dayjs.locale('ru')
 
+    import {InlineCalendar} from 'svelte-calendar';
     import Scheduler from "./components/Scheduler.svelte";
     import EditGoal from "./components/EditGoal.svelte";
     import Icon from "@iconify/svelte"
@@ -18,13 +19,24 @@
         alert("В разработке)");
     }
 
+    const theme = {
+        calendar: {
+            width: '250px',
+            shadow: '0px 0px 5px rgba(0, 0, 0, 0.25)',
+            legend: {
+                height: "25px"
+            },
+        }
+    };
+
     let sidebarActive = false;
+    let activeBtn = false;
 
     const newGoal = writable({
         title: '',
         description: '',
         gid: null,
-        priority: '',
+        priority: 4,
         deadline: new Date(),
         deadlineTime: ''
     })
@@ -63,6 +75,25 @@
     let showScheduler = false;
     let bounding;
 
+    let showFilters = false;
+    let filtersIsActive;
+    let filters = [
+        {
+            priority: 1, active: false, icon: "bi:flag-fill", color: "#de4c4a"
+        },
+        {
+            priority: 2, active: false, icon: "bi:flag-fill", color: "#f49c18"
+        },
+        {
+            priority: 3, active: false, icon: "bi:flag-fill", color: "#3077e1"
+        },
+        {
+            priority: 4, active: false, icon: "bi:flag", color: ""
+        },
+    ]
+    $: filtersIsActive = filters.filter(e => e.active).length != 0;
+
+
     let showGoalInfo = false;
     let infoAbout;
 
@@ -91,7 +122,7 @@
         $newGoal['title'] = '';
         $newGoal['description'] = '';
         $newGoal['gid'] = null;
-        $newGoal['priority'] = '';
+        $newGoal['priority'] = 4;
         $newGoal['deadline'] = new Date();
         $newGoal['deadlineTime'] = '';
     }
@@ -250,55 +281,36 @@
                                 Создать цель
                         </span>
                     </button>
-                    <button class="create_button" type="button" on:click|once={inDev}>
-                        <div class="create_button-icon">
-                            <Icon icon="carbon:task-add" style="height: 24px; width: 24px; color: #000;"/>
-                        </div>
-                        <span class="create_button-title">
-                                Создать задачу
-                        </span>
-                    </button>
                 </div>
                 <div class="sidebar_navigation">
-                    <div class="navigation_panel">
-                        <div class="navigation_panel-header">
-                            <button class="navigation_panel-header-btn" on:click|once={inDev}>
-                                <Icon icon="uil:angle-right-b" style="width: 20px; height: 20px; margin-right: 4px;"/>
-                                Проекты
-                            </button>
-                            <div class="navigation_panel-header-icon{sidebarActive ? '--active' : ''}">
-                                <button class="navigation_panel-header-icon-btn">
-                                    <Icon icon="akar-icons:plus"/>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="calendar-holder">
+                        <InlineCalendar {theme} startOfWeekIndex={1}/>
                     </div>
                     <div class="navigation_panel">
                         <div class="navigation_panel-header">
-                            <button class="navigation_panel-header-btn" on:click|once={inDev}>
-                                <Icon icon="uil:angle-right-b" style="width: 20px; height: 20px; margin-right: 4px;"/>
-                                Метки
-                            </button>
-                            <div class="navigation_panel-header-icon{sidebarActive ? '--active' : ''}">
-                                <button class="navigation_panel-header-icon-btn">
-                                    <Icon icon="akar-icons:plus"/>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="navigation_panel">
-                        <div class="navigation_panel-header">
-                            <button class="navigation_panel-header-btn">
-                                <Icon icon="uil:angle-right-b" style="width: 20px; height: 20px; margin-right: 4px;"/>
+                            <button class="navigation_panel-header-btn" on:click={() => showFilters = !showFilters}>
+                                <Icon icon="uil:angle-right-b" style="width: 20px; height: 20px; margin-right: 4px;"
+                                      rotate="{showFilters ? '45' : '0'}"/>
                                 Фильтры
                             </button>
-                            <div class="navigation_panel-header-icon{sidebarActive ? '--active' : ''}">
-                                <button class="navigation_panel-header-icon-btn">
-                                    <Icon icon="akar-icons:plus"/>
-                                </button>
-                            </div>
+                            <!--                            <div class="navigation_panel-header-icon{sidebarActive ? '&#45;&#45;active' : ''}">-->
+                            <!--                                <button class="navigation_panel-header-icon-btn">-->
+                            <!--                                    <Icon icon="akar-icons:plus"/>-->
+                            <!--                                </button>-->
+                            <!--                            </div>-->
                         </div>
                     </div>
+                    {#if showFilters}
+                        <div class="filter-container">
+                            {#each filters as filter}
+                                <button class="filter-btn{filter.active ? '--active' : ''}"
+                                        on:click={() => filter.active = !filter.active}>
+                                    <Icon icon={filter.icon} style="width: 20px; height: 20px; color: {filter.color};"/>
+                                    <span>{"Приоритет - " + filter.priority}</span>
+                                </button>
+                            {/each}
+                        </div>
+                    {/if}
                 </div>
                 <div class="sidebar_app-link-wrapper">
                     <div class="app-link-wrapper-container">
@@ -317,72 +329,191 @@
                         </div>
                         <div class="container-content-list">
                             <div class="content-list-inner">
-                                {#each userGoals.filter(e => !e.gid) as goal}
-                                    <Goal {goal}
-                                          on:showSub={changeShowSub}
-                                          on:done={complete}
-                                          on:createGoal={createGoal}
-                                          on:createSub={createSubtask}
-                                          on:click={showInfo(goal)}
-                                          on:edit={editGoal}
-                                          on:update={updateGoal}
-                                          on:delete={deleteGoal}
-                                    />
-                                    {#if showSubtasks[goal.id]}
-                                        {#each userGoals.filter(e => e.gid === goal.id) as subtask_1}
-                                            <Goal goal="{subtask_1}" indent="2"
-                                                  on:showSub={changeShowSub}
-                                                  on:done={complete}
-                                                  on:createGoal={createGoal}
-                                                  on:createSub={createSubtask}
-                                                  on:click={showInfo(subtask_1)}
-                                                  on:edit={editGoal}
-                                                  on:update={updateGoal}
-                                                  on:delete={deleteGoal}
-                                            />
-                                            {#if showSubtasks[subtask_1.id]}
-                                                {#each userGoals.filter(e => e.gid === subtask_1.id) as subtask_2}
-                                                    <Goal goal="{subtask_2}" indent="3"
-                                                          on:showSub={changeShowSub}
-                                                          on:done={complete}
-                                                          on:createGoal={createGoal}
-                                                          on:createSub={createSubtask}
-                                                          on:click={showInfo(subtask_2)}
-                                                          on:edit={editGoal}
-                                                          on:update={updateGoal}
-                                                          on:delete={deleteGoal}
-                                                    />
-                                                    {#if showSubtasks[subtask_2.id]}
-                                                        {#each userGoals.filter(e => e.gid === subtask_2.id) as subtask_3}
-                                                            <Goal goal="{subtask_3}" indent="4"
-                                                                  on:showSub={changeShowSub}
-                                                                  on:done={complete}
-                                                                  on:createGoal={createGoal}
-                                                                  on:createSub={createSubtask}
-                                                                  on:click={showInfo(subtask_3)}
-                                                                  on:edit={editGoal}
-                                                                  on:update={updateGoal}
-                                                                  on:delete={deleteGoal}
-                                                            />
-                                                            {#if showSubtasks[subtask_3.id]}
-                                                                {#each userGoals.filter(e => e.gid === subtask_3.id) as subtask_4}
-                                                                    <Goal goal="{subtask_4}" indent="5"
-                                                                          on:done={complete}
-                                                                          on:click={showInfo(subtask_4)}
-                                                                          on:createGoal={createGoal}
-                                                                          on:edit={editGoal}
-                                                                          on:update={updateGoal}
-                                                                          on:delete={deleteGoal}
-                                                                    />
-                                                                {/each}
-                                                            {/if}
-                                                        {/each}
-                                                    {/if}
-                                                {/each}
-                                            {/if}
-                                        {/each}
-                                    {/if}
-                                {/each}
+                                {#if filtersIsActive}
+                                    {#each userGoals.filter(e => filters.filter(e => e.active).map(e => e.priority).includes(e.priority) && !e.isDone) as goal}
+                                        <Goal {goal}
+                                              showSub={false}
+                                              on:showSub={changeShowSub}
+                                              on:done={complete}
+                                              on:createGoal={createGoal}
+                                              on:createSub={createSubtask}
+                                              on:click={showInfo(goal)}
+                                              on:edit={editGoal}
+                                              on:update={updateGoal}
+                                              on:delete={deleteGoal}
+                                        />
+                                    {/each}
+
+                                    <div class="children-content-add"
+                                         on:mouseenter={() => activeBtn = true}
+                                         on:mouseleave={() => activeBtn = false}>
+                                        <button class="content-add-btn{activeBtn ? '--active' : ''}"
+                                                on:click={createGoal}>
+                                            <Icon icon="{activeBtn ? 'bi:plus-circle-fill' : 'bi:plus'}"
+                                                  style="color: #f00; width: 24px; height: 24px"/>
+                                            <span>Добавить цель</span>
+                                        </button>
+                                    </div>
+
+                                    {#each userGoals.filter(e => filters.filter(e => e.active).map(e => e.priority).includes(e.priority) && e.isDone) as goal }
+                                        <Goal {goal}
+                                              showSub={false}
+                                              on:showSub={changeShowSub}
+                                              on:done={complete}
+                                              on:createGoal={createGoal}
+                                              on:createSub={createSubtask}
+                                              on:click={showInfo(goal)}
+                                              on:edit={editGoal}
+                                              on:update={updateGoal}
+                                              on:delete={deleteGoal}
+                                        />
+                                    {/each}
+                                {:else}
+                                    {#each userGoals.filter(e => !e.gid && !e.isDone) as goal}
+                                        <Goal {goal}
+                                              on:showSub={changeShowSub}
+                                              on:done={complete}
+                                              on:createGoal={createGoal}
+                                              on:createSub={createSubtask}
+                                              on:click={showInfo(goal)}
+                                              on:edit={editGoal}
+                                              on:update={updateGoal}
+                                              on:delete={deleteGoal}
+                                        />
+                                        {#if showSubtasks[goal.id]}
+                                            {#each userGoals.filter(e => e.gid === goal.id) as subtask_1}
+                                                <Goal goal="{subtask_1}" indent="2"
+                                                      on:showSub={changeShowSub}
+                                                      on:done={complete}
+                                                      on:createGoal={createGoal}
+                                                      on:createSub={createSubtask}
+                                                      on:click={showInfo(subtask_1)}
+                                                      on:edit={editGoal}
+                                                      on:update={updateGoal}
+                                                      on:delete={deleteGoal}
+                                                />
+                                                {#if showSubtasks[subtask_1.id]}
+                                                    {#each userGoals.filter(e => e.gid === subtask_1.id) as subtask_2}
+                                                        <Goal goal="{subtask_2}" indent="3"
+                                                              on:showSub={changeShowSub}
+                                                              on:done={complete}
+                                                              on:createGoal={createGoal}
+                                                              on:createSub={createSubtask}
+                                                              on:click={showInfo(subtask_2)}
+                                                              on:edit={editGoal}
+                                                              on:update={updateGoal}
+                                                              on:delete={deleteGoal}
+                                                        />
+                                                        {#if showSubtasks[subtask_2.id]}
+                                                            {#each userGoals.filter(e => e.gid === subtask_2.id) as subtask_3}
+                                                                <Goal goal="{subtask_3}" indent="4"
+                                                                      on:showSub={changeShowSub}
+                                                                      on:done={complete}
+                                                                      on:createGoal={createGoal}
+                                                                      on:createSub={createSubtask}
+                                                                      on:click={showInfo(subtask_3)}
+                                                                      on:edit={editGoal}
+                                                                      on:update={updateGoal}
+                                                                      on:delete={deleteGoal}
+                                                                />
+                                                                {#if showSubtasks[subtask_3.id]}
+                                                                    {#each userGoals.filter(e => e.gid === subtask_3.id) as subtask_4}
+                                                                        <Goal goal="{subtask_4}" indent="5"
+                                                                              on:done={complete}
+                                                                              on:click={showInfo(subtask_4)}
+                                                                              on:createGoal={createGoal}
+                                                                              on:edit={editGoal}
+                                                                              on:update={updateGoal}
+                                                                              on:delete={deleteGoal}
+                                                                        />
+                                                                    {/each}
+                                                                {/if}
+                                                            {/each}
+                                                        {/if}
+                                                    {/each}
+                                                {/if}
+                                            {/each}
+                                        {/if}
+                                    {/each}
+
+                                    <div class="children-content-add"
+                                         on:mouseenter={() => activeBtn = true}
+                                         on:mouseleave={() => activeBtn = false}>
+                                        <button class="content-add-btn{activeBtn ? '--active' : ''}"
+                                                on:click={createGoal}>
+                                            <Icon icon="{activeBtn ? 'bi:plus-circle-fill' : 'bi:plus'}"
+                                                  style="color: #f00; width: 24px; height: 24px"/>
+                                            <span>Добавить цель</span>
+                                        </button>
+                                    </div>
+
+                                    {#each userGoals.filter(e => !e.gid && e.isDone) as goal}
+                                        <Goal {goal}
+                                              on:showSub={changeShowSub}
+                                              on:done={complete}
+                                              on:createGoal={createGoal}
+                                              on:createSub={createSubtask}
+                                              on:click={showInfo(goal)}
+                                              on:edit={editGoal}
+                                              on:update={updateGoal}
+                                              on:delete={deleteGoal}
+                                        />
+                                        {#if showSubtasks[goal.id]}
+                                            {#each userGoals.filter(e => e.gid === goal.id) as subtask_1}
+                                                <Goal goal="{subtask_1}" indent="2"
+                                                      on:showSub={changeShowSub}
+                                                      on:done={complete}
+                                                      on:createGoal={createGoal}
+                                                      on:createSub={createSubtask}
+                                                      on:click={showInfo(subtask_1)}
+                                                      on:edit={editGoal}
+                                                      on:update={updateGoal}
+                                                      on:delete={deleteGoal}
+                                                />
+                                                {#if showSubtasks[subtask_1.id]}
+                                                    {#each userGoals.filter(e => e.gid === subtask_1.id) as subtask_2}
+                                                        <Goal goal="{subtask_2}" indent="3"
+                                                              on:showSub={changeShowSub}
+                                                              on:done={complete}
+                                                              on:createGoal={createGoal}
+                                                              on:createSub={createSubtask}
+                                                              on:click={showInfo(subtask_2)}
+                                                              on:edit={editGoal}
+                                                              on:update={updateGoal}
+                                                              on:delete={deleteGoal}
+                                                        />
+                                                        {#if showSubtasks[subtask_2.id]}
+                                                            {#each userGoals.filter(e => e.gid === subtask_2.id) as subtask_3}
+                                                                <Goal goal="{subtask_3}" indent="4"
+                                                                      on:showSub={changeShowSub}
+                                                                      on:done={complete}
+                                                                      on:createGoal={createGoal}
+                                                                      on:createSub={createSubtask}
+                                                                      on:click={showInfo(subtask_3)}
+                                                                      on:edit={editGoal}
+                                                                      on:update={updateGoal}
+                                                                      on:delete={deleteGoal}
+                                                                />
+                                                                {#if showSubtasks[subtask_3.id]}
+                                                                    {#each userGoals.filter(e => e.gid === subtask_3.id) as subtask_4}
+                                                                        <Goal goal="{subtask_4}" indent="5"
+                                                                              on:done={complete}
+                                                                              on:click={showInfo(subtask_4)}
+                                                                              on:createGoal={createGoal}
+                                                                              on:edit={editGoal}
+                                                                              on:update={updateGoal}
+                                                                              on:delete={deleteGoal}
+                                                                        />
+                                                                    {/each}
+                                                                {/if}
+                                                            {/each}
+                                                        {/if}
+                                                    {/each}
+                                                {/if}
+                                            {/each}
+                                        {/if}
+                                    {/each}
+                                {/if}
                             </div>
                         </div>
                     </div>
@@ -466,8 +597,6 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-
-        height: 90px;
     }
 
     .create_button {
@@ -535,6 +664,52 @@
         color: #333;
         font-weight: 700;
         padding: 10px 0;
+    }
+
+    .filter-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+
+        width: 100%;
+    }
+
+    .filter-btn, .filter-btn--active {
+        padding: 8px;
+        margin: 0 12px 0 0;
+
+        width: calc(100% - 12px);
+
+        display: flex;
+        flex-direction: row;
+        align-items: start;
+        justify-content: space-around;
+
+        background: #F8F8F8;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .filter-btn--active {
+        background: #7db8ef;
+    }
+
+    .filter-btn span, .filter-btn--active span {
+        margin-left: 8px;
+    }
+
+    .filter-btn:hover {
+        background: #dddddd;
+    }
+
+    .calendar-holder {
+        margin: 8px 0;
+        width: 100%;
+
+        display: flex;
+        justify-content: center;
     }
 
     .navigation_panel-header-icon, .navigation_panel-header-icon--active {
@@ -661,6 +836,23 @@
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
+    }
+
+    .content-add-btn, .content-add-btn--active {
+        background: #fff;
+        border: none;
+        display: flex;
+        align-items: center;
+
+        font-weight: 300;
+    }
+
+    .content-add-btn span, .content-add-btn--active span {
+        margin-left: 8px;
+    }
+
+    .content-add-btn--active {
+        color: #f00;
     }
 
     .footer {

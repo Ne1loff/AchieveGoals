@@ -68,7 +68,7 @@
         flex-direction: column;
         background: #fff;
         border-radius: 3px;
-        box-shadow: 0 1px 8px 0 rgb(0 0 0 / 8%), 0 0 1px 0 rgb(0 0 0 / 30%);
+        box-shadow: 0 1px 8px 0 rgb(0 0 0 / 25%), 0 0 1px 0 rgb(0 0 0 / 30%);
         overflow: hidden;
         z-index: 1020;
     }

@@ -5,6 +5,7 @@
     import Main from "./routes/Main.svelte"
     import Notfound from "./routes/Notfound.svelte";
     import Home from "./routes/Home.svelte";
+    import AdminHome from "./routes/AdminHome.svelte";
     import Profile from "./routes/Profile.svelte";
 </script>
 
@@ -18,6 +19,9 @@
     </Route>
     <Route path="/home">
         <Home/>
+    </Route>
+    <Route path="/admin/*">
+        <AdminHome/>
     </Route>
     <Route path="/user/profile">
         <Profile/>

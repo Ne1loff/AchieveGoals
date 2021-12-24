@@ -1,6 +1,7 @@
 <script lang="ts">
     import SetGoalWindow from "../ModalWindows/SetGoalWindow.svelte";
     import TextAreaViaAutosize from "./TextAreaViaAutosize.svelte";
+    import Priority from "./Priority.svelte";
     import Icon from "@iconify/svelte";
 
     import {createEventDispatcher} from 'svelte';
@@ -15,13 +16,13 @@
     const dispatch = createEventDispatcher();
 
     const updateGoal = () => {
-      dispatch('update', goal)
+        dispatch('update', goal)
     }
     const clearGoal = () => {
         dispatch('clear')
     }
     const getGoals = () => {
-      dispatch('getGoals')
+        dispatch('getGoals')
     }
     const setGoal = () => {
         let regx = new RegExp(' p[1-4]', 'gm');
@@ -60,6 +61,22 @@
         clearGoal();
     }
 
+    let showPriorities = false;
+    const priorities = [
+        {
+            priority: 1, icon: "bi:flag-fill", color: "#de4c4a"
+        },
+        {
+            priority: 2, icon: "bi:flag-fill", color: "#f49c18"
+        },
+        {
+            priority: 3, icon: "bi:flag-fill", color: "#3077e1"
+        },
+        {
+            priority: 4, icon: "bi:flag", color: ""
+        },
+    ]
+
 </script>
 
 <style>
@@ -89,6 +106,7 @@
 
     .set-goal-window-buttons {
         display: flex;
+        justify-content: space-between;
     }
 
     .calendar_button {
@@ -110,6 +128,22 @@
     }
 
     .calendar_button:hover {
+        background: #eee;
+    }
+
+    .property {
+        height: 28px;
+        width: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        padding: 0;
+        margin: 0;
+        background: #fff;
+    }
+
+    .property:hover {
         background: #eee;
     }
 
@@ -163,9 +197,16 @@
                 <Icon class="calendar_button_icon" icon="bi:calendar-week"/>
                 <span class="calendar_button_span">{dayjs(goal.deadline).format('DD dd ') + goal.deadlineTime}</span>
             </button>
+            <button class="property" type="button" bind:this={bounding}
+                    on:click={() => showPriorities = true}>
+                <Icon icon={priorities[goal.priority - 1].icon} style="width: 20px; height: 20px; color: {priorities[goal.priority - 1].color};"/>
+            </button>
         </div>
     </div>
     <button class="set_goal_button" slot="button" disabled={goal.title === ''} on:click={setGoal}>
         {create ? 'Поставить цель' : 'Обновить цель'}
     </button>
 </SetGoalWindow>
+{#if showPriorities}
+    <Priority bind:priority={goal.priority} {bounding} on:close={() => showPriorities = false}/>
+{/if}
