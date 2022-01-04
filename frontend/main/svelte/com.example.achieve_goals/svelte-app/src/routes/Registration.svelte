@@ -1,5 +1,7 @@
 <script lang="ts">
     import {navigate} from "svelte-routing";
+    import PasswordField from "./components/PasswordField.svelte";
+    import InputField from "./components/InputField.svelte";
 
 
     let username = ''
@@ -62,7 +64,7 @@
 
     let clickable;
 
-    $:clickable = (password === confirm_pass && password && confirm_pass && selected.id !== -1);
+    $:clickable = (password === confirm_pass && password && confirm_pass && selected.id !== -1 && password.length >= 6);
 
     addEventListener('keydown', e => {
         if (window.location.pathname !== "/registration") return;
@@ -85,8 +87,18 @@
     <form class="box" method="post">
         <div class="title">Registration</div>
         <div class="user_details">
-            <input class="input_field" type="text" bind:value={username} placeholder="Username">
-            <input class="input_field" type="text" bind:value={email} placeholder="Email">
+            <InputField bind:bindText={username} placeholderText="Username"
+                        --custom-height="45px"
+                        --custom-width="285px"
+                        --custom-margin="8px 0 4px 0"
+                        --custom-border-color="#A9A9A9"
+            />
+            <InputField bind:bindText={email} placeholderText="Email"
+                        --custom-height="45px"
+                        --custom-width="285px"
+                        --custom-margin="8px 0 4px 0"
+                        --custom-border-color="#A9A9A9"
+            />
             <select class="country_selector" bind:value={selected}>
                 {#each countries as country}
                     <option value={country}>
@@ -94,9 +106,23 @@
                     </option>
                 {/each}
             </select>
-            <input class="input_field" type="password" autocomplete="true" bind:value={password} placeholder="Пароль">
-            <input class="input_field" type="password" autocomplete="true" bind:value={confirm_pass}
-                   placeholder="Подтвердите пароль">
+            <PasswordField bind:password={password} placeholderText="Пароль"
+                           newPass={true}
+                           --custom-height="45px"
+                           --custom-width="285px"
+                           --custom-margin="8px 0 4px 0"
+                           --custom-border-color="#A9A9A9"
+            />
+            <PasswordField bind:password={confirm_pass} placeholderText="Подтвердите пароль"
+                           newPass="{true}"
+                           --custom-height="45px"
+                           --custom-width="285px"
+                           --custom-margin="8px 0 4px 0"
+                           --custom-border-color="#A9A9A9"
+            />
+            {#if password.length > 0 && password.length < 6 }
+                <legend class="pass_match">Минимальная длина пароля 6 символов!</legend>
+            {/if}
             {#if password !== confirm_pass && confirm_pass}
                 <legend class="pass_match">Пароли не совпадают!</legend>
             {/if}
@@ -119,6 +145,13 @@
 </div>
 
 <style>
+
+    /*:root {*/
+    /*    --custom-height: 45px;*/
+    /*    --custom-width: 285px;*/
+    /*    --custom-margin: 8px 0 4px 0;*/
+    /*    --custom-border-color: #A9A9A9;*/
+    /*}*/
 
     /* Container */
     .container {
@@ -205,31 +238,23 @@
 
     /* User Details */
     .user_details {
-        justify-content: space-between;
-        text-align: center;
-    }
-
-    /* Input Field */
-    .input_field {
-        border-color: #A9A9A9;
-        border-radius: 12px;
-        margin: 8px auto;
-        outline: none;
-        padding: 10px 14px;
-        color: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
     /* Country */
     .country_selector {
         background: white;
         border-color: #A9A9A9;
-        border-radius: 12px;
-        width: 282px;
-        height: 41px;
+        border-radius: 6px;
+        width: 312px;
+        height: 48px;
         display: block;
-        margin: 8px auto;
+        margin: 8px 0 4px 0;
         outline: none;
-        padding: 10px 14px;
+        padding: 12px 14px;
         color: black;
     }
 
@@ -291,10 +316,6 @@
             justify-content: center;
         }
 
-        .input_field {
-            max-width: 100%;
-        }
-
         .country_selector {
             max-width: 100%;
         }
@@ -314,10 +335,6 @@
         .user_details {
             max-height: 35vh;
             overflow-y: scroll;
-        }
-
-        .input_field {
-            max-height: 100%;
         }
 
         .country_selector {

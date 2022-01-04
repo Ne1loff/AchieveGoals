@@ -35,14 +35,23 @@
 
 <style>
 
+    :root {
+        --custom-height: 22px;
+        --custom-width: 100%;
+        --custom-margin: 0;
+        --custom-border-color: #dddfe2;
+    }
+
     .input_container {
         background: white;
         height: 22px;
-        max-width: 100%;
+        max-width: var(--custom-width);
+        max-height: var(--custom-height);
+        margin: var(--custom-margin);
 
         padding: 12px 14px;
         font-size: 17px;
-        border: 1px solid #dddfe2;
+        border: 1px solid var(--custom-border-color);
         border-radius: 6px;
 
         display: flex;
@@ -51,14 +60,9 @@
         user-select: none;
     }
 
-    .input_container:hover {
-        border: 1px solid #b0b0b0;
-    }
-
     .input_field {
         height: 100%;
-        width: 85%;
-        max-width: 90%;
+        flex: 1;
         border: none;
 
         padding: 0;

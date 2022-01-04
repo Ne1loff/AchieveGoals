@@ -51,11 +51,19 @@
             <h1>Login</h1>
             <div class="user_details">
                 <div class="input_box">
-                    <InputField bind:bindText={login} placeholderText="Username/Email"/>
+                    <InputField bind:bindText={login} placeholderText="Username/Email"
+                                --custom-height="45px"
+                                --custom-width="285px"
+                                --custom-border-color="#A9A9A9"
+                    />
                 </div>
                 <div class="input_box">
                     <PasswordField bind:password={password} placeholderText="Пароль"
-                                   newPass="{false}"/>
+                                   newPass="{false}"
+                                   --custom-height="45px"
+                                   --custom-width="285px"
+                                   --custom-border-color="#A9A9A9"
+                    />
                 </div>
             </div>
             <button class="submit_btn" type="button" on:click={sigIn}>Вход</button>
@@ -192,10 +200,6 @@
             margin: 0;
         }
 
-        .text_field {
-            max-width: 100%;
-        }
-
         .submit_btn {
             max-width: 100%;
         }
@@ -211,10 +215,6 @@
         .user_details {
             max-height: 15vh;
             overflow-y: scroll;
-        }
-
-        .text_field {
-            max-height: 100%;
         }
 
         .submit_btn {
