@@ -24,6 +24,7 @@ class UserMapperImpl : UserMapper {
 
     override fun dtoFromUser(user: User, locality: String, avatar: String?): UserDTO {
         return UserDTO(
+            id = user.id,
             username = user.username,
             name = user.name,
             surname = user.surname,
