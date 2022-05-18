@@ -2,8 +2,6 @@
     import MenuButton from '../components/MenuButton.svelte'
     import Navbar from "../components/Navbar.svelte";
     import Sidebar from "../components/Sidebar.svelte";
-    import GoalComponent from "../components/goal-card/GoalComponent.svelte";
-    import {navigate} from "svelte-routing";
     import Icon from "@iconify/svelte";
     import Goal from "../data/models/Goal";
     import {onMount} from "svelte";
@@ -11,29 +9,111 @@
     import ApiError from "../data/api/ApiError";
     import NotificationService, {ErrorMessage} from "../services/NotificationService";
     import ApiResponse from "../data/api/ApiResponse";
+    import ServiceFactory from "../services/ServiceFactory";
+    import ThemeSelect from "../components/ThemeSelect.svelte";
+    import LocalStorageService from "../services/LocalStorageService";
+    import UserService from "../services/UserService";
+    import {USER} from "../data/storage/storage";
+    import LoadingScreen from "../components/LoadingScreen.svelte";
+
+    let pageIsReady = false;
 
     let goalService: GoalService;
+    let userService: UserService;
     let notificationService: NotificationService;
+    let localStorageService: LocalStorageService;
 
-    let open = true;
+    let open: boolean;
+    let goals: Goal[] = [];
+    let sideBarWasOpen: boolean;
+    let wasCheck: boolean = false;
 
-    let goals: Goal[] = []; //TODO: doesn't work
+    $: {
+        if (sideBarWasOpen !== undefined && localStorageService && $USER !== null) {
+            localStorageService.setSideBarWasOpen($USER.id, sideBarWasOpen)
+        }
+    }
 
     const onError = (apiError: ApiError) => {
         notificationService.errorFromErrorMessage(new ErrorMessage().fromApiError(apiError));
     }
 
+    const handleResize = () => {
+        const autoCloseSideBar = document.body.clientWidth <= 770;
+        if (autoCloseSideBar && !wasCheck) {
+            console.log(open)
+            open = false;
+            console.log(open)
+            wasCheck = true;
+        } else if (!autoCloseSideBar) {
+            open = sideBarWasOpen;
+            wasCheck = false;
+        }
+    };
+
+    const setUp = () => {
+        if ($USER === null) {
+            userService.getCurrentUser().then(() => {
+                sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
+                open = sideBarWasOpen;
+                handleResize();
+                setInterval(() => pageIsReady = true, 200);
+            });
+        } else {
+            sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
+            open = sideBarWasOpen;
+            handleResize();
+            setInterval(() => pageIsReady = true, 200);
+        }
+    }
+
     onMount(() => {
-        goalService = GoalService.getInstance();
-        notificationService = NotificationService.getInstance();
+        goalService = ServiceFactory.INSTANCE.goalService;
+        userService = ServiceFactory.INSTANCE.userService;
+        notificationService = ServiceFactory.INSTANCE.notificationService;
+        localStorageService = ServiceFactory.INSTANCE.localStorageService;
         goalService.getUserGoals()
             .then((response: Goal[]) => goals = response)
-            .catch((apiResponse: ApiResponse<ApiError>) =>
-                notificationService.errorFromErrorMessage(new ErrorMessage().fromApiError(apiResponse.data))
-            );
+            .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error));
+        setUp();
     });
 
 </script>
+
+
+<svelte:window on:resize={handleResize}/>
+<LoadingScreen show={!pageIsReady}/>
+<div class="page-inner">
+    <Navbar --own-nav-bar-right-margin-right=".5rem">
+        <div class="navbar-left" slot="left">
+            <MenuButton bind:open
+                        on:change={(e) => (sideBarWasOpen = e.detail)}
+                        --own-menu-btn-border="none"
+                        --own-burger-color="var(--cds-icon-01)"
+                        --own-menu-btn-hover-background="var(--cds-layer-hover)"
+            />
+            <div class="nav-bar-title">
+                <span>Achieve Goals</span>
+            </div>
+        </div>
+        <svelte:fragment slot="right">
+            <ThemeSelect/>
+            <Icon width="2rem" height="2rem" icon="bxs:user-circle"/>
+        </svelte:fragment>
+    </Navbar>
+    <div class="main-page">
+        <Sidebar bind:open
+                 --own-sidebar-background="var(--cds-layer)">
+            <div slot="bottom" class="footer"></div>
+        </Sidebar>
+        <div class="main-content-wrapper" class:full-size={!open}>
+            <div class="main-content elevation-6">
+                <slot name="content"></slot>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <style lang="scss">
 
@@ -46,7 +126,7 @@
     --own-nav-bar-align-items: center;
     --own-nav-bar-align-content: center;
 
-    --own-main-page-footer-height: 2rem;
+    --own-main-page-footer-height: 2.5rem;
     --own-main-page-footer-width: 100%;
 
     --own-main-content-height: 100%;
@@ -104,7 +184,7 @@
 
   .navbar-left span {
     margin-left: 16px;
-    @include fluidFontSize(18px, 28px, 640px, 1280px, 18px);
+    @include fluidFontSize(24px, 28px, 480px, 640px, 18px);
   }
 
   .nav-bar-title {
@@ -112,10 +192,6 @@
 
     display: flex;
     justify-content: flex-start;
-  }
-
-  .navbar-right {
-    margin-right: 8px;
   }
 
   .page-inner {
@@ -127,79 +203,50 @@
 
     box-sizing: border-box;
 
-    background-color: #f6f6f6;
+    background-color: var(--cds-layer);
   }
 
   .main-page {
-    min-height: calc(100vh - var(--own-nav-bar-height));
+    height: calc(100vh - var(--own-nav-bar-height));
     width: 100%;
 
     box-sizing: border-box;
 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+  }
+
+  .main-content-wrapper {
+    min-height: 100%;
+
+    // top right bottom left
+    padding: .5rem 1rem 1rem .25rem;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+
+    transition: padding-left var(--own-sidebar-transition-time) ease-in-out;
+  }
+
+  .main-content-wrapper.full-size {
+    padding: .5rem 1rem 1rem 1rem;
   }
 
   .main-content {
-    height: calc(100% - var(--own-main-page-footer-height));
+    min-height: 100%;
     width: 100%;
 
-    display: flex;
-    flex-direction: row;
+    background: var(--cds-ui-background);
+    overflow: hidden;
 
-    box-sizing: border-box;
+    border-radius: 10px;
   }
 
-  .content {
-    width: auto;
-    height: var(--own-main-content-height);
-    flex-grow: 1;
-  }
-
-  .content-inner {
-    margin: 0 8px;
-    border-radius: 6px;
-    background-color: #fff;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-
-    box-sizing: border-box;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .1)
-  }
-
-  .content-center {
-    height: calc(100% - 16px);
-    min-width: 30%;
-    width: 50%;
-    max-width: 70%;
-    margin: 8px auto;
-  }
-
-  .content-title {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-
-  .content-menu {
-    user-select: none;
-    cursor: pointer;
-
-    --size: 24px;
-    height: var(--size);
-    width: var(--size);
-
-    border-radius: 4px;
-  }
-
-  .content-menu:hover {
-    background-color: #eee;
-  }
 
   .footer {
+    --own-main-page-footer-width: var(--own-sidebar-width);
     height: var(--own-main-page-footer-height);
     width: var(--own-main-page-footer-width);
 
@@ -207,41 +254,3 @@
   }
 
 </style>
-
-<div class="page-inner">
-    <Navbar>
-        <div class="navbar-left" slot="left">
-            <MenuButton bind:open --own-menu-btn-border="none"/>
-            <div class="nav-bar-title">
-                <span>Achieve Goals</span>
-            </div>
-        </div>
-        <div class="navbar-right" slot="right">
-            <Icon size="2rem" icon="bxs:user-circle"/>
-        </div>
-    </Navbar>
-    <div class="main-page">
-        <div class="main-content">
-            <Sidebar bind:open --own-sidebar-background="#f6f6f6"/>
-            <div class="content">
-                <div class="content-inner elevation-4">
-                    <div class="content-center">
-                        <div class="content-title">
-
-                            <div class="content-menu" on:click={() => navigate('./goal/')}>
-
-                            </div>
-                        </div>
-                        <div>
-                            {#each goals.filter(it => it.gid === null) as goal}
-                                <GoalComponent bind:goal
-                                               subs={goals.filter(it => it.gid === goal.id)}/>
-                            {/each}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="footer"></div>
-    </div>
-</div>

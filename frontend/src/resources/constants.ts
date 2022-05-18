@@ -18,19 +18,19 @@ const FILTERS = [
 const PRIORITY_COLORS = {
     1: {
         icon: '#de4c4a',
-        background: '#faeceb'
+        background: 'rgba(222,76,74,0.125)'
     },
     2: {
         icon: '#f49c18',
-        background: '#fdf3e6'
+        background: 'rgba(244,156,24,0.125)'
     },
     3: {
         icon: '#3077e1',
-        background: '#e9f1fc'
+        background: 'rgba(48,119,225,0.125)'
     },
     4: {
         icon: '#808080',
-        background: 'none'
+        background: 'rgba(128,128,128,0.125)'
     }
 } as const;
 
@@ -43,10 +43,10 @@ const THEMES = [
 ] as const;
 
 const ICONS = {
-    [NotificationType.ERROR]: {name: 'carbon:error-filled', color: 'var(--cds-inverse-support-01, #fa4d56)'},
-    [NotificationType.SUCCESS]: {name: 'carbon:checkmark-filled', color: 'var(--cds-inverse-support-02, #42be65)'},
-    [NotificationType.WARNING]: {name: 'carbon:warning-filled', color: 'var(--cds-inverse-support-03, #f1c21b)'},
-    [NotificationType.INFO]: {name: 'carbon:information-filled', color: 'var(--cds-inverse-support-04, #4589ff)'}
+    [NotificationType.ERROR]: {name: 'carbon:error-filled', color: 'var(--cds-support-01, #fa4d56)'},
+    [NotificationType.SUCCESS]: {name: 'carbon:checkmark-filled', color: 'var(--cds-support-02, #42be65)'},
+    [NotificationType.WARNING]: {name: 'carbon:warning-filled', color: 'var(--cds-support-03, #f1c21b)'},
+    [NotificationType.INFO]: {name: 'carbon:information-filled', color: 'var(--cds-support-04, #4589ff)'}
 
 } as const;
 

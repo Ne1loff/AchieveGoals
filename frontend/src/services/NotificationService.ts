@@ -22,12 +22,6 @@ export {ErrorMessage};
 
 export default class NotificationService {
 
-    private static INSTANCE: NotificationService;
-
-    private constructor() { }
-
-    static getInstance = () => this.INSTANCE ?? new NotificationService();
-
     private static showNotification(
         notificationType: NotificationType,
         title?: string,
@@ -51,7 +45,7 @@ export default class NotificationService {
             theme: {
                 '--toastPadding': '0',
                 '--toastMsgPadding': '0',
-                '--toastBackground': 'var(--cds-inverse-02, #393939)'
+                '--toastBackground': 'var(--cds-notification-background-info, #393939)'
             }
         })
     }

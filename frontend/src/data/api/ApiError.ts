@@ -1,25 +1,16 @@
-import {jsonProperty, Serializable} from "ts-serializable";
+export default class ApiError {
 
-export default class ApiError extends Serializable {
+    status?: number = null;
 
-    @jsonProperty(Number, null)
-    status?: number;
+    error?: string = null;
 
-    @jsonProperty(String, null)
-    error?: string;
+    message?: string = null;
 
-    @jsonProperty(String, null)
-    message?: string;
+    timestamp?: Date = null;
 
-    @jsonProperty(Date, null)
-    timestamp?: Date;
-
-    @jsonProperty(String, null)
-    path?: string;
-
+    path?: string = null;
 
     constructor(message?: string, status?: number, error?: string,  timestamp?: Date, path?: string) {
-        super();
         this.status = status;
         this.error = error;
         this.message = message;

@@ -6,6 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import {optimizeCss, optimizeImports} from "carbon-preprocess-svelte";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -32,15 +33,19 @@ function serve() {
 
 export default {
 	input: 'src/main.ts',
+	inlineDynamicImports: true,
 	output: {
-		sourcemap: true,
+		sourcemap: !production,
 		format: 'iife',
 		name: 'app',
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
 		svelte({
-			preprocess: sveltePreprocess({ sourceMap: !production }),
+			preprocess: [
+				sveltePreprocess({ sourceMap: !production }),
+				optimizeImports()
+			],
 			compilerOptions: {
 				// enable run-time checks when not in production
 				dev: !production
@@ -75,7 +80,9 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser(),
+
+		production && optimizeCss()
 	],
 	watch: {
 		clearScreen: false

@@ -1,22 +1,26 @@
-import Request from "./Request";
+import type Request from "./Request";
 import type Login from "../data/models/Login";
 import type Registration from "../data/models/Registration";
+import type UserService from "./UserService";
 import {DataType} from "../data/enums/_enums";
 
 
+
 export default class SignUIOService {
-    private static INSTANCE: SignUIOService;
     private request: Request;
+    private userService: UserService;
 
-    private constructor() {
-        this.request = Request.getInstance();
+    constructor(request: Request, userService: UserService) {
+        this.request = request;
+        this.userService = userService;
     }
-
-    static getInstance = () => this.INSTANCE ?? new SignUIOService();
 
     async logIn(login: Login): Promise<number> {
         return this.request.post<number>('api/login', null, login, DataType.JSON)
-            .then((apiResponse) => apiResponse.status);
+            .then((apiResponse) => {
+                this.userService.getCurrentUser();
+                return  apiResponse.status;
+            });
     }
 
     async signUp(registration: Registration): Promise<number> {

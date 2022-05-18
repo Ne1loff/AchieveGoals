@@ -36,7 +36,7 @@
         align-items: var(--own-sidebar-align-items);
         align-content: var(--own-sidebar-align-content);
 
-        transition: all var(--own-sidebar-transition-time) ease-in-out;
+        transition: width var(--own-sidebar-transition-time) ease-in-out;
     }
 
     .side-bar.open {
@@ -54,20 +54,14 @@
 
 </style>
 
-<div class="side-bar" class:open class:collapsed >
-    {#if $$slots.top}
-        <div class="side-bar-top">
-            <slot name="top"></slot>
-        </div>
-    {/if}
-    {#if $$slots.center}
-        <div class="side-bar-center">
-            <slot name="center"></slot>
-        </div>
-    {/if}
-    {#if $$slots.bottom}
-        <div class="side-bar-bottom">
-            <slot name="bottom"></slot>
-        </div>
-    {/if}
+<div class="side-bar" class:open class:collapsed>
+    <div class="side-bar-top">
+        <slot name="top"></slot>
+    </div>
+    <div class="side-bar-center">
+        <slot name="center"></slot>
+    </div>
+    <div class="side-bar-bottom">
+        <slot name="bottom"></slot>
+    </div>
 </div>

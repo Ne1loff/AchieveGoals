@@ -1,22 +1,20 @@
 <script lang="ts">
     import {SvelteToast} from '@zerodevx/svelte-toast'
     import {Route, Router} from "svelte-routing";
-    import {onMount} from "svelte";
     import LoginPage from "./pages/LoginPage.svelte";
     import RegistrationPage from "./pages/RegistrationPage.svelte";
     import HomePage from "./pages/HomePage.svelte";
     import ProfilePage from "./pages/ProfilePage.svelte";
     import NotfoundPage from "./pages/NotfoundPage.svelte";
     import MainPage from "./pages/MainPage.svelte";
-    import {setLanguage} from "./resources/localization/l10n";
-    import {getLanguage} from "./resources/localization/languages/languages";
-
-    onMount(() => {
-        setLanguage(getLanguage(navigator.language));
-    });
-
+    import GoalsHolder from "./components/homeComponents/GoalsHolder.svelte";
+    import {Theme} from "carbon-components-svelte";
 </script>
 
+<svelte:head>
+    <link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/all.css"/>
+</svelte:head>
+<Theme persist persistKey="__carbon-theme"/>
 <Router>
     <Route path="/">
         <MainPage/>
@@ -27,9 +25,18 @@
     <Route path="/registration">
         <RegistrationPage/>
     </Route>
-    <Route path="/home">
-        <HomePage/>
-        <!--        <Route path="/home/goal/:id" let:params><Route/>    -->
+    <Route path="/home/*">
+        <HomePage>
+            <svelte:fragment slot="content">
+                <Router>
+                    <Route path="goals/*">
+                        <GoalsHolder/>
+                        <!--        <Route path="/home/goals/:id" let:params><Route/>    -->
+                    </Route>
+                </Router>
+            </svelte:fragment>
+        </HomePage>
+
     </Route>
     <Route path="/user/profile">
         <ProfilePage/>

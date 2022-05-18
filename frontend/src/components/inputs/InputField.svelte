@@ -81,6 +81,7 @@
 <style lang="scss">
 
   :root {
+    --custom-background-color: #fff;
     --custom-height: 22px;
     --custom-width: 100%;
     --custom-margin: 0;
@@ -91,7 +92,7 @@
   .input_container {
     position: relative;
 
-    background: white;
+    background: var(--custom-background-color);
     width: var(--custom-width);
     max-height: var(--custom-height);
     margin: var(--custom-margin);
@@ -133,7 +134,9 @@
     left var(--custom-transparent-duration) ease-in,
     font-size var(--custom-transparent-duration) ease-in,
     transform var(--custom-transparent-duration) ease-in;
-    background: inherit;
+    background: var(--custom-background-color);
+
+    user-select: none;
   }
 
   .input_field:focus ~ .input_label,
@@ -156,27 +159,34 @@
     flex: 1;
     border: none;
 
+    background: var(--custom-background-color);
+    color: var(--cds-text-01);
+
     padding: 0;
     margin: 0;
   }
 
   input::-webkit-input-placeholder {
     opacity: 0;
+    color: var(--cds-text-placeholder);
     transition: var(--custom-transparent-duration) ease-in;
   }
 
   input::-moz-placeholder {
     opacity: 0;
+    color: var(--cds-text-placeholder);
     transition: var(--custom-transparent-duration) ease-in;
   }
 
   input:-moz-placeholder {
     opacity: 0;
+    color: var(--cds-text-placeholder);
     transition: var(--custom-transparent-duration) ease-in;
   }
 
   input:-ms-input-placeholder {
     opacity: 0;
+    color: var(--cds-text-placeholder);
     transition: var(--custom-transparent-duration) ease-in;
   }
 
@@ -217,7 +227,7 @@
   }
 
   .icon_holder:hover {
-    background: rgba(0, 0, 0, .05);
+    background: var(--cds-hover-ui);
   }
 
   :global(.input_box_icon) {

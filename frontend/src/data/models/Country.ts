@@ -1,10 +1,4 @@
-import {jsonProperty, Serializable} from "ts-serializable";
-
-export default class Country extends Serializable{
-
-    @jsonProperty(Number)
+export default class Country {
     id: number = 0;
-
-    @jsonProperty(String)
     name: string = '';
 }

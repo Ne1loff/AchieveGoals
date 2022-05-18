@@ -1,18 +1,20 @@
-import Request from "./Request";
+import type Request from "./Request";
 import type User from "../data/models/User";
+import {USER} from "../data/storage/storage";
 
 export default class UserService {
-    private static INSTANCE: UserService;
     private request: Request;
 
-    private constructor() {
-        this.request = Request.getInstance();
+    constructor(request: Request) {
+        this.request = request;
     }
-
-    static getInstance = () => this.INSTANCE ?? new UserService();
 
     async getCurrentUser(): Promise<User> {
         return this.request.get<User>('api/user/')
-            .then((apiResponse) => apiResponse.data as User);
+            .then((apiResponse) => {
+                const user = apiResponse.data as User;
+                USER.set(user);
+                return user;
+            });
     }
 }

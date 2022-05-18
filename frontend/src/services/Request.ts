@@ -21,12 +21,6 @@ class RequestData<T> {
 }
 
 export default class Request {
-    private static INSTANCE: Request;
-
-    private constructor() {
-    };
-
-    static getInstance = () => this.INSTANCE ?? new Request();
 
     private static generatePropsString(props: {}): string {
         let propsStr = '?';
@@ -42,7 +36,7 @@ export default class Request {
         if (method === Method.GET) {
             request = fetch(`${base}/${url}`)
                 .catch((reason: TypeError) => {
-                    throw new ApiResponse(0, {
+                    throw new ApiResponse(0, null, {
                         status: 503,
                         error: 'Service Unavailable',
                         message: reason.message,
@@ -58,7 +52,7 @@ export default class Request {
                 body: requestData.dataType === DataType.JSON ?
                     JSON.stringify(requestData.data) : (requestData.data as any)
             }).catch((reason: TypeError) => {
-                throw new ApiResponse(0, {
+                throw new ApiResponse(0, null, {
                     status: 503,
                     error: 'Service Unavailable',
                     message: reason.message,
@@ -72,7 +66,7 @@ export default class Request {
             if (response.ok)
                 return new ApiResponse(response.status, data as T);
             else
-                throw new ApiResponse(response.status, data as ApiError)
+                throw new ApiResponse(response.status, null, data as ApiError)
         });
     }
 

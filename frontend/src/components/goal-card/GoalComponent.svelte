@@ -3,20 +3,23 @@
     import Icon from "@iconify/svelte"
     import Scheduler from "./SchedulerComponent.svelte";
     import GoalMenu from "./GoalMenuComponent.svelte";
-    import {createEventDispatcher} from 'svelte';
+    import {createEventDispatcher, onMount} from 'svelte';
     import dayjs from 'dayjs';
     import {PRIORITY_COLORS} from "../../resources/constants";
     import Goal from '../../data/models/Goal'
     import Popover from "../popover/Popover.svelte";
-    import InlineCalendar from "./InlineCalendar.svelte";
+    import InlineCalendar from "./date-picker/InlineCalendar.svelte";
+    import {GOALS} from "../../data/storage/storage";
+    import GoalCheckbox from "./GoalCheckbox.svelte";
 
     const dispatch = createEventDispatcher();
 
     export let goal: Goal;
-    export let subs: Goal[];
     export let indent = 1;
     export let showSub = true;
     export let fromGoalCard = true;
+
+    let subs: Goal[] = [];
 
     const priorityColors = PRIORITY_COLORS;
 
@@ -42,7 +45,6 @@
     }
 
     let showSubtasks = false;
-    let hoverCheckBtn = false;
     let showActions = false;
     let active = false;
     let showScheduler = false;
@@ -53,13 +55,15 @@
     $: {
         if (goal) {
             diff = dayjs(goal.deadline).diff(dayjs(), 'day');
-            color = diff === 0 ? "#06c03a"
-                : diff === 1 ? "#d97c01"
-                    : diff > 1 && diff < 8 ? "#246fe0"
-                        : diff < 0 || isNaN(diff) ? "#dc231f"
-                            : "#838383";
+            color = diff === 0 ? "var(--cds-support-success)"
+                : diff === 1 ? "var(--cds-support-warning)"
+                    : diff > 1 && diff < 8 ? "var(--cds-support-info)"
+                        : diff < 0 || isNaN(diff) ? "var(--cds-text-error)"
+                            : "var(--cds-disabled-03)";
         }
     }
+
+    onMount(() => subs = $GOALS.filter(it => it.gid === goal.id));
 
 </script>
 
@@ -68,38 +72,33 @@
      on:mouseout={() => active = false}
      on:focus={() => active = true}
      on:blur={() => active = false}
-     transition:slide>
+     transition:slide={{ duration: 200 }}>
     <div class="body-container">
         <div class="body-container-left">
             {#if goal.subtasks.total > 0 && showSub}
-                <div class="container-actions-left" on:click={() => {
-                showSubtasks = !showSubtasks;
-                dispatch('showSub', goal.id);
-            }}>
-                    <div class="btn-icon-container" data-item-rotate={showSubtasks ? '45' : '0'}>
+                <div class="container-actions-left" on:click={() => showSubtasks = !showSubtasks}>
+                    <div class="btn-icon-container" data-item-rotate={showSubtasks ? '90' : '0'}>
                         <Icon class="action-left-btn" icon="uil:angle-right-b"/>
                     </div>
                 </div>
+            {:else}
+                <div style="width: 28px"></div>
             {/if}
-            <div class="container-checkbox"
-                 style="background: {priorityColors[goal.priority].background}; border-color: {priorityColors[goal.priority].icon}"
-                 on:mouseover={() => hoverCheckBtn = true}
-                 on:mouseout={() => hoverCheckBtn = false}
-                 on:focus={() => hoverCheckBtn = true}
-                 on:blur={() => hoverCheckBtn = false}
-                 on:click={() => {
-                     console.log(goal.isDone);
-                 goal.isDone = !goal.isDone;
-                 dispatch('done', goal);
-             }}>
-                {#if hoverCheckBtn && !goal.isDone}
-                    <Icon class="done_btn" icon="akar-icons:circle-check"
-                          style="color: {priorityColors[goal.priority].icon};"/>
-                {:else if goal.isDone}
-                    <Icon class="done_btn" icon="akar-icons:circle-check-fill"
-                          style="color: {priorityColors[goal.priority].icon}"/>
-                {/if}
-            </div>
+            <GoalCheckbox
+                    bind:done={goal.isDone}
+                    round
+                    --own-checkbox-size="1.5rem"
+                    --own-checkbox-border-color={priorityColors[goal.priority].icon}
+                    --own-checkbox-hover-border-color={priorityColors[goal.priority].icon}
+                    --own-checkbox-done-border-color={priorityColors[goal.priority].icon}
+
+                    --own-checkbox-bg-color={priorityColors[goal.priority].background}
+                    --own-checkbox-hover-bg-color={priorityColors[goal.priority].background}
+                    --own-checkbox-done-bg-color={priorityColors[goal.priority].icon}
+
+                    --own-check-mark-bg-color={priorityColors[goal.priority].icon}
+                    --own-check-mark-hover-bg-color={priorityColors[goal.priority].icon}
+            />
         </div>
         <div class="container-content" on:click>
             <div class="content-title" class:done={goal.isDone}>{goal.title}</div>
@@ -112,7 +111,7 @@
                         <div class="info-tags-text">{goal.subtasks.completed + '/' + goal.subtasks.total}</div>
                     </div>
                 {/if}
-                <Popover overlayColor={"rgba(0, 0, 0, 0.15)"} on:close={onMenuClose}>
+                <Popover overlayColor={"var(--cds-overlay)"} on:close={onMenuClose}>
                     <div slot="target" class="info-tags-date">
                         <div class="info-tags-icon">
                             <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
@@ -153,7 +152,7 @@
 </div>
 {#if showSubtasks}
     {#each subs as goal}
-        <svelte:self bind:goal indent={indent + 1} subs={subs.filter(it => it.gid === goal.id)}/>
+        <svelte:self bind:goal indent={indent + 1}/>
     {/each}
 {/if}
 
@@ -165,10 +164,20 @@
 
     .goal-body {
         position: relative;
-        min-width: 450px;
+        min-width: 300px;
         width: 100%;
-        border-bottom: 1px solid #f4f4f4;
         user-select: none;
+    }
+
+    .goal-body:before {
+        width: calc(100% - 28px);
+        content: "";
+
+        position: absolute;
+        right: 0;
+        bottom: 0;
+
+        border-bottom: 1px solid var(--cds-ui-03);
     }
 
     .goal-body[data-item-indent="2"] {
@@ -220,26 +229,13 @@
         border-radius: 5px;
 
 
-        background: #fff;
+        background: inherit;
         border: none;
     }
 
     .container-actions-left:hover {
-        background: var(--own-btn-hover-color);
-    }
-
-    .container-checkbox {
-        height: 16px;
-        width: 16px;
-        cursor: pointer;
-        background: #faeceb;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 50%;
-        border: 2px solid #fff;
+        background-color: var(--cds-hover-ui);
+        color: var(--cds-hover-primary-text, #0043ce);
     }
 
     .container-content {
@@ -262,7 +258,7 @@
 
     .content-title.done {
         text-decoration: line-through;
-        color: #777
+        color: var(--cds-text-disabled);
     }
 
     .content-info-tags {
@@ -291,7 +287,8 @@
 
     .info-tags-date:hover {
         border-radius: 5px;
-        background-color: var(--own-btn-hover-color);
+        background-color: var(--cds-hover-ui);
+        color: var(--cds-hover-primary-text, #0043ce);
     }
 
     .info-tags-icon {
@@ -319,7 +316,7 @@
         justify-content: center;
     }
 
-    .btn-icon-container[data-item-rotate="45"] {
+    .btn-icon-container[data-item-rotate="90"] {
         transform: rotate(90deg);
     }
 
@@ -348,7 +345,7 @@
 
         border: none;
         border-radius: 3px;
-        background: #fff;
+        background: inherit;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -360,24 +357,20 @@
     }
 
     .action-btn:hover {
-        background: var(--own-btn-hover-color);
+        background-color: var(--cds-hover-ui);
+        color: var(--cds-hover-primary-text, #0043ce);
     }
 
     :global(.action-left-btn) {
         height: 18px;
         width: 18px;
-        color: gray;
+        color: var(--cds-icon-01);
     }
 
     :global(.action-icons) {
         height: 16px;
         width: 16px;
-        color: gray;
+        color: var(--cds-icon-01);
     }
 
-    :global(.done_btn) {
-        height: 20px;
-        width: 20px;
-        overflow: visible;
-    }
 </style>

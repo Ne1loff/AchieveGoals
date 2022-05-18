@@ -22,7 +22,7 @@
     }
 
     :global(._toastBtn) {
-        color: var(--cds-inverse-01, #ffffff)
+        color: var(--cds-text-01, #ffffff)
     }
 
     :root {
@@ -37,9 +37,9 @@
         flex-direction: row;
         align-items: center;
 
-        color: var(--cds-inverse-01, #ffffff);
+        color: var(--cds-text-01, #ffffff);
         border-left: 3px solid var(--cds-inverse-support-03, #f1c21b);
-        background: var(--cds-inverse-02, #393939);
+        background: var(--cds-notification-background-info, #393939)
     }
 
     .notification-icon {
@@ -59,6 +59,7 @@
     .notification-body {
         flex-grow: 1;
         height: 100%;
+        color: var(--cds-text-primary)
     }
 
 </style>
@@ -69,7 +70,7 @@
             <Icon icon={icons[notificationType].name} color={icons[notificationType].color}/>
         </div>
     </div>
-    <div class="notification-body">
+    <div class="notification-body bx--toast-notification--low-contrast ">
         <h3 class="bx--toast-notification__title">{title}</h3>
         <div class="bx--toast-notification__subtitle">{subtitle}</div>
         <div class="bx--toast-notification__caption">{caption}</div>

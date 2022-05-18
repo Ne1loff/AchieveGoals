@@ -11,12 +11,15 @@
     import Login from "../data/models/Login";
     import ApiResponse from "../data/api/ApiResponse";
     import ApiError from "../data/api/ApiError";
+    import ServiceFactory from "../services/ServiceFactory";
+    import UserService from "../services/UserService";
 
     const handleKeydown = (e) => {
         if (e.key !== 'Enter') return;
         sigIn();
     }
 
+    let userService: UserService;
     let signUIOService: SignUIOService;
     let notificationService: NotificationService;
 
@@ -25,16 +28,17 @@
     function sigIn() {
         if (login.login.length > 0 && login.password.length > 0) {
             signUIOService.logIn(login)
-                .then(() => navigate('/home'))
+                .then(() => navigate('/home/goals'))
                 .catch((apiResponse: ApiResponse<ApiError>) =>
-                    notificationService.errorFromErrorMessage(new ErrorMessage().fromApiError(apiResponse.data))
+                    notificationService.errorFromErrorMessage(new ErrorMessage().fromApiError(apiResponse.error))
                 );
         }
     }
 
     onMount(() => {
-        signUIOService = SignUIOService.getInstance();
-        notificationService = NotificationService.getInstance();
+        userService = ServiceFactory.INSTANCE.userService;
+        signUIOService = ServiceFactory.INSTANCE.signUIOService;
+        notificationService = ServiceFactory.INSTANCE.notificationService;
     });
 
 </script>
@@ -43,9 +47,9 @@
 <Navbar outlinedBottom --own-nav-bar-left-margin-left="4px">
     <img slot="left" class="logo" on:click={() => navigate('/')} src="/static/logo_200x44.png" alt="logo">
 </Navbar>
-<div class="main-content">
+<div class="main-content login-page">
     <div class="intro__inner">
-        <form class="box" method="post">
+        <form class="box elevation-6" method="post">
             <h1>Login</h1>
             <div class="user_details">
                 <div class="input_box">
@@ -54,7 +58,8 @@
                                 label={l10n.login}
                                 --custom-height="45px"
                                 --custom-width="285px"
-                                --custom-border-color="#A9A9A9"
+                                --custom-border-color="var(--cds-border-inverse)"
+                                --custom-background-color="var(--cds-ui-01)"
                     />
                 </div>
                 <div class="input_box">
@@ -63,7 +68,8 @@
                                 newPass={false}
                                 --custom-height="45px"
                                 --custom-width="285px"
-                                --custom-border-color="#A9A9A9"
+                                --custom-border-color="var(--cds-border-inverse)"
+                                --custom-background-color="var(--cds-ui-01)"
                     />
                 </div>
             </div>
@@ -86,11 +92,10 @@
         flex-direction: column;
         align-items: center;
 
-        background: linear-gradient(135deg, #71b7e6, #9b59b6);
+        background: var(--own-login-page-background);
 
         width: 100%;
-        height: 100vh;
-        bottom: 0;
+        height: calc(100% - var(--own-nav-bar-height));
     }
 
 
@@ -99,7 +104,7 @@
         width: 350px;
         padding: 20px;
         position: center;
-        background: white;
+        background: var(--cds-ui-01);
         border-radius: 10px;
         text-align: center;
     }
@@ -116,6 +121,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-bottom: .5rem;
     }
 
     .input_box {
@@ -123,27 +129,12 @@
         max-width: 90%;
     }
 
-    /* Submit Button */
-    .submit_btn {
-        margin: 5px auto;
-        width: 130px;
-        border-radius: 12px;
-        border-color: #A9A9A9;
-        color: #fff;
-        background: #1877f2;
-    }
-
-    .submit_btn:hover {
-        background: darkgray;
-        transition: 0.3s;
-    }
-
     /* Sign Up Link */
     .signup_link {
         padding: 5px;
         margin: 5px auto;
         text-align: center;
-        color: black;
+        color: var(--cds-text-01);
     }
 
     /* Media */

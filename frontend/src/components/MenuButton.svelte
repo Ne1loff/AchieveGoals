@@ -1,7 +1,14 @@
 <script lang="ts">
+    import {createEventDispatcher} from "svelte";
+
+    const dispatch = createEventDispatcher();
 
     export let open = false;
-    const onClick = () => open = !open;
+
+    const onClick = () => {
+        open = !open;
+        dispatch('change', open);
+    }
 
 </script>
 
@@ -15,9 +22,9 @@
         --own-menu-btn-background: transparent;
         --own-menu-btn-hover-background: #e1e1e1;
 
-        --own-burder-color: #000;
-        --own-burder-border-radius: 5px;
-        --own-burder-box-shadow: 0 2px 5px rgba(117, 106, 104, 0.2);
+        --own-burger-color: #000;
+        --own-burger-border-radius: 5px;
+        --own-burger-box-shadow: 0 2px 5px rgba(117, 106, 104, 0.2);
     }
 
     .menu-btn {
@@ -30,7 +37,7 @@
         height: var(--own-menu-btn-size);
 
         cursor: pointer;
-        transition: all var(--own-menu-btn-transition-time) ease-in-out, background-color 0s ease-in-out ;
+        transition: all var(--own-menu-btn-transition-time) ease-in-out, background-color 0s ease-in-out;
 
         border: var(--own-menu-btn-border);
         border-radius: var(--own-menu-btn-border-radius);
@@ -47,10 +54,11 @@
         width: calc(var(--own-menu-btn-size) * .75);
         height: calc(var(--own-menu-btn-size) * .1);
 
-        background: var(--own-burder-color);
-        border-radius: var(--own-burder-border-radius);
-        box-shadow: var(--own-burder-box-shadow);
-        transition: all var(--own-menu-btn-transition-time) ease-in-out;
+        background: var(--own-burger-color);
+        border-radius: var(--own-burger-border-radius);
+        box-shadow: var(--own-burger-box-shadow);
+        transition: transform var(--own-menu-btn-transition-time) ease-in-out,
+        background-color var(--own-menu-btn-transition-time) ease-in-out;
     }
 
     .menu-btn--burger::before,

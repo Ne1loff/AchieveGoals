@@ -3,8 +3,8 @@
     import Icon from "@iconify/svelte";
     import SchedulerModal from "../modals/SchedulerModal.svelte";
     import Goal from "../../data/models/Goal";
-    import InlineCalendar from "./InlineCalendar.svelte";
-    import TimeComponent from "./TimeComponent.svelte";
+    import InlineCalendar from "./date-picker/InlineCalendar.svelte";
+    import TimeComponent from "./date-picker/TimeComponent.svelte";
 
     const daysName = (dayNum) => {
         let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];

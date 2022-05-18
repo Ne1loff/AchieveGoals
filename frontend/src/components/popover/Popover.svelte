@@ -36,7 +36,7 @@
     export let arrow = true;
     export let placement = 'auto';
     export let arrowColor = 'white';
-    export let overlayColor;
+    export let overlayColor = 'rgba(0, 0, 0, 0.02)';
     export let preventDefault = false;
     export let stopPropagation = false;
 

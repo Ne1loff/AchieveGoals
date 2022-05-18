@@ -19,6 +19,7 @@
     import InputField from "../components/inputs/InputField.svelte";
     import {EMAIL_REGEX, PASSWORD_REGEX} from "../resources/regexes";
     import {l10n} from "../resources/localization/l10n";
+    import ServiceFactory from "../services/ServiceFactory";
 
     let countryService: CountryService;
     let signUIOService: SignUIOService;
@@ -29,9 +30,9 @@
     let countries: Country[] = [];
 
     onMount(() => {
-        countryService = CountryService.getInstance();
-        signUIOService = SignUIOService.getInstance();
-        notificationService = NotificationService.getInstance();
+        countryService = ServiceFactory.INSTANCE.countryService;
+        signUIOService = ServiceFactory.INSTANCE.signUIOService;
+        notificationService = ServiceFactory.INSTANCE.notificationService;
 
         loadCountries();
     });
@@ -40,7 +41,7 @@
         countryService.getCountries()
             .then((it: Country[]) => countries = it)
             .catch((apiResponse: ApiResponse<ApiError>) => {
-                onError(apiResponse.data);
+                onError(apiResponse.error);
                 countries = [];
             });
     }
@@ -50,8 +51,8 @@
             .then(() => {
                 signUIOService.logIn(new Login().fromRegistration(registration))
                     .then(() => navigate('/home'))
-                    .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.data));
-            }).catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.data))
+                    .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error));
+            }).catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error))
     }
 
     const onError = (apiError: ApiError) => {
@@ -81,8 +82,8 @@
 <Navbar outlinedBottom --own-nav-bar-left-margin-left="4px">
     <img slot="left" class="logo" on:click={() => navigate('/')} src="/static/logo_200x44.png" alt="logo">
 </Navbar>
-<div class="main-content">
-    <form class="box" method="post">
+<div class="main-content login-page">
+    <form class="box elevation-6" method="post">
         <h1>Sign up</h1>
         <div class="user_details">
             <InputField bind:value={registration.username} label={l10n.username}
@@ -90,7 +91,9 @@
                         --custom-height="45px"
                         --custom-width="285px"
                         --custom-margin="8px 0 4px 0"
-                        --custom-border-color="#A9A9A9"
+                        --custom-border-color="var(--cds-border-inverse)"
+                        --custom-background-color="var(--cds-ui-01)"
+                        --own-input-error-color="var(--cds-text-error)"
             />
             <InputField bind:value={registration.email} label={l10n.email}
                         required
@@ -100,7 +103,9 @@
                         --custom-height="45px"
                         --custom-width="285px"
                         --custom-margin="8px 0 4px 0"
-                        --custom-border-color="#A9A9A9"
+                        --custom-border-color="var(--cds-border-inverse)"
+                        --custom-background-color="var(--cds-ui-01)"
+                        --own-input-error-color="var(--cds-text-error)"
             />
             <Svelecte options={countries}
                       bind:value={registration.locality}
@@ -110,11 +115,22 @@
                       style="width: 285px;
                       margin: 8px 0 4px 0;
                       --sv-dropdown-height: 200px;
-                      --sv-border-color: #A9A9A9;
+                      --sv-border-color: var(--cds-border-inverse);
                       --sv-border: 1px solid var(--sv-border-color);
+                      --sv-active-border: 1px solid var(--cds-border-interactive);
+                      --sv-bg: var(--cds-ui-01);
                       --sv-min-height: 45px;
-                      --sv-placeholder-color: var(--cds-text-01, #161616);
-                      color: var(--cds-text-01, #161616);
+                      --sv-icon-color: var(--cds-icon-01);
+                      --sv-item-selected-bg: var(--cds-background-selected);
+                      --sv-item-color: var(--cds-text-01);
+                      --sv-item-active-color: var(--cds-text-01);
+                      --sv-item-active-bg: var(--cds-background-active);
+                      --sv-item-btn-bg: var(--sv-item-selected-bg);
+                      --sv-item-btn-bg-hover: var(--cds-hover-ui);
+                      --sv-placeholder-color: var(--cds-text-01);
+                      --sv-icon-hover: var(--cds-icon-02);
+                      --sv-highlight-bg: var(--cds-highlight);
+                      color: var(--cds-text-01);
                       font-size: 17px;"
             >
                 <div slot="icon" style="margin-left: 8px; height: 100%; width: 0"></div>
@@ -130,7 +146,9 @@
                         --custom-height="45px"
                         --custom-width="285px"
                         --custom-margin="8px 0 4px 0"
-                        --custom-border-color="#A9A9A9"
+                        --custom-border-color="var(--cds-border-inverse)"
+                        --custom-background-color="var(--cds-ui-01)"
+                        --own-input-error-color="var(--cds-text-error)"
             />
             <InputField bind:value={confirmedPassword} label={l10n.confirmPass}
                         type="password"
@@ -140,7 +158,9 @@
                         --custom-height="45px"
                         --custom-width="285px"
                         --custom-margin="8px 0 4px 0"
-                        --custom-border-color="#A9A9A9"
+                        --custom-border-color="var(--cds-border-inverse)"
+                        --custom-background-color="var(--cds-ui-01)"
+                        --own-input-error-color="var(--cds-text-error)"
             />
             {#if passNotMatch}
                 <legend class="pass_match">{l10n.passwordsNotMatch}!</legend>
@@ -193,7 +213,7 @@
     }
 
     :global(.bx--content-switcher-btn.bx--content-switcher--selected) {
-        z-index: 1;
+        z-index: 1 !important;
     }
 
     :global(.bx--content-switcher-btn) {
@@ -212,10 +232,9 @@
         align-items: center;
 
         width: 100%;
-        height: 100vh;
-        bottom: 0;
+        height: calc(100% - var(--own-nav-bar-height));
 
-        background: linear-gradient(135deg, #71b7e6, #9b59b6);
+        background: var(--own-login-page-background);
     }
 
     /* Box */
@@ -223,7 +242,7 @@
         width: 350px;
         padding: 20px;
         position: center;
-        background: white;
+        background: var(--cds-ui-01);
         border-radius: 10px;
         text-align: center;
     }
@@ -253,7 +272,7 @@
     /* Check for male */
     .check-for-male {
         max-width: calc(285px - 10%);
-        margin: 4px auto;
+        margin: 4px auto .5rem;
 
         text-align: center;
         display: flex;
@@ -265,7 +284,7 @@
         padding: 5px;
         margin: 5px auto;
         text-align: center;
-        color: black;
+        color: var(--cds-text-01);
     }
 
     /* Media */
