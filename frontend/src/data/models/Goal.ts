@@ -19,11 +19,11 @@ class Goal {
 
     priority: 1 | 2 | 3 | 4 = 4;
 
-    createdAt: Date = null;
+    createdAt: Date = new Date();
 
-    updatedAt: Date = null;
+    updatedAt: Date = new Date();
 
-    deadline: Date = null;
+    deadline: Date = new Date();
 }
 
 export default Goal;

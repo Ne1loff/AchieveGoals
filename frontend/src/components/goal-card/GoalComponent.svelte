@@ -40,13 +40,11 @@
     }
 
     const onMenuClose = () => {
-        active = false;
         updateGoal();
     }
 
     let showSubtasks = false;
     let showActions = false;
-    let active = false;
     let showScheduler = false;
 
     let diff;
@@ -68,10 +66,6 @@
 </script>
 
 <div class="goal-body" data-item-indent="{indent > 5 || indent < 1 ? 1 : indent}"
-     on:mouseover={() => active = true}
-     on:mouseout={() => active = false}
-     on:focus={() => active = true}
-     on:blur={() => active = false}
      transition:slide={{ duration: 200 }}>
     <div class="body-container">
         <div class="body-container-left">
@@ -123,7 +117,7 @@
                 </Popover>
             </div>
         </div>
-        <div class="container-actions-right" class:active>
+        <div class="container-actions-right">
             <div class="action-btn" on:click={editGoal}>
                 <Icon class="action-icons" icon="feather:edit-3"/>
             </div>
@@ -320,7 +314,7 @@
         transform: rotate(90deg);
     }
 
-    .container-actions-right, .container-actions-right.active {
+    .container-actions-right {
         display: flex;
         justify-content: flex-end;
         height: 24px;
@@ -336,7 +330,7 @@
         opacity: 0;
     }
 
-    .container-actions-right.active {
+    .goal-body:hover .container-actions-right {
         opacity: 1;
     }
 

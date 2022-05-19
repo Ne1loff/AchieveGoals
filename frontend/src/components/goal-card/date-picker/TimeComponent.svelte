@@ -9,7 +9,7 @@
     const minutes = Array(60).fill(0).map((_, i) => i);
 
     let time;
-    $:value = dayjs(value).set('hour', time?.getHours()).set('minute', time?.getMinutes()).toDate();
+    //$:value = dayjs(value).set('hour', time?.getHours()).set('minute', time?.getMinutes()).toDate();
 
 </script>
 

@@ -41,9 +41,7 @@
     const handleResize = () => {
         const autoCloseSideBar = document.body.clientWidth <= 770;
         if (autoCloseSideBar && !wasCheck) {
-            console.log(open)
             open = false;
-            console.log(open)
             wasCheck = true;
         } else if (!autoCloseSideBar) {
             open = sideBarWasOpen;

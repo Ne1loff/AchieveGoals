@@ -7,7 +7,7 @@ class GoalMapper {
         const goal = new Goal();
         Object.keys(goalDto)
             .forEach(key => {
-                goal[key] = goalDto[key];
+                goal[key] = goal[key] instanceof Date ? new Date(goalDto[key]) : goalDto[key];
             });
         return goal;
     }
@@ -27,7 +27,7 @@ class GoalMapper {
             const goal = new Goal();
             Object.keys(dto)
                 .forEach(key => {
-                    goal[key] = dto[key];
+                    goal[key] = goal[key] instanceof Date ? new Date(dto[key]) : dto[key];
                 });
             goals.push(goal);
         });

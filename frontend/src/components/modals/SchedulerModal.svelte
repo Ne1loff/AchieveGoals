@@ -25,7 +25,7 @@
         max-height: 600px;
         display: flex;
         flex-direction: column;
-        background: #fff;
+        background: var(--cds-field);
         border-radius: 3px;
         z-index: 1020;
     }

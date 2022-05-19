@@ -4,7 +4,6 @@
     import SchedulerModal from "../modals/SchedulerModal.svelte";
     import Goal from "../../data/models/Goal";
     import InlineCalendar from "./date-picker/InlineCalendar.svelte";
-    import TimeComponent from "./date-picker/TimeComponent.svelte";
 
     const daysName = (dayNum) => {
         let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -26,97 +25,6 @@
 
 </script>
 
-<style>
-
-    button {
-        margin: 0;
-    }
-
-    .scheduler-title {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-
-        padding: 8px 10px;;
-    }
-
-    .scheduler-suggestion {
-        display: flex;
-        flex-direction: column;
-
-        padding: 4px 0;
-    }
-
-    .scheduler-suggestion-item {
-        border: 0;
-        background: none;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        padding: 4px 10px;
-        line-height: 24px;
-        outline: none;
-
-        width: 100%;
-    }
-
-    .scheduler-suggestion-item:hover {
-        background: #f1f1f1;
-    }
-
-    .scheduler-suggestion-item-icon {
-        display: flex;
-        position: relative;
-        margin-right: 10px;
-        color: grey;
-    }
-
-    .scheduler-suggestion-item-icon span {
-        width: 18px;
-        height: 18px;
-
-        position: absolute;
-        transform: translateY(-1px);
-
-        color: #058527;
-        font-size: 12px;
-        font-weight: 400;
-    }
-
-    .scheduler-suggestion-item-label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        margin-right: 4px;
-
-        font-size: 13px;
-        font-weight: 400;
-        color: #202020;
-    }
-
-    .scheduler-suggestion-item-weekend {
-        margin-left: auto;
-        color: grey;
-    }
-
-    .scheduler-date-picker {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .scheduler-action input {
-        line-height: 22px;
-        padding: 0 4px;
-        margin: 0;
-        border-radius: 3px;
-        border: 1px solid #ccc;
-        outline: none;
-        box-sizing: border-box;
-    }
-
-</style>
 
 <SchedulerModal on:close bind:fromGoalCard>
     <div class="scheduler-title" slot="header">
@@ -126,7 +34,9 @@
         <button class="scheduler-suggestion-item" on:click={() => goal.deadline = dates.today}>
                         <span class="scheduler-suggestion-item-icon">
                             <Icon icon="bi:calendar" style="width: 18px; height: 18px; color: #058527;"/>
-                            <span>{dates.todayNum}</span>
+                            <span class="icon-badge">
+                                <span>{dates.todayNum}</span>
+                            </span>
                         </span>
             <span class="scheduler-suggestion-item-label">Сегодня</span>
             <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().day())}</span>
@@ -157,7 +67,115 @@
         <InlineCalendar bind:value={goal.deadline}/>
     </div>
     <div slot="time">
-
-        <TimeComponent bind:value={goal.deadline}/>
+        <!--        <TimeComponent bind:value={goal.deadline}/>-->
     </div>
 </SchedulerModal>
+
+
+<style>
+
+    button {
+        margin: 0;
+    }
+
+    .scheduler-title {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        padding: 8px 10px;;
+    }
+
+    .scheduler-suggestion {
+        display: flex;
+        flex-direction: column;
+
+        padding: 4px 0;
+
+        color: var(--cds-text-01);
+    }
+
+    .scheduler-suggestion-item {
+        border: 0;
+        background: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        padding: 4px 10px;
+        line-height: 24px;
+        outline: none;
+
+        color: var(--cds-text-01);
+
+        width: 100%;
+    }
+
+    .scheduler-suggestion-item:hover {
+        background: var(--cds-hover-ui);
+    }
+
+    .scheduler-suggestion-item-icon {
+        display: flex;
+        position: relative;
+        margin-right: 10px;
+        color: var(--cds-icon-01);
+    }
+
+    .icon-badge {
+        width: 18px;
+        height: 18px;
+
+        position: absolute;
+        top: 50%;
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+
+        color: #058527;
+        font-size: 12px;
+        font-weight: 400;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-badge span {
+        width: 100%;
+        height: 100%;
+        transform: translateY(-1px);
+    }
+
+    .scheduler-suggestion-item-label {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        margin-right: 4px;
+
+        font-size: 13px;
+        font-weight: 400;
+    }
+
+    .scheduler-suggestion-item-weekend {
+        margin-left: auto;
+        color: var(--cds-text-02);
+    }
+
+    .scheduler-date-picker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .scheduler-action input {
+        line-height: 22px;
+        padding: 0 4px;
+        margin: 0;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+</style>
