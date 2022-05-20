@@ -1,6 +1,6 @@
 package com.example.achieve_goals.dto
 
-data class ChangePasswordDTO(
+data class ChangePasswordRequestDTO(
     val oldPassword: String,
     val newPassword: String
 )

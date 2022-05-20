@@ -51,9 +51,9 @@ data class User(
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         val authorityList: MutableList<GrantedAuthority> = ArrayList()
-        authorityList.add(SimpleGrantedAuthority("ROLE_USER"))
+        authorityList.add(SimpleGrantedAuthority(Roles.USER))
         if (admin)
-            authorityList.add(SimpleGrantedAuthority("ROLE_ADMIN"))
+            authorityList.add(SimpleGrantedAuthority(Roles.ADMIN))
         return authorityList
     }
 

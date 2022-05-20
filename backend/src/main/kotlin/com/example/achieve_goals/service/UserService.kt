@@ -29,6 +29,9 @@ class UserService(
 
     private val localityNames = localityRepository.findAll().associate { it.id to it.name }
 
+    private val maleDefaultAvatar: String = "male_default_avatar.png"
+    private val femaleDefaultAvatar: String = "female_default_avatar.png"
+
     override fun loadUserByUsername(login: String): UserDetails {
         return userRepository.findUserByUsernameSalt(login) ?: userRepository.findUserByEmail(login)
         ?: throw ApiInvalidLoginOrPasswordException("Invalid login or password")
@@ -49,7 +52,9 @@ class UserService(
 
     fun getUserAvatarLink(id: Long): String {
         val user = userRepository.findUserById(id)
-        val filename = if (user.male) "male_default_avatar.png" else "female_default_avatar.png"
+
+        val filename = if (user.male) maleDefaultAvatar else femaleDefaultAvatar
+
         if (user.userPhoto == null) return minioService.getPhoto(filename)
         return minioService.getPhoto(user.id, user.userPhoto!!.fileExtension)
     }
@@ -58,24 +63,16 @@ class UserService(
     fun uploadUserAvatar(id: Long, file: InputStream, fileExtension: String) {
         val user = userRepository.findUserById(id)
         var userAvatar = user.userPhoto
-        if (userAvatar != null) {
-            minioService.deletePhoto(userAvatar.id, userAvatar.fileExtension)
-            userAvatar.fileExtension = fileExtension
-        } else {
-            userAvatar = UserAvatar(id, fileExtension)
-        }
-        minioService.uploadPhoto(id, file, fileExtension)
+
+        if (userAvatar != null) userAvatar.fileExtension = fileExtension
+        else userAvatar = UserAvatar(id, fileExtension)
+
         userAvatarRepository.save(userAvatar)
     }
 
     @Transactional
     fun deleteUserPhoto(id: Long) {
-        val user = userRepository.findUserById(id)
-        val userAvatar = user.userPhoto
-        if (userAvatar != null) {
-            minioService.deletePhoto(userAvatar.id, userAvatar.fileExtension)
-            userAvatarRepository.deleteUserAvatarById(user.id)
-        }
+        userAvatarRepository.deleteUserAvatarById(id)
     }
 
 
@@ -106,7 +103,7 @@ class UserService(
                 if (userRepository.existsUserByUsernameSalt(userDTO.username))
                     throw ApiBadRequestException("User with this username already exist!")
 
-        user.usernameSalt = userDTO.username ?: user.username
+        user.usernameSalt = userDTO.username ?: user.usernameSalt
         user.email = userDTO.email ?: user.email
         user.name = userDTO.name ?: user.name
         user.surname = userDTO.surname ?: user.surname

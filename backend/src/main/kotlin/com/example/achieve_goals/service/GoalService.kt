@@ -31,7 +31,7 @@ class GoalService(
         if (goal.uid == userId) {
             return mapper.dtoFromGoal(goal)
         }
-        throw ApiBadRequestException("User doesn't have this goal")
+        throw ApiNotfoundException("Goal not found!")
     }
 
 
@@ -41,53 +41,46 @@ class GoalService(
             val goals = goalRepository.getGoalsByGid(gid)
             return goals.map { mapper.dtoFromGoal(it) }.toMutableList()
         }
-        throw ApiBadRequestException("User doesn't have this goal")
+        throw ApiNotfoundException("Goal not found!")
     }
 
-    fun createMainGoal(goalDTO: GoalDTO, uid: Long): Boolean {
+    fun createMainGoal(goalDTO: GoalDTO, uid: Long) {
         val date = Date()
-        try {
-            val goal = Goal(
-                id = -1,
-                uid = uid,
-                title = goalDTO.title!!,
-                description = goalDTO.description,
-                isDone = false,
-                gid = null,
-                priority = goalDTO.priority!!,
-                createdAt = date,
-                updatedAt = date,
-                deadline = goalDTO.deadline!!
-            )
-            goalRepository.save(goal)
-        } catch (e: Exception) {
-            throw ApiBadRequestException("Incorrect data")
-        }
-        return true
+
+        val goal = Goal(
+            id = -1,
+            uid = uid,
+            title = goalDTO.title?.run { goalDTO.title } ?: throw ApiBadRequestException("Incorrect data"),
+            description = goalDTO.description,
+            isDone = false,
+            gid = null,
+            priority = goalDTO.priority?.run { goalDTO.priority } ?: throw ApiBadRequestException("Incorrect data"),
+            createdAt = date,
+            updatedAt = date,
+            deadline = goalDTO.deadline?.run { goalDTO.deadline } ?: throw ApiBadRequestException("Incorrect data"),
+        )
+
+        goalRepository.save(goal)
     }
 
-    fun createSubGoal(goalDTO: GoalDTO, uid: Long): Boolean {
+    fun createSubGoal(goalDTO: GoalDTO, uid: Long) {
         if (goalDTO.gid == null) throw ApiBadRequestException("SubGoal must have parent")
 
         val date = Date()
-        try {
-            val goal = Goal(
-                id = -1,
-                uid = uid,
-                title = goalDTO.title!!,
-                description = goalDTO.description,
-                isDone = false,
-                gid = goalDTO.gid,
-                priority = goalDTO.priority!!,
-                createdAt = date,
-                updatedAt = date,
-                deadline = goalDTO.deadline!!
-            )
-            goalRepository.save(goal)
-        } catch (e: Exception) {
-            throw ApiBadRequestException("Incorrect data")
-        }
-        return true
+
+        val goal = Goal(
+            id = -1,
+            uid = uid,
+            title = goalDTO.title?.run { goalDTO.title } ?: throw ApiBadRequestException("Incorrect data"),
+            description = goalDTO.description,
+            isDone = false,
+            gid = goalDTO.gid,
+            priority = goalDTO.priority?.run { goalDTO.priority } ?: throw ApiBadRequestException("Incorrect data"),
+            createdAt = date,
+            updatedAt = date,
+            deadline = goalDTO.deadline?.run { goalDTO.deadline } ?: throw ApiBadRequestException("Incorrect data")
+        )
+        goalRepository.save(goal)
     }
 
     @Transactional

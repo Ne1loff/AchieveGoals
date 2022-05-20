@@ -4,6 +4,7 @@ import com.example.achieve_goals.repository.MinioRepository
 import io.minio.GetPresignedObjectUrlArgs
 import io.minio.PutObjectArgs
 import io.minio.RemoveObjectArgs
+import io.minio.StatObjectArgs
 import io.minio.http.Method
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -20,12 +21,35 @@ class MinioService(
 
     fun uploadPhoto(uid: Long, file: InputStream, fileExtension: String) {
         val updFile = "$uid.$fileExtension"
+
+        if (photoExist(updFile))
+            deletePhoto(uid, fileExtension);
+
         minioClient.putObject(
             PutObjectArgs.builder()
-                .bucket(bucketName).stream(file, -1, PutObjectArgs.MIN_MULTIPART_SIZE.toLong())
+                .bucket(bucketName)
+                .stream(file, -1, PutObjectArgs.MIN_MULTIPART_SIZE.toLong())
                 .`object`(updFile)
                 .build()
         )
+    }
+
+    fun photoExist(uid: Long, fileExtension: String): Boolean {
+        val file = "$uid.$fileExtension"
+        return photoExist(file)
+    }
+
+    fun photoExist(filename: String): Boolean {
+        return try {
+            minioClient.statObject(
+                StatObjectArgs.builder()
+                    .bucket(bucketName)
+                    .`object`(filename)
+                    .build()
+            ).size() > 0
+        } catch (e: Exception) {
+            false
+        }
     }
 
     fun getPhoto(uid: Long, fileExtension: String): String {
@@ -40,7 +64,7 @@ class MinioService(
                     .bucket(bucketName)
                     .`object`(filename)
                     .method(Method.GET)
-                    .expiry(5, TimeUnit.SECONDS)
+                    .expiry(1, TimeUnit.MINUTES)
                     .build()
             )
         } catch (e: Exception) {

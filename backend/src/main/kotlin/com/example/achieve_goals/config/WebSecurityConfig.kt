@@ -1,11 +1,11 @@
 package com.example.achieve_goals.config
 
+import com.example.achieve_goals.entities.Roles
 import com.example.achieve_goals.service.UserService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -54,8 +54,8 @@ class WebSecurityConfig(
                     .antMatchers("/api/login").permitAll()
                     .antMatchers("/api/registration").permitAll()
                     .antMatchers("/api/countries/").permitAll()
-                    .antMatchers("/api/admin/**").hasRole("ADMIN")
-                    .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
+                    .antMatchers("/api/admin/**").hasAuthority(Roles.ADMIN)
+                    .antMatchers("/api/**").hasAnyAuthority(Roles.ADMIN, Roles.USER)
                     .antMatchers("/**").permitAll()
             }
             ?.logout { logout: LogoutConfigurer<HttpSecurity?> ->

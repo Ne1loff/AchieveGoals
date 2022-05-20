@@ -1,10 +1,11 @@
 package com.example.achieve_goals.controller
 
 import com.example.achieve_goals.config.RegistrationRequest
-import com.example.achieve_goals.dto.ChangePasswordDTO
+import com.example.achieve_goals.dto.ChangePasswordRequestDTO
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.exceptions.ApiNotfoundException
+import com.example.achieve_goals.service.MinioService
 import com.example.achieve_goals.service.UserService
 import org.apache.commons.io.FilenameUtils
 import org.springframework.http.HttpStatus
@@ -16,7 +17,8 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping(value = ["/api/"])
 class UserController(
-    val userService: UserService
+    val userService: UserService,
+    val minioService: MinioService
 ) {
 
     @PostMapping("registration")
@@ -38,7 +40,7 @@ class UserController(
     @PutMapping("user/changePassword")
     fun changePassword(
         auth: Authentication,
-        @RequestBody passwordDTO: ChangePasswordDTO
+        @RequestBody passwordDTO: ChangePasswordRequestDTO
     ): ResponseEntity<Any> {
         val principal = auth.principal
         if (principal is User) {
@@ -65,6 +67,7 @@ class UserController(
         val principal = auth.principal
         val fileExtension = FilenameUtils.getExtension(avatar.originalFilename)
         if (principal is User) {
+            minioService.uploadPhoto(principal.id, avatar.inputStream, fileExtension)
             userService.uploadUserAvatar(principal.id, avatar.inputStream, fileExtension)
             return ResponseEntity.ok().build()
         }
@@ -75,8 +78,12 @@ class UserController(
     fun deleteUserAvatar(auth: Authentication): ResponseEntity<Any> {
         val principal = auth.principal
         if (principal is User) {
-            userService.deleteUserPhoto(principal.id)
-            return ResponseEntity.ok().build()
+            if (principal.userPhoto != null) {
+                userService.deleteUserPhoto(principal.id)
+                minioService.deletePhoto(principal.userPhoto!!.id, principal.userPhoto!!.fileExtension)
+                return ResponseEntity.ok().build()
+            }
+            throw ApiNotfoundException("File not found!")
         }
         throw ApiNotfoundException("User not found!")
     }
