@@ -1,11 +1,12 @@
 package com.example.achieve_goals.service
 
-import com.example.achieve_goals.config.RegistrationRequest
+import com.example.achieve_goals.dto.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.entities.UserAvatar
-import com.example.achieve_goals.exceptions.ApiBadRequestException
-import com.example.achieve_goals.exceptions.ApiInvalidLoginOrPasswordException
+import com.example.achieve_goals.exceptions.badRequest.InvalidLoginOrPasswordException
+import com.example.achieve_goals.exceptions.conflict.EmailConflictException
+import com.example.achieve_goals.exceptions.conflict.UsernameConflictException
 import com.example.achieve_goals.mapper.UserMapperImpl
 import com.example.achieve_goals.repository.LocalityRepository
 import com.example.achieve_goals.repository.UserAvatarRepository
@@ -34,7 +35,7 @@ class UserService(
 
     override fun loadUserByUsername(login: String): UserDetails {
         return userRepository.findUserByUsernameSalt(login) ?: userRepository.findUserByEmail(login)
-        ?: throw ApiInvalidLoginOrPasswordException("Invalid login or password")
+        ?: throw InvalidLoginOrPasswordException()
     }
 
     fun getAllUsers(): MutableList<UserDTO> {
@@ -78,7 +79,7 @@ class UserService(
 
     fun saveUser(newUser: RegistrationRequest): Boolean {
         if (userRepository.existsUserByEmail(newUser.email))
-            throw ApiBadRequestException("A user with such an email already exists")
+            throw EmailConflictException()
         val user = mapper.userFromRegistrationRequest(newUser)
         user.passwordHash = passwordEncoder.encode(user.password)
         userRepository.save(user)
@@ -94,23 +95,27 @@ class UserService(
     fun updateUser(userDTO: UserDTO, id: Long) {
         val user = userRepository.findUserById(id)
 
-        if (userDTO.email != null)
-            if (userDTO.email != user.email)
-                if (userRepository.existsUserByEmail(userDTO.email))
-                    throw ApiBadRequestException("User with this email already exist!")
-        if (userDTO.username != null)
-            if (userDTO.username != user.usernameSalt)
-                if (userRepository.existsUserByUsernameSalt(userDTO.username))
-                    throw ApiBadRequestException("User with this username already exist!")
+        if (
+            userDTO.email != null &&
+            userDTO.email != user.email &&
+            userRepository.existsUserByEmail(userDTO.email)
+        )
+            throw UsernameConflictException()
 
-        user.usernameSalt = userDTO.username ?: user.usernameSalt
-        user.email = userDTO.email ?: user.email
-        user.name = userDTO.name ?: user.name
-        user.surname = userDTO.surname ?: user.surname
-        user.male = userDTO.male ?: user.male
-        if (userDTO.country != null) {
-            val keyFromLocalityName = getKeyFromLocalityName(userDTO.country)
-            user.locality = if (keyFromLocalityName == -1L) user.locality else keyFromLocalityName
+        if (userDTO.username != null &&
+            userDTO.username != user.usernameSalt &&
+            userRepository.existsUserByUsernameSalt(userDTO.username)
+        )
+            throw EmailConflictException()
+
+
+        userDTO.username?.let { user.usernameSalt = it }
+        userDTO.email?.let { user.email = it }
+        userDTO.name?.let { user.name = it }
+        userDTO.surname?.let { user.surname = it }
+        userDTO.male?.let { user.male = it }
+        userDTO.country?.let {
+            getKeyFromLocalityName(it)?.let { locality -> user.locality = locality }
         }
     }
 
@@ -124,8 +129,7 @@ class UserService(
         return false
     }
 
-    fun getKeyFromLocalityName(name: String): Long {
-        localityNames.forEach { (t, u) -> if (u == name) return t }
-        return -1
+    fun getKeyFromLocalityName(name: String): Long? {
+        return localityNames.firstNotNullOfOrNull { it.takeIf { map -> map.value == name }?.key }
     }
 }

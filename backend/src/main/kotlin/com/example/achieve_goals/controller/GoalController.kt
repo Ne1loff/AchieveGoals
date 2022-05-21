@@ -1,8 +1,9 @@
 package com.example.achieve_goals.controller
 
+import com.example.achieve_goals.dto.CreateGoalRequest
 import com.example.achieve_goals.dto.GoalDTO
 import com.example.achieve_goals.entities.User
-import com.example.achieve_goals.exceptions.ApiNotfoundException
+import com.example.achieve_goals.exceptions.notFound.UserNotFoundException
 import com.example.achieve_goals.service.GoalService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,7 +22,7 @@ class GoalController(
         if (principal is User) {
             return goalService.getUserGoals(principal.id).toMutableList()
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @GetMapping("{id}")
@@ -30,7 +31,7 @@ class GoalController(
         if (principal is User) {
             return goalService.getUserGoalById(principal.id, id)
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
 
@@ -40,27 +41,17 @@ class GoalController(
         if (principal is User) {
             return goalService.getSubGoalsByGid(principal.id, id)
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @PostMapping
-    fun createMainGoal(@RequestBody goalDTO: GoalDTO, auth: Authentication): ResponseEntity<HttpStatus> {
+    fun createMainGoal(@RequestBody goalRequest: CreateGoalRequest, auth: Authentication): ResponseEntity<HttpStatus> {
         val principal = auth.principal
         if (principal is User) {
-            goalService.createMainGoal(goalDTO, principal.id)
+            goalService.createMainGoal(goalRequest, principal.id)
             return ResponseEntity.status(HttpStatus.CREATED).build()
         }
-        throw ApiNotfoundException("User not found!")
-    }
-
-    @PostMapping("sub-goals")
-    fun createSubGoal(@RequestBody goalDTO: GoalDTO, auth: Authentication): ResponseEntity<HttpStatus> {
-        val principal = auth.principal
-        if (principal is User) {
-            goalService.createSubGoal(goalDTO, principal.id)
-            return ResponseEntity.status(HttpStatus.CREATED).build()
-        }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @PutMapping
@@ -70,7 +61,7 @@ class GoalController(
             goalService.updateGoal(goalsDTO, principal.id)
             return ResponseEntity.accepted().build()
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @DeleteMapping
@@ -80,6 +71,6 @@ class GoalController(
             goalService.deleteGoal(ids, principal.id)
             return ResponseEntity.ok().build()
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 }

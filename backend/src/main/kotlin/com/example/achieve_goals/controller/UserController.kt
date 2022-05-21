@@ -1,10 +1,11 @@
 package com.example.achieve_goals.controller
 
-import com.example.achieve_goals.config.RegistrationRequest
-import com.example.achieve_goals.dto.ChangePasswordRequestDTO
+import com.example.achieve_goals.dto.RegistrationRequest
+import com.example.achieve_goals.dto.ChangePasswordRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
-import com.example.achieve_goals.exceptions.ApiNotfoundException
+import com.example.achieve_goals.exceptions.notFound.FileNotFoundException
+import com.example.achieve_goals.exceptions.notFound.UserNotFoundException
 import com.example.achieve_goals.service.MinioService
 import com.example.achieve_goals.service.UserService
 import org.apache.commons.io.FilenameUtils
@@ -34,13 +35,13 @@ class UserController(
         if (principal is User) {
             return userService.getUserById(principal.id)
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @PutMapping("user/changePassword")
     fun changePassword(
         auth: Authentication,
-        @RequestBody passwordDTO: ChangePasswordRequestDTO
+        @RequestBody passwordDTO: ChangePasswordRequest
     ): ResponseEntity<Any> {
         val principal = auth.principal
         if (principal is User) {
@@ -49,7 +50,7 @@ class UserController(
             else
                 ResponseEntity.badRequest().build()
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @GetMapping("user/avatar")
@@ -59,7 +60,7 @@ class UserController(
             return ResponseEntity.ok()
                 .body(userService.getUserAvatarLink(principal.id))
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @PutMapping("user/avatar")
@@ -71,7 +72,7 @@ class UserController(
             userService.uploadUserAvatar(principal.id, avatar.inputStream, fileExtension)
             return ResponseEntity.ok().build()
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @DeleteMapping("user/avatar")
@@ -83,9 +84,9 @@ class UserController(
                 minioService.deletePhoto(principal.userPhoto!!.id, principal.userPhoto!!.fileExtension)
                 return ResponseEntity.ok().build()
             }
-            throw ApiNotfoundException("File not found!")
+            throw FileNotFoundException()
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 
     @PutMapping("user")
@@ -95,6 +96,6 @@ class UserController(
             userService.updateUser(userDTO, principal.id)
             return ResponseEntity.ok().build()
         }
-        throw ApiNotfoundException("User not found!")
+        throw UserNotFoundException()
     }
 }

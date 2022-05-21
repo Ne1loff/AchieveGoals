@@ -1,6 +1,6 @@
-package com.example.achieve_goals.exceptions
+package com.example.achieve_goals.exceptions.abstracts
 
-class ApiInvalidLoginOrPasswordException : RuntimeException {
+open class ApiConflictException : RuntimeException {
     constructor(message: String?) : super(message)
     constructor(message: String?, cause: Throwable?) : super(message, cause)
 }

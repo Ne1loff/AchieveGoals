@@ -1,5 +1,8 @@
 package com.example.achieve_goals.exceptions
 
+import com.example.achieve_goals.exceptions.abstracts.ApiBadRequestException
+import com.example.achieve_goals.exceptions.abstracts.ApiConflictException
+import com.example.achieve_goals.exceptions.abstracts.ApiNotfoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -34,9 +37,9 @@ class ApiExceptionHandler {
         return ResponseEntity(apiException, httpStatus)
     }
 
-    @ExceptionHandler(value = [(ApiInvalidLoginOrPasswordException::class)])
-    fun handleApiIncorrectLoginOrPasswordException(exception: ApiInvalidLoginOrPasswordException): ResponseEntity<Any> {
-        val httpStatus = HttpStatus.UNAUTHORIZED
+    @ExceptionHandler(value = [(ApiConflictException::class)])
+    fun handleApiConflictException(exception: ApiConflictException): ResponseEntity<Any> {
+        val httpStatus = HttpStatus.CONFLICT
         val apiException = ApiException(
             message = exception.message,
             status = httpStatus.value(),

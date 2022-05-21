@@ -1,4 +1,4 @@
-package com.example.achieve_goals.config
+package com.example.achieve_goals.dto
 
 data class RegistrationRequest(
     val username: String,

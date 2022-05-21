@@ -1,6 +1,6 @@
-package com.example.achieve_goals.exceptions
+package com.example.achieve_goals.exceptions.abstracts
 
-class ApiBadRequestException : RuntimeException {
+open class ApiNotfoundException : RuntimeException {
     constructor(message: String?) : super(message)
     constructor(message: String?, cause: Throwable?) : super(message, cause)
 }

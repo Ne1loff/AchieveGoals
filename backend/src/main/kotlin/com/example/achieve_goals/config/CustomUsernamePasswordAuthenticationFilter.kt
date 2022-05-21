@@ -1,5 +1,6 @@
 package com.example.achieve_goals.config
 
+import com.example.achieve_goals.dto.LoginRequest
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.core.Authentication
