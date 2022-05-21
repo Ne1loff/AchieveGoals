@@ -54,6 +54,7 @@ class WebSecurityConfig(
                     .antMatchers("/api/login").permitAll()
                     .antMatchers("/api/registration").permitAll()
                     .antMatchers("/api/countries/").permitAll()
+                    .antMatchers("/api/docs/**").permitAll()
                     .antMatchers("/api/admin/**").hasAuthority(Roles.ADMIN)
                     .antMatchers("/api/**").hasAnyAuthority(Roles.ADMIN, Roles.USER)
                     .antMatchers("/**").permitAll()

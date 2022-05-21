@@ -27,12 +27,13 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("com.vladmihalcea:hibernate-types-52:2.15.1")
+	implementation("com.vladmihalcea:hibernate-types-52:2.16.2")
 	implementation("commons-io:commons-io:2.11.0")
-	implementation("io.minio:minio:8.3.7")
+	implementation("io.minio:minio:8.4.1")
 	implementation("com.squareup.okhttp3:okhttp:4.9.3")
-	implementation("org.springdoc:springdoc-openapi-ui:1.6.7")
-	implementation("org.springdoc:springdoc-openapi-security:1.6.7")
+	implementation("io.swagger.core.v3:swagger-annotations")
+	implementation("org.springdoc:springdoc-openapi-ui:1.6.8")
+	implementation("org.springdoc:springdoc-openapi-security:1.6.8")
 
 	runtimeOnly("org.postgresql:postgresql")
 
@@ -42,7 +43,7 @@ dependencies {
 
 	compile("org.springframework.boot:spring-boot-configuration-processor")
 	compile("org.springframework.boot:spring-boot-configuration-processor")
-	compile("io.minio:minio:8.3.7")
+	compile("io.minio:minio:8.4.1")
 }
 
 tasks.withType<KotlinCompile> {
