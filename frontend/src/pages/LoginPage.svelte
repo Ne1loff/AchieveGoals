@@ -144,10 +144,6 @@
             padding: 5px;
             margin: 0;
         }
-
-        .submit_btn {
-            max-width: 100%;
-        }
     }
 
     @media (max-height: 370px) {
@@ -160,10 +156,6 @@
         .user_details {
             max-height: 15vh;
             overflow-y: scroll;
-        }
-
-        .submit_btn {
-            max-height: 100%;
         }
     }
 

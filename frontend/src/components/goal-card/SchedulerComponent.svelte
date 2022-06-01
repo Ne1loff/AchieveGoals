@@ -4,6 +4,7 @@
     import SchedulerModal from "../modals/SchedulerModal.svelte";
     import Goal from "../../data/models/Goal";
     import InlineCalendar from "./date-picker/InlineCalendar.svelte";
+    import {GOALS} from "../../data/storage/storage";
 
     const daysName = (dayNum) => {
         let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -17,11 +18,16 @@
         nextWeek: dayjs().add(7, 'day').toDate()
     }
 
-
     export let goal: Goal;
-    export let targetRef;
-    export let isCreate;
     export let fromGoalCard = false;
+
+    $:{
+        if (goal) {
+            let goals = $GOALS;
+            goals[goals.indexOf(goal)] = goal;
+            $GOALS = goals;
+        }
+    }
 
 </script>
 

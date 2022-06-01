@@ -3,9 +3,9 @@
     import {datesEqual, datesLessEqual, getCalendar, getWeekdays,} from './datetime-utils.js';
     import {Button} from "attractions";
 
-    export let weekdaysClass: string = null;
-    export let weekClass: string = null;
-    export let dayClass: string = null;
+    export let weekdaysClass: string = '';
+    export let weekClass: string = '';
+    export let dayClass: string = '';
     export let locale: string = undefined;
     export let firstWeekday: number = 1;
     export let month: number;
@@ -63,7 +63,8 @@
                         title={computeTitle(day)}
                         on:click={e => {
                             e.detail.nativeEvent.stopPropagation();
-                            selected = day.value;
+                            selected.setFullYear(day.value.getFullYear(), day.value.getMonth(), day.value.getDate());
+                            selected = selected;
                             dispatch('day-select', day.value);
                         }}
                         disabled={day.disabled}>
@@ -126,10 +127,7 @@
 
         &:hover {
           background-color: var(--cds-border-interactive);
-        }
-
-        &:focus:not([disabled]) {
-          background: inherit !important;
+          color: var(--cds-text-04);
         }
       }
 
@@ -138,13 +136,13 @@
         color: var(--cds-inverse-link);
 
         &:hover {
-          color: var(--cds-text-primary);
+          color: var(--cds-text-04);
         }
       }
 
       &.selected > :global .btn {
         background-color: var(--cds-button-primary-active) !important;
-        color: var(--cds-text-primary) !important;
+        color: var(--cds-text-04) !important;
       }
 
       &.outside > :global .btn {

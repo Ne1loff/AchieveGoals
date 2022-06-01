@@ -81,76 +81,7 @@
         line-height: 1;
     }
 
-
-    /* Header */
-    .header {
-        width: 100%;
-
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        height: 4rem;
-
-        max-width: 100vw;
-
-        background-color: #fff;
-    }
-
-    .header__inner {
-        height: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header__inner:after {
-        content: "";
-        display: block;
-
-        width: 100%;
-        height: 5px;
-
-        background-color: #707070;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        z-index: 1;
-    }
-
-
     .logo:hover {
         cursor: pointer;
     }
-
-    /* Nav */
-    .nav {
-        height: 100%;
-        font-size: 20px;
-        display: flex;
-    }
-
-    .nav li {
-        height: 100%;
-        width: 100%;
-
-        text-decoration: none;
-        display: flex;
-    }
-
-    .nav li:hover {
-        background-color: #e3e3e3;
-        cursor: pointer;
-    }
-
-    .nav__link {
-        height: 100%;
-        color: #000;
-        padding: 0 20px;
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-    }
-
 </style>

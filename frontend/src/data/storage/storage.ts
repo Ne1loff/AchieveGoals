@@ -3,6 +3,6 @@ import type User from "../models/User";
 import type Goal from "../models/Goal";
 
 const USER = writable<User>(null);
-const GOALS = writable<Goal[]>([]);
+let GOALS = writable<Goal[]>([]);
 
 export {USER, GOALS}

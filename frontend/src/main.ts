@@ -1,5 +1,6 @@
 import "carbon-components-svelte/css/all.css";
 import "flatpickr/dist/flatpickr.css"
+import "./style/own.css"
 
 import App from './App.svelte';
 import {setLanguage} from "./resources/localization/l10n";

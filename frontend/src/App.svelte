@@ -4,7 +4,6 @@
     import LoginPage from "./pages/LoginPage.svelte";
     import RegistrationPage from "./pages/RegistrationPage.svelte";
     import HomePage from "./pages/HomePage.svelte";
-    import ProfilePage from "./pages/ProfilePage.svelte";
     import NotfoundPage from "./pages/NotfoundPage.svelte";
     import MainPage from "./pages/MainPage.svelte";
     import GoalsHolder from "./components/homeComponents/GoalsHolder.svelte";
@@ -36,16 +35,16 @@
                 </Router>
             </svelte:fragment>
         </HomePage>
-
     </Route>
     <Route path="/user/profile">
-        <ProfilePage/>
+        <!--        <ProfilePage/>-->
     </Route>
     <Route path="/*">
         <NotfoundPage/>
     </Route>
 </Router>
-<SvelteToast options={{pausable: true}}/>
+<SvelteToast options={{ pausable: true }}/>
+<div id="popoverContainer"></div>
 
 <style>
 

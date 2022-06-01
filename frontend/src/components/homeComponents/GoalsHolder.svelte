@@ -11,7 +11,13 @@
 
     let overflowTop: boolean = false;
 
+    let goals = $GOALS;
+    GOALS.subscribe((g) => {
+        goals = g;
+    });
+
     const scroll = () => (overflowTop = viewport.scrollTop > 0);
+
 </script>
 
 <div class="holder">
@@ -44,7 +50,7 @@
         <div class="content-wrapper">
             <div class="goals-content">
                 <div class="content-inner" bind:this={contents}>
-                    {#each $GOALS.filter((it) => (it.gid === null)) as goal}
+                    {#each goals.filter((it) => (it.gid === null)) as goal}
                         <GoalComponent bind:goal/>
                     {/each}
                 </div>
@@ -93,9 +99,7 @@
     }
 
     .holder-inner {
-
         overflow: scroll;
-
         -ms-overflow-style: none;
         scrollbar-width: none;
     }

@@ -1,38 +1,29 @@
 <style>
-    .target {
-        display: inline-block;
-        position: relative;
-    }
     .own-popover {
-        position: relative;
+
     }
 </style>
 
 <div class="own-popover">
-    <div bind:this={targetRef} class="target" on:click={onClick} on:touchend={onTouchEnd} on:mouseover={onMouseOver} on:mouseout={onMouseOut}>
-        <slot name="target" {open} />
-    </div>
-    {#if open}
-        <Content on:open={onOpen} on:setOpen={setOpen} {placement} {targetRef} {zIndex} {arrow} {action} {overlayColor} {arrowColor} {preventDefault} {stopPropagation}>
-            <slot name="content" {open} />
-        </Content>
-    {/if}
+    <Content on:open on:setOpen={setOpen} {placement} {targetRef} {zIndex} {arrow} {action} {overlayColor}
+             {arrowColor} {preventDefault} {stopPropagation}>
+        <svelte:component this={contentComponent} {...componentProps}/>
+    </Content>
 </div>
 
 <script>
-    const DEFAULT_ZINDEX = 1000;
+    const DEFAULT_Z_INDEX = 1000;
     import Content from './Content.svelte';
-    let targetRef;
+    import {createEventDispatcher} from 'svelte';
 
-    import { createEventDispatcher } from 'svelte';
+    export let targetRef;
+    export let contentComponent;
+    export let componentProps;
+
     const dispatch = createEventDispatcher();
 
-    const onOpen = () => {
-        dispatch('open');
-    };
-
     export let action = 'click';
-    export let zIndex = DEFAULT_ZINDEX;
+    export let zIndex = DEFAULT_Z_INDEX;
     export let arrow = true;
     export let placement = 'auto';
     export let arrowColor = 'var(--cds-field)';
@@ -40,7 +31,7 @@
     export let preventDefault = false;
     export let stopPropagation = false;
 
-    export let open = false;
+    export let open = true;
 
     const setOpen = () => {
         open = !open;
@@ -53,7 +44,7 @@
         if (stopPropagation) e.stopPropagation();
         setOpen();
     };
-    const eventMouseOut = ({ relatedTarget }) => {
+    const eventMouseOut = ({relatedTarget}) => {
         if (relatedTarget.id === 'overlay' && !open) {
             setOpen();
         }

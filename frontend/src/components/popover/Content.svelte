@@ -3,7 +3,6 @@
     .arrow {
         position: absolute;
         top: 0;
-        text-shadow: 0 2px 2px rgb(255 255 255 / 70%), 4px 1px 4px rgb(0 0 0 / 30%);
     }
 
     .content {
@@ -11,6 +10,8 @@
         position: absolute;
         left: 0;
         top: 0;
+
+        border-radius: .5rem;
     }
 </style>
 
