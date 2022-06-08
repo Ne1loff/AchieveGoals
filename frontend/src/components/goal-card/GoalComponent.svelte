@@ -9,8 +9,8 @@
     import InlineCalendar from "./date-picker/InlineCalendar.svelte";
     import {GOALS} from "../../data/storage/storage";
     import GoalCheckbox from "./GoalCheckbox.svelte";
-    import Scheduler from "./SchedulerComponent.svelte"
-    import PopoverCreator from "../popover/PopoverCreator.svelte";
+    import Scheduler from "./SchedulerComponent.svelte";
+    import GoalMenu from "./GoalMenuComponent.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -108,7 +108,7 @@
                         <div class="info-tags-text">{goal.subtasks.completed + '/' + goal.subtasks.total}</div>
                     </div>
                 {/if}
-                <Popover  on:close={onMenuClose}> <!-- overlayColor={"var(--cds-overlay)"} -->
+                <Popover on:close={onMenuClose}> <!-- overlayColor={"var(--cds-overlay)"} -->
                     <div slot="target" class="info-tags-date">
                         <div class="info-tags-icon">
                             <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
@@ -132,34 +132,26 @@
             <div class="action-btn" on:click={editGoal}>
                 <Icon class="action-icons" icon="feather:edit-3"/>
             </div>
-            <PopoverCreator component={Scheduler} componentProps={{
-                goal: goal,
-                fromGoalCard: fromGoalCard
-            }}>
-                <div class="action-btn">
+            <Popover on:close={onMenuClose}>
+                <div slot="target" class="action-btn"
+                     on:click={() => showScheduler = true}>
                     <Icon class="action-icons" icon="bi:calendar-event"/>
                 </div>
-            </PopoverCreator>
-            <!--            <Popover on:close={onMenuClose}>-->
-            <!--                <div slot="target" class="action-btn"-->
-            <!--                     on:click={() => showScheduler = true}>-->
-            <!--                    <Icon class="action-icons" icon="bi:calendar-event"/>-->
-            <!--                </div>-->
-            <!--                <Scheduler slot="content" bind:goal isCreate={false}-->
-            <!--                           fromGoalCard={fromGoalCard}-->
-            <!--                           on:close={onMenuClose}/>-->
-            <!--            </Popover>-->
-            <!--            <Popover on:close={onMenuClose}>-->
-            <!--                <div slot="target" class="action-btn" on:click={() => showActions = true}>-->
-            <!--                    <Icon class="action-icons" icon="bi:three-dots"/>-->
-            <!--                </div>-->
-            <!--                <GoalMenu slot="content" bind:goal fromGoalCard={fromGoalCard}-->
-            <!--                          on:newGoal={createGoal}-->
-            <!--                          on:newSub={createSubtask}-->
-            <!--                          on:edit={editGoal}-->
-            <!--                          on:close={onMenuClose}-->
-            <!--                          on:delete={deleteGoal}/>-->
-            <!--            </Popover>-->
+                <Scheduler slot="content" bind:goal isCreate={false}
+                           fromGoalCard={fromGoalCard}
+                           on:close={onMenuClose}/>
+            </Popover>
+            <Popover on:close={onMenuClose}>
+                <div slot="target" class="action-btn" on:click={() => showActions = true}>
+                    <Icon class="action-icons" icon="bi:three-dots"/>
+                </div>
+                <GoalMenu slot="content" bind:goal fromGoalCard={fromGoalCard}
+                          on:newGoal={createGoal}
+                          on:newSub={createSubtask}
+                          on:edit={editGoal}
+                          on:close={onMenuClose}
+                          on:delete={deleteGoal}/>
+            </Popover>
         </div>
     </div>
 </div>
