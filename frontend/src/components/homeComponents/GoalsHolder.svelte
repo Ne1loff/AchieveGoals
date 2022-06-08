@@ -16,12 +16,16 @@
         goals = g;
     });
 
+    let scrollable: boolean = true;
+
+    const changeScrollable = () => { scrollable = !scrollable }
     const scroll = () => (overflowTop = viewport.scrollTop > 0);
 
 </script>
 
 <div class="holder">
     <div class="holder-inner"
+         style="overflow: {scrollable ? 'scroll' : 'hidden'}"
          bind:this={viewport}
          on:scroll={scroll}>
         <header class="header" data-overflow-top={overflowTop ? '' : undefined}>
@@ -51,7 +55,10 @@
             <div class="goals-content">
                 <div class="content-inner" bind:this={contents}>
                     {#each goals.filter((it) => (it.gid === null)) as goal}
-                        <GoalComponent bind:goal/>
+                        <GoalComponent bind:goal
+                                       on:popoverOpen={changeScrollable}
+                                       on:popoverClose={changeScrollable}
+                        />
                     {/each}
                 </div>
             </div>
@@ -102,6 +109,8 @@
         overflow: scroll;
         -ms-overflow-style: none;
         scrollbar-width: none;
+
+        flex-grow: 1;
     }
 
     .holder-inner::-webkit-scrollbar {
@@ -164,6 +173,8 @@
         position: relative;
         display: flex;
         justify-content: center;
+
+        min-height: 100%;
 
         padding-bottom: 84px;
     }

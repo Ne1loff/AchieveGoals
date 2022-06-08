@@ -1,20 +1,6 @@
 <script>
-    import {createEventDispatcher} from 'svelte';
 
-    export let fromGoalCard;
     export let width = 226;
-
-    const dispatch = createEventDispatcher();
-
-    const close = () => {
-        dispatch('close')
-    };
-
-    const handle_keydown = e => {
-        if (e.key === 'Escape') {
-            close();
-        }
-    };
 
 </script>
 

@@ -19,7 +19,6 @@
     }
 
     export let goal: Goal;
-    export let fromGoalCard = false;
 
     $:{
         if (goal) {
@@ -32,7 +31,7 @@
 </script>
 
 
-<SchedulerModal on:close bind:fromGoalCard>
+<SchedulerModal>
     <div class="scheduler-title" slot="header">
         <span>{dayjs(goal.deadline).format('DD dd HH:mm')}</span>
     </div>

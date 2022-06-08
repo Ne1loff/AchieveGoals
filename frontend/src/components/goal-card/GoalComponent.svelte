@@ -11,6 +11,8 @@
     import GoalCheckbox from "./GoalCheckbox.svelte";
     import Scheduler from "./SchedulerComponent.svelte";
     import GoalMenu from "./GoalMenuComponent.svelte";
+    import {popoverTrigger} from "../popover/global/Popover";
+
 
     const dispatch = createEventDispatcher();
 
@@ -23,6 +25,14 @@
 
     const priorityColors = PRIORITY_COLORS;
 
+    const popoverOpen = () => {
+        dispatch('popoverOpen')
+    }
+
+    const popoverClose = () => {
+        dispatch('popoverClose')
+    }
+
     const createGoal = () => {
         dispatch('createGoal')
     }
@@ -30,7 +40,7 @@
         dispatch('createSub', goal.id);
     }
     const editGoal = () => {
-        dispatch('edit', goal)
+        dispatch('edit', goal);
     }
     const updateGoal = () => {
         dispatch('update', goal)
@@ -41,6 +51,7 @@
 
     const onMenuClose = () => {
         updateGoal();
+        popoverClose();
     }
 
     let showSubtasks = false;
@@ -108,7 +119,9 @@
                         <div class="info-tags-text">{goal.subtasks.completed + '/' + goal.subtasks.total}</div>
                     </div>
                 {/if}
-                <Popover on:close={onMenuClose}> <!-- overlayColor={"var(--cds-overlay)"} -->
+                <Popover
+                        on:open={popoverOpen}
+                        on:close={onMenuClose}> <!-- overlayColor={"var(--cds-overlay)"} -->
                     <div slot="target" class="info-tags-date">
                         <div class="info-tags-icon">
                             <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
@@ -129,19 +142,30 @@
             </div>
         </div>
         <div class="container-actions-right">
-            <div class="action-btn" on:click={editGoal}>
+            <div class="action-btn" use:popoverTrigger={{
+                component: {
+                    src: Scheduler,
+                    props: {
+                        goal: goal
+                    }
+                }
+            }}
+                 on:click={editGoal}>
                 <Icon class="action-icons" icon="feather:edit-3"/>
             </div>
-            <Popover on:close={onMenuClose}>
+            <Popover
+                    on:open={popoverOpen}
+                    on:close={onMenuClose}>
                 <div slot="target" class="action-btn"
                      on:click={() => showScheduler = true}>
                     <Icon class="action-icons" icon="bi:calendar-event"/>
                 </div>
-                <Scheduler slot="content" bind:goal isCreate={false}
-                           fromGoalCard={fromGoalCard}
+                <Scheduler slot="content" bind:goal
                            on:close={onMenuClose}/>
             </Popover>
-            <Popover on:close={onMenuClose}>
+            <Popover
+                    on:open={popoverOpen}
+                    on:close={onMenuClose}>
                 <div slot="target" class="action-btn" on:click={() => showActions = true}>
                     <Icon class="action-icons" icon="bi:three-dots"/>
                 </div>
@@ -157,7 +181,10 @@
 </div>
 {#if showSubtasks}
     {#each subs as goal}
-        <svelte:self bind:goal indent={indent + 1}/>
+        <svelte:self bind:goal indent={indent + 1}
+                     on:popoverOpen
+                     on:popoverClose
+        />
     {/each}
 {/if}
 
@@ -337,14 +364,6 @@
         top: 0;
     }
 
-    .container-actions-right {
-        opacity: 0;
-    }
-
-    .goal-body:hover .container-actions-right {
-        opacity: 1;
-    }
-
     .action-btn {
         position: relative;
 
@@ -359,11 +378,21 @@
         cursor: pointer;
         margin-left: 8px;
         padding: 0;
+
+        opacity: 0;
     }
 
     .action-btn:hover {
         background-color: var(--cds-hover-ui);
         color: var(--cds-hover-primary-text, #0043ce);
+    }
+
+    .goal-body:hover .container-actions-right .action-btn {
+        opacity: 1;
+    }
+
+    :global(.action-btn[aria-expanded="true"]) {
+        opacity: 1 !important;
     }
 
     :global(.action-left-btn) {

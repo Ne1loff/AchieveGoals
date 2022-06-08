@@ -8,6 +8,7 @@
     import MainPage from "./pages/MainPage.svelte";
     import GoalsHolder from "./components/homeComponents/GoalsHolder.svelte";
     import {Theme} from "carbon-components-svelte";
+    import PopoverGlobal from "./components/popover/global/PopoverGlobal.svelte";
 </script>
 
 <svelte:head>
@@ -44,7 +45,7 @@
     </Route>
 </Router>
 <SvelteToast options={{ pausable: true }}/>
-<div id="popoverContainer"></div>
+<PopoverGlobal />
 
 <style>
 
