@@ -20,7 +20,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--cds-text-01);
+        color: var(--cds-text-04);
     }
 
     .month-year-label:hover {

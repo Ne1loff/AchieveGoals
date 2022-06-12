@@ -221,13 +221,12 @@
 </script>
 
 <svelte:window on:resize={calculatePosition}/>
-<div class="overlay" on:click={close}>
-    <div class="popover-item"
-         bind:this={contentRef}
-         style="{style}; {positionStyle}"
-    >
-        <svelte:component this={options.component.src} {...options.component.props}/>
-    </div>
+<div class="overlay" on:click={close}></div>
+<div class="popover-item"
+     bind:this={contentRef}
+     style="{style}; {positionStyle}"
+>
+    <svelte:component this={options.component.src} {...options.component.props}/>
 </div>
 
 <style>
@@ -244,8 +243,6 @@
     .overlay {
         width: 100vw;
         height: 100vh;
-
-        position: relative;
 
         background: var(--own-overlay-bg);
         z-index: 9999;

@@ -69,7 +69,7 @@
         </button>
     </div>
     <div class="scheduler-date-picker" slot="date">
-        <InlineCalendar bind:value={goal.deadline}/>
+        <InlineCalendar bind:value={goal.deadline} withTime />
     </div>
     <div slot="time">
         <!--        <TimeComponent bind:value={goal.deadline}/>-->

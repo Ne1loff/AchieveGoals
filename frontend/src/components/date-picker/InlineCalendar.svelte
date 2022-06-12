@@ -4,7 +4,7 @@
     import TimeComponent from "./time-picker/TimeComponent.svelte";
 
     export let value: Date = new Date();
-    export let minDate: Date = dayjs().add(-1, 'd').toDate();
+    export let minDate: Date = dayjs().add(-1, 'day').toDate();
     export let withTime: boolean = false;
 
 </script>
@@ -19,6 +19,8 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+
+        user-select: none;
     }
 
     .time-holder {
