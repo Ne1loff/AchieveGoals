@@ -1,27 +1,80 @@
 <script lang="ts">
 
-    import {onMount} from "svelte";
+    import {onMount, tick} from "svelte";
+    import type {PickerOptions} from "./picker";
 
     export let data: Array<any>;
     export let selected: number = 0;
+    export let options: PickerOptions = {
+        pickerScrollPadding: 122,
+        pickerHeight: 32,
+        pickerUnit: 'px'
+    };
+
+    const getStyle = (): string => {
+        let height = '2rem';
+        let width = '100%';
+        let scrollPadding = '122px';
+
+        if (options) {
+            if (options.pickerHeight) {
+                height = options.pickerHeight + options.pickerUnit;
+            }
+            if (options.pickerWidth) {
+                width = options.pickerWidth + options.pickerUnit;
+            }
+            if (options.pickerScrollPadding) {
+                scrollPadding = options.pickerScrollPadding + options.pickerUnit;
+            }
+        }
+
+        return `
+        --own-picker-item-height: ${height};
+        --own-picker-item-width: ${width};
+        --own-picker-scroll-padding: ${scrollPadding};`
+    }
+
+    const style: string = getStyle();
+
+    let selectedIndex = selected;
 
     let itemsElem;
     let selectedItemOffset;
 
-    const scrollToItem = (index: number) => itemsElem.scrollTo(0, index * 32 + 16);
-    const onScroll = () => {
-        selectedItemOffset = (itemsElem.scrollTop - 16) / 32;
-        selected = Math.round(selectedItemOffset);
+    const scrollToItem = async (index: number) => {
+        if (itemsElem.scrollHeight < ((data.length - 1) * options.pickerHeight + options.pickerScrollPadding * 2 + 32)) {
+            await tick();
+        }
+        itemsElem.scrollTo(0, (index * options.pickerHeight + 16));
     };
+
+    const onScroll = () => {
+        selectedItemOffset = (itemsElem.scrollTop - 16) / options.pickerHeight;
+        selectedIndex = Math.round(selectedItemOffset);
+        selected = selectedIndex > data.length - 1 ? data.length - 1 : selectedIndex;
+    };
+
+    const checkEquals = () => selected === selectedIndex;
+
+    const checkReadyItemsElem = () => !!itemsElem;
+
+    $: if (!checkEquals()) {
+        selectedIndex = selected;
+        if (checkReadyItemsElem()) scrollToItem(selected);
+    }
 
     onMount(() => scrollToItem(selected));
 
 </script>
 
 <div class="picker-column">
-    <div class="picker-items" bind:this={itemsElem} on:scroll={onScroll}>
+    <div class="picker-items"
+         bind:this={itemsElem}
+         on:scroll={onScroll}
+         style={style}>
         {#each data as item, i}
-            <div class="picker-item" class:selected={selectedItemOffset > (i - 0.5) && selectedItemOffset < (i + 0.5)}
+            <div class="picker-item"
+                 class:selected={selectedItemOffset > (i - 0.5) && selectedItemOffset < (i + 0.5)}
                  on:click={() => scrollToItem(i)}>
                 <span>{item}</span>
             </div>
@@ -30,6 +83,12 @@
 </div>
 
 <style>
+
+    :root {
+        --own-picker-item-height: 2rem;
+        --own-picker-item-width: 100%;
+        --own-picker-scroll-padding: 122px;
+    }
 
     .picker-column {
         position: relative;
@@ -60,7 +119,7 @@
         text-overflow: ellipsis;
         left: 0;
         top: 0;
-        width: 100%;
+        width: var(--own-picker-item-width);
         box-sizing: border-box;
         color: var(--cds-text-disabled);
         cursor: pointer;

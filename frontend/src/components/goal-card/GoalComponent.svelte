@@ -6,7 +6,7 @@
     import {PRIORITY_COLORS} from "../../resources/constants";
     import Goal from '../../data/models/Goal'
     import Popover from "../popover/Popover.svelte";
-    import InlineCalendar from "./date-picker/InlineCalendar.svelte";
+    import InlineCalendar from "../date-picker/InlineCalendar.svelte";
     import {GOALS} from "../../data/storage/storage";
     import GoalCheckbox from "./GoalCheckbox.svelte";
     import Scheduler from "./SchedulerComponent.svelte";

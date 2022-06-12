@@ -79,7 +79,7 @@
 <style lang="scss">
   @use 'sass:color';
   @use 'sass:math';
-  @use 'node_modules/attractions/_variables' as vars;
+  @use 'node_modules/attractions/variables' as vars;
 
   $day-size: 2.25rem;
   $day-gap: 0.0625rem;

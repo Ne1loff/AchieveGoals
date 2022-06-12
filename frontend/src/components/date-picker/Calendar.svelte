@@ -4,10 +4,12 @@
     import dayjs from "dayjs";
     import {Button} from "carbon-components-svelte";
     import {ArrowLeft, ArrowRight} from "carbon-icons-svelte";
+    import MonthYearComponent from "./date-picker/MonthYearComponent.svelte";
+    import {onMount} from "svelte";
 
     export let value: Date = new Date();
     export let changeMonthDuration: number = 200;
-    export const disabledDates: Array<Date | { start?: Date, end?: Date }> = [{end: dayjs().add(-1, 'd').toDate()}];
+    export const disabledDates: Array<Date | { start?: Date, end?: Date }> = [{end: dayjs().add(-1, 'day').toDate()}];
     export let minDate: Date | null = null;
     export let maxDate: Date | null = null;
 
@@ -42,7 +44,7 @@
         next ? showNext = true : showPrev = true;
 
         setTimeout(() => {
-            date = dayjs(date).add(next ? 1 : -1, 'M').toDate();
+            date = dayjs(date).add(next ? 1 : -1, 'month').toDate();
             checkLastMonths();
             showNext = false;
             showPrev = false;
@@ -50,14 +52,17 @@
         }, changeMonthDuration);
     }
 
-    $:date = value < minDate ? new Date() : value;
     $:{
-        prev = dayjs(date).add(-1, 'M').toDate();
-        next = dayjs(date).add(1, 'M').toDate();
+        prev = dayjs(date).add(-1, 'month').toDate();
+        next = dayjs(date).add(1, 'month').toDate();
         checkLastMonths();
     }
 
-    checkLastMonths();
+    onMount(() => {
+        date = value < minDate ? new Date() : value;
+        checkLastMonths();
+    })
+
 
 </script>
 
@@ -69,9 +74,7 @@
                 on:click={() => changeMonth(false)}
                 disabled={lastOnLeft}
                 size="small"/>
-        <div>
-            {dayjs(date).format('MMMM YYYY')}
-        </div>
+        <MonthYearComponent bind:value={date} minValue={minDate} />
         <Button icon={ArrowRight}
                 iconDescription={dayjs(next).format("MMMM")}
                 on:click={() => changeMonth(true)}

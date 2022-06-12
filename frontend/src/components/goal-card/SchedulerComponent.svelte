@@ -3,7 +3,7 @@
     import Icon from "@iconify/svelte";
     import SchedulerModal from "../modals/SchedulerModal.svelte";
     import Goal from "../../data/models/Goal";
-    import InlineCalendar from "./date-picker/InlineCalendar.svelte";
+    import InlineCalendar from "../date-picker/InlineCalendar.svelte";
     import {GOALS} from "../../data/storage/storage";
 
     const daysName = (dayNum) => {

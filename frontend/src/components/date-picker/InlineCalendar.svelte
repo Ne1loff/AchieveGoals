@@ -1,9 +1,10 @@
 <script lang="ts">
     import Calendar from "./Calendar.svelte";
     import dayjs from "dayjs";
-    import TimeComponent from "./TimeComponent.svelte";
+    import TimeComponent from "./time-picker/TimeComponent.svelte";
 
     export let value: Date = new Date();
+    export let minDate: Date = dayjs().add(-1, 'd').toDate();
     export let withTime: boolean = false;
 
 </script>
@@ -37,7 +38,7 @@
 </style>
 
 <div class="calendar-container">
-    <Calendar bind:value minDate={dayjs().add(-1, 'd').toDate()}/>
+    <Calendar bind:value {minDate}/>
     {#if withTime}
         <div class="time-holder">
             <div class="time-label">
