@@ -5,7 +5,6 @@
     import dayjs from 'dayjs';
     import {PRIORITY_COLORS} from "../../resources/constants";
     import Goal from '../../data/models/Goal'
-    import Popover from "../popover/Popover.svelte";
     import InlineCalendar from "../date-picker/InlineCalendar.svelte";
     import {GOALS} from "../../data/storage/storage";
     import GoalCheckbox from "./GoalCheckbox.svelte";
@@ -86,7 +85,11 @@
             {#if goal.subtasks.total > 0 && showSub}
                 <div class="container-actions-left" on:click={() => showSubtasks = !showSubtasks}>
                     <div class="btn-icon-container" data-item-rotate={showSubtasks ? '90' : '0'}>
-                        <Icon class="action-left-btn" icon="uil:angle-right-b"/>
+                        <Icon class="action-left-btn"
+                              icon="uil:angle-right-b"
+                              width="32" height="32"
+                              color="color: var(--cds-icon-01)"
+                        />
                     </div>
                 </div>
             {:else}
@@ -108,7 +111,7 @@
                     --own-check-mark-hover-bg-color={priorityColors[goal.priority].icon}
             />
         </div>
-        <div class="container-content" on:click>
+        <div class="container-content">
             <div class="content-title" class:done={goal.isDone}>{goal.title}</div>
             <div class="content-info-tags">
                 {#if goal.subtasks.total > 0}
@@ -119,72 +122,78 @@
                         <div class="info-tags-text">{goal.subtasks.completed + '/' + goal.subtasks.total}</div>
                     </div>
                 {/if}
-                <Popover
-                        on:open={popoverOpen}
-                        on:close={onMenuClose}> <!-- overlayColor={"var(--cds-overlay)"} -->
-                    <div slot="target" class="info-tags-date">
-                        <div class="info-tags-icon">
-                            <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
-                        </div>
-                        <div class="info-tags-text" style="color:{color}">
-                            {dayjs(goal.deadline).format('DD dddd HH:mm')}</div>
+                <div class="info-tags-date"
+                     use:popoverTrigger={{
+                        component: {
+                            src: InlineCalendar,
+                            props: {
+                                goalId: goal.id,
+                                withTime: true
+                            }
+                        },
+                        style: {
+                            width: "274px",
+                            padding: '.25rem',
+                            'border-radius': '5px',
+                            background: 'var(--cds-field)'
+                        },
+                        classStyle: 'elevation-6'
+                    }}>
+                    <div class="info-tags-icon">
+                        <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
                     </div>
-                    <div slot="content"
-                         style="
-                         width: 274px;
-                         padding: .25rem;
-                         border-radius: 5px;
-                         background: var(--cds-field)
-                    ">
-                        <InlineCalendar bind:value={goal.deadline} withTime/>
-                    </div>
-                </Popover>
+                    <div class="info-tags-text" style="color:{color}">
+                        {dayjs(goal.deadline).format('DD dddd HH:mm')}</div>
+                </div>
             </div>
         </div>
         <div class="container-actions-right">
-            <div class="action-btn" use:popoverTrigger={{
-                component: {
-                    src: Scheduler,
-                    props: {
-                        goal: goal
-                    }
-                }
-            }}
-                 on:click={editGoal}>
-                <Icon class="action-icons" icon="feather:edit-3"/>
+            <div class="action-btn"
+                 on:click={editGoal}
+            >
+                <Icon class="action-icons" icon="feather:edit-3"
+                      height="16" width="16"
+                      color="var(--cds-icon-01)"
+                />
             </div>
-            <Popover
-                    on:open={popoverOpen}
-                    on:close={onMenuClose}>
-                <div slot="target" class="action-btn"
-                     on:click={() => showScheduler = true}>
-                    <Icon class="action-icons" icon="bi:calendar-event"/>
-                </div>
-                <Scheduler slot="content" bind:goal
-                           on:close={onMenuClose}/>
-            </Popover>
-            <Popover
-                    on:open={popoverOpen}
-                    on:close={onMenuClose}>
-                <div slot="target" class="action-btn" on:click={() => showActions = true}>
-                    <Icon class="action-icons" icon="bi:three-dots"/>
-                </div>
-                <GoalMenu slot="content" bind:goal fromGoalCard={fromGoalCard}
-                          on:newGoal={createGoal}
-                          on:newSub={createSubtask}
-                          on:edit={editGoal}
-                          on:close={onMenuClose}
-                          on:delete={deleteGoal}/>
-            </Popover>
+            <div class="action-btn"
+                 use:popoverTrigger={{
+                    component: {
+                        src: Scheduler,
+                        props: {
+                            goalId: goal.id
+                        }
+                    },
+                    classStyle: 'elevation-6'
+                }}
+            >
+                <Icon class="action-icons" icon="bi:calendar-event"
+                      height="16" width="16"
+                      color="var(--cds-icon-01)"
+                />
+            </div>
+            <div class="action-btn"
+                 use:popoverTrigger={{
+                        component: {
+                            src: GoalMenu,
+                            props: {
+                                goalId: goal.id
+                            }
+                        },
+                        classStyle: 'elevation-6'
+                    }}
+            >
+                <Icon class="action-icons" icon="bi:three-dots"
+                      height="16" width="16"
+                      color="var(--cds-icon-01)"
+                />
+            </div>
         </div>
     </div>
 </div>
 {#if showSubtasks}
     {#each subs as goal}
-        <svelte:self bind:goal indent={indent + 1}
-                     on:popoverOpen
-                     on:popoverClose
-        />
+        <svelte:self bind:goal indent={indent + 1}/>
     {/each}
 {/if}
 
@@ -393,18 +402,6 @@
 
     :global(.action-btn[aria-expanded="true"]) {
         opacity: 1 !important;
-    }
-
-    :global(.action-left-btn) {
-        height: 18px;
-        width: 18px;
-        color: var(--cds-icon-01);
-    }
-
-    :global(.action-icons) {
-        height: 16px;
-        width: 16px;
-        color: var(--cds-icon-01);
     }
 
 </style>

@@ -6,6 +6,10 @@
     import InlineCalendar from "../date-picker/InlineCalendar.svelte";
     import {GOALS} from "../../data/storage/storage";
 
+    export let goalId: number;
+
+    const goal: Goal = $GOALS.find((it) => it.id === goalId);
+
     const daysName = (dayNum) => {
         let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
         return days[dayNum];
@@ -18,13 +22,15 @@
         nextWeek: dayjs().add(7, 'day').toDate()
     }
 
-    export let goal: Goal;
+    const updateGoals = () => {
+        const goals = $GOALS;
+        goals[goals.indexOf(goal)] = goal;
+        $GOALS = goals;
+    }
 
     $:{
         if (goal) {
-            let goals = $GOALS;
-            goals[goals.indexOf(goal)] = goal;
-            $GOALS = goals;
+            updateGoals();
         }
     }
 
@@ -35,7 +41,7 @@
     <div class="scheduler-title" slot="header">
         <span>{dayjs(goal.deadline).format('DD dd HH:mm')}</span>
     </div>
-    <div class="scheduler-suggestion" slot="suggestion">
+    <div class="scheduler-suggestion" slot="content">
         <button class="scheduler-suggestion-item" on:click={() => goal.deadline = dates.today}>
                         <span class="scheduler-suggestion-item-icon">
                             <Icon icon="bi:calendar" style="width: 18px; height: 18px; color: #058527;"/>
@@ -68,11 +74,8 @@
             <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().add(1, 'week').day())}</span>
         </button>
     </div>
-    <div class="scheduler-date-picker" slot="date">
-        <InlineCalendar bind:value={goal.deadline} withTime />
-    </div>
-    <div slot="time">
-        <!--        <TimeComponent bind:value={goal.deadline}/>-->
+    <div class="scheduler-date-picker" slot="footer">
+        <InlineCalendar bind:value={goal.deadline} withTime/>
     </div>
 </SchedulerModal>
 

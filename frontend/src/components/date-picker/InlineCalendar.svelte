@@ -1,11 +1,29 @@
 <script lang="ts">
     import Calendar from "./Calendar.svelte";
     import dayjs from "dayjs";
-    import TimeComponent from "./time-picker/TimeComponent.svelte";
+    import Time from "./time-picker/Time.svelte";
+    import Goal from "../../data/models/Goal";
+    import {GOALS} from "../../data/storage/storage";
 
-    export let value: Date = new Date();
+    export let goalId: number | undefined = undefined;
+    const goal: Goal | undefined = goalId ? $GOALS.find((it) => it.id === goalId) : undefined;
+
+    export let value: Date = goal ? goal!.deadline : new Date();
     export let minDate: Date = dayjs().add(-1, 'day').toDate();
     export let withTime: boolean = false;
+
+    const updateGoals = () => {
+        const goals = $GOALS;
+        goals[goals.indexOf(goal)] = goal;
+        $GOALS = goals;
+    }
+
+    $:{
+        if (goal) {
+            goal!.deadline = value;
+            updateGoals();
+        }
+    }
 
 </script>
 
@@ -23,30 +41,11 @@
         user-select: none;
     }
 
-    .time-holder {
-        width: 100%;
-        height: 3rem;
-
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 12px .25rem 12px 16px;
-    }
-
-    .time-label {
-        flex-grow: 1;
-    }
-
 </style>
 
 <div class="calendar-container">
     <Calendar bind:value {minDate}/>
     {#if withTime}
-        <div class="time-holder">
-            <div class="time-label">
-                <span>Время:</span> <!-- TODO: l10n -->
-            </div>
-            <TimeComponent bind:value/>
-        </div>
+        <Time bind:value />
     {/if}
 </div>

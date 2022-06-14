@@ -2,13 +2,11 @@
 
 </script>
 
-<div class="_popoverContainer">
-
-</div>
+<div id="popover-holder"></div>
 
 <style>
 
-    ._popoverContainer {
+    #popover-holder {
         position: fixed;
         top: 0;
         left: 0;

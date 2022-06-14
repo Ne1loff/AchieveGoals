@@ -1,12 +1,10 @@
-<script>
-
-    export let width = 226;
-
+<script lang="ts">
+    export let width: number = 226;
 </script>
 
 <style>
 
-    .scheduler {
+    .container {
         max-width: 550px;
         max-height: 600px;
         display: flex;
@@ -16,29 +14,29 @@
         z-index: 1020;
     }
 
-    .scheduler hr {
+    .container hr {
         width: 100%;
         border: 0;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--cds-border-subtle);
         margin: 0;
     }
 
 </style>
 
-<div class="scheduler" style="width: {width}px">
+<div class="container" style="width: {width}px">
     {#if $$slots.header}
         <slot name="header"></slot>
-        <hr>
+        {#if $$slots.content}
+            <hr>
+        {/if}
     {/if}
-    {#if $$slots.suggestion}
-        <slot name="suggestion"></slot>
-        <hr>
+    {#if $$slots.content}
+        <slot name="content"></slot>
+        {#if $$slots.footer}
+            <hr>
+        {/if}
     {/if}
-    {#if $$slots.date}
-        <slot name="date"></slot>
-        <hr>
-    {/if}
-    {#if $$slots.time}
-        <slot name="time"></slot>
+    {#if $$slots.footer}
+        <slot name="footer"></slot>
     {/if}
 </div>

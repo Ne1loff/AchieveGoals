@@ -6,6 +6,7 @@
     import GoalComponent from "../goal-card/GoalComponent.svelte";
     import {Svrollbar} from "svrollbar";
 
+
     let viewport: Element;
     let contents: Element;
 
@@ -18,7 +19,6 @@
 
     let scrollable: boolean = true;
 
-    const changeScrollable = () => { scrollable = !scrollable }
     const scroll = () => (overflowTop = viewport.scrollTop > 0);
 
 </script>
@@ -55,10 +55,7 @@
             <div class="goals-content">
                 <div class="content-inner" bind:this={contents}>
                     {#each goals.filter((it) => (it.gid === null)) as goal}
-                        <GoalComponent bind:goal
-                                       on:popoverOpen={changeScrollable}
-                                       on:popoverClose={changeScrollable}
-                        />
+                        <GoalComponent bind:goal/>
                     {/each}
                 </div>
             </div>

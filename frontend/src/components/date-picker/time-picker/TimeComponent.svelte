@@ -10,10 +10,6 @@
 
 </script>
 
-<style>
-
-</style>
-
 <div>
     <Popover>
         <div slot="target">
@@ -27,5 +23,4 @@
             <TimePicker bind:value/>
         </div>
     </Popover>
-
 </div>

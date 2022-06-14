@@ -15,10 +15,20 @@
         dispatch('close')
     }
 
+    const getClasses = (): string => {
+        if (!options.classStyle) return '';
+
+        if (Array.isArray(options.classStyle)) {
+            return options.classStyle.join();
+        } else {
+            return options.classStyle;
+        }
+    }
+
     const setStyle = () => {
         if (options.style) {
             const names: string[] = Object.getOwnPropertyNames(options.style);
-            style = names.map(name => `${name}:${options.style[name]}`).join('');
+            style = names.map(name => `${name}:${options.style[name]};`).join('');
         }
     }
 
@@ -221,12 +231,15 @@
 </script>
 
 <svelte:window on:resize={calculatePosition}/>
-<div class="overlay" on:click={close}></div>
-<div class="popover-item"
-     bind:this={contentRef}
-     style="{style}; {positionStyle}"
->
-    <svelte:component this={options.component.src} {...options.component.props}/>
+<div id="popover-{options.id}" class="popover_container">
+    <div class="overlay" on:click={close}
+    ></div>
+    <div class="popover-item {getClasses()}"
+         bind:this={contentRef}
+         style="{style} {positionStyle}"
+    >
+        <svelte:component this={options.component.src} {...options.component.props}/>
+    </div>
 </div>
 
 <style>
@@ -240,12 +253,15 @@
         --own-popover-padding: 0;
     }
 
+    .popover_container {
+        position: absolute;
+    }
+
     .overlay {
         width: 100vw;
         height: 100vh;
 
         background: var(--own-overlay-bg);
-        z-index: 9999;
     }
 
     .popover-item {
@@ -255,7 +271,6 @@
         border: var(--own-popover-border, none);
         border-radius: var(--own-popover-border-radius, 5px);
         padding: var(--own-popover-padding, 0);
-        z-index: 9999;
     }
 
 </style>
