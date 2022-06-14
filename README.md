@@ -12,5 +12,3 @@
 - Svelte
 - S3 Minio
 - PostgreSQL
-
-Сайт: https://goals.typex.one/
