@@ -50,6 +50,10 @@ export default class NotificationService {
         })
     }
 
+    closeAll() {
+        toast.pop(0);
+    }
+
     info(title?: string, subtitle?: string, caption?: string, duration?: number) {
         NotificationService.showNotification(NotificationType.INFO, title, subtitle, caption, duration);
     }

@@ -2,6 +2,7 @@ import {base} from "../resources/config";
 import {DataType} from "../data/enums/_enums";
 import ApiResponse from "../data/api/ApiResponse";
 import type ApiError from "../data/api/ApiError";
+import {navigate} from "svelte-routing";
 
 enum Method {
     GET = 'GET',
@@ -65,8 +66,9 @@ export default class Request {
             const data = await response.json();
             if (response.ok)
                 return new ApiResponse(response.status, data as T);
-            else
-                throw new ApiResponse(response.status, null, data as ApiError)
+            else if (response.status === 403 || response.status === 401)
+                navigate('/login');
+            else throw new ApiResponse(response.status, null, data as ApiError)
         });
     }
 

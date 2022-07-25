@@ -4,8 +4,6 @@ import type Registration from "../data/models/Registration";
 import type UserService from "./UserService";
 import {DataType} from "../data/enums/_enums";
 
-
-
 export default class SignUIOService {
     private request: Request;
     private userService: UserService;
@@ -19,7 +17,7 @@ export default class SignUIOService {
         return this.request.post<number>('api/login', null, login, DataType.JSON)
             .then((apiResponse) => {
                 this.userService.getCurrentUser();
-                return  apiResponse.status;
+                return apiResponse.status;
             });
     }
 
@@ -30,6 +28,8 @@ export default class SignUIOService {
 
     async logOut(): Promise<number> {
         return this.request.post<number>('api/logout', null, {}, DataType.JSON)
-            .then((apiResponse) => apiResponse.status);
+            .then((apiResponse) => {
+                return apiResponse.status;
+            });
     }
 }

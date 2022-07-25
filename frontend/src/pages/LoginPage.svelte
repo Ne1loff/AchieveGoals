@@ -1,11 +1,13 @@
 <script lang="ts">
     import {Link, navigate} from "svelte-routing"
-    import InputField from "../components/inputs/InputField.svelte";
-    import Navbar from "../components/Navbar.svelte";
-    import {l10n} from "../resources/localization/l10n";
     import {Button} from "carbon-components-svelte";
     import {Login as LoginIcon} from "carbon-icons-svelte";
     import {onMount} from "svelte";
+
+
+    import InputField from "../components/inputs/InputField.svelte";
+    import Navbar from "../components/Navbar.svelte";
+    import {l10n} from "../resources/localization/l10n";
     import SignUIOService from "../services/SignUIOService";
     import NotificationService, {ErrorMessage} from "../services/NotificationService";
     import Login from "../data/models/Login";
@@ -13,6 +15,7 @@
     import ApiError from "../data/api/ApiError";
     import ServiceFactory from "../services/ServiceFactory";
     import UserService from "../services/UserService";
+    import CheckboxLine from "../components/CheckboxLine.svelte";
 
     const handleKeydown = (e) => {
         if (e.key !== 'Enter') return;
@@ -72,6 +75,10 @@
                                 --custom-background-color="var(--cds-ui-01)"
                     />
                 </div>
+                <CheckboxLine position={'left'} bind:checked={login.rememberMe} labelText={l10n.rememberMe}
+                              activeContainer
+                              --line-padding="6px 15px 6px 15px"
+                />
             </div>
             <Button size="small" icon={LoginIcon} on:click={sigIn}>{l10n.logInAction}</Button>
             <div class="signup_link">
@@ -127,6 +134,8 @@
     .input_box {
         padding: 6px 0;
         max-width: 90%;
+        display: flex;
+        align-items: center;
     }
 
     /* Sign Up Link */

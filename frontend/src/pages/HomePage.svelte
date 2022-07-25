@@ -2,7 +2,6 @@
     import MenuButton from '../components/MenuButton.svelte'
     import Navbar from "../components/Navbar.svelte";
     import Sidebar from "../components/Sidebar.svelte";
-    import Icon from "@iconify/svelte";
     import Goal from "../data/models/Goal";
     import {onMount} from "svelte";
     import GoalService from "../services/GoalService";
@@ -15,6 +14,8 @@
     import UserService from "../services/UserService";
     import {USER} from "../data/storage/storage";
     import LoadingScreen from "../components/LoadingScreen.svelte";
+    import TopBarMenu from "../components/TopBarMenu.svelte";
+    import HomeMenu from "../components/homeComponents/HomeMenu.svelte";
 
     let pageIsReady = false;
 
@@ -96,7 +97,7 @@
         </div>
         <svelte:fragment slot="right">
             <ThemeSelect/>
-            <Icon width="2rem" height="2rem" icon="bxs:user-circle"/>
+            <TopBarMenu dropdownComponent={{src: HomeMenu}}/>
         </svelte:fragment>
     </Navbar>
     <div class="main-page">

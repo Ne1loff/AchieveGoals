@@ -17,15 +17,12 @@
         goals = g;
     });
 
-    let scrollable: boolean = true;
-
     const scroll = () => (overflowTop = viewport.scrollTop > 0);
 
 </script>
 
 <div class="holder">
     <div class="holder-inner"
-         style="overflow: {scrollable ? 'scroll' : 'hidden'}"
          bind:this={viewport}
          on:scroll={scroll}>
         <header class="header" data-overflow-top={overflowTop ? '' : undefined}>

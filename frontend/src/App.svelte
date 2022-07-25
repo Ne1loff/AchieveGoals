@@ -45,7 +45,7 @@
     </Route>
 </Router>
 <SvelteToast options={{ pausable: true }}/>
-<PopoverGlobal />
+<PopoverGlobal/>
 
 <style>
 

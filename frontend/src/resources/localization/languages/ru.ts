@@ -8,6 +8,7 @@ const ru: Dictionary = {
         return male ? 'Мужчина' : 'Женщина';
     },
     incorrectLoginOrPass: 'Неверный логин или пароль',
+    rememberMe: "Запомнить меня",
     logInAction: 'Войти',
     logUpAction: 'Зарегистрироваться',
     noAccount: 'Нет аккаунта',

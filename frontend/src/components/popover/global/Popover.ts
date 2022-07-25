@@ -2,13 +2,16 @@ import type {SvelteComponent} from "svelte";
 import PopoverItem from "./PopoverItem.svelte";
 
 
+interface SvelteComponentOptions {
+    src: typeof SvelteComponent,
+    props?: { [key: string]: any }
+}
+
 interface SveltePopoverOptions {
     id?: string,
     target?: HTMLElement,
-    component: {
-        src: typeof SvelteComponent,
-        props?: { [key: string]: any }
-    }
+    component: SvelteComponentOptions,
+    useOverlay?: boolean,
     placement?: 'auto' |
         'top-start' | 'top-center' | 'top-end' |
         'left-start' | 'left-center' | 'left-end' |
@@ -18,16 +21,19 @@ interface SveltePopoverOptions {
     classStyle: string | string[]
 }
 
+interface ComponentInfo {
+    id: string,
+    target: HTMLElement,
+    component: SvelteComponent
+}
+
 class Popover {
 
-    private components: {
-        id: string,
-        target: HTMLElement,
-        component: SvelteComponent
-    }[] = [];
+    private components: ComponentInfo[] = [];
 
     show(options: SveltePopoverOptions): string {
         if (!options.placement) options.placement = 'auto';
+        if (options.useOverlay === undefined) options.useOverlay = true;
 
         let id = Math.random().toString(4).slice(2);
 
@@ -36,6 +42,17 @@ class Popover {
 
         options.target.setAttribute('aria-expanded', 'true');
 
+        const close = () => {
+            this.destroy(componentInfo);
+        }
+
+        if (options.component.props) {
+            options.component.props['closePopover'] = close;
+        } else {
+            options.component.props = {closePopover: close}
+        }
+
+
         const component = new PopoverItem({
             target: document.getElementById("popover-holder"),
             props: {
@@ -43,26 +60,32 @@ class Popover {
             }
         })
 
-        this.components.push({
+        component.$on("close", close);
+
+        let componentInfo: ComponentInfo = {
             id: id,
             target: options.target,
             component: component
-        });
+        };
 
-        component.$on("close", () => {
-            this.destroy(id);
-        });
+        this.components.push(componentInfo);
+
 
         return id;
     }
 
-    destroy(id: string) {
-        const item = this.components.find((it) => it.id === id);
+
+    destroy(item: ComponentInfo) {
         const index = this.components.indexOf(item);
         this.components.splice(index, 1);
 
         item.target.removeAttribute('aria-expanded');
+        item.target.dispatchEvent(new CustomEvent('popupClose'));
         item.component.$destroy();
+    }
+
+    destroyAll() {
+        this.components.forEach(it => this.destroy(it))
     }
 }
 
@@ -85,5 +108,5 @@ const popoverTrigger = (node: HTMLElement, options: SveltePopoverOptions) => {
     }
 }
 
-export type {SveltePopoverOptions};
+export type {SvelteComponentOptions, SveltePopoverOptions};
 export {popover, popoverTrigger}

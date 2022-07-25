@@ -4,6 +4,7 @@ type Dictionary = {
     logInAction: string,
     noAccount: string,
     registration: string,
+    rememberMe: string,
     incorrectLoginOrPass: string,
     username: string,
     email: string,

@@ -9,6 +9,7 @@ const en: Dictionary = {
     },
     incorrectLoginOrPass: 'Invalid username or password',
     logInAction: 'Log In',
+    rememberMe: 'Remember me',
     logUpAction: 'Register',
     noAccount: 'No account',
     password: 'Password',

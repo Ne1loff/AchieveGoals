@@ -1,7 +1,7 @@
 <script lang="ts">
     import dayjs from 'dayjs';
     import Icon from "@iconify/svelte";
-    import SchedulerModal from "../modals/SchedulerModal.svelte";
+    import MenuContainer from "../modals/MenuContainer.svelte";
     import Goal from "../../data/models/Goal";
     import InlineCalendar from "../date-picker/InlineCalendar.svelte";
     import {GOALS} from "../../data/storage/storage";
@@ -37,7 +37,7 @@
 </script>
 
 
-<SchedulerModal>
+<MenuContainer>
     <div class="scheduler-title" slot="header">
         <span>{dayjs(goal.deadline).format('DD dd HH:mm')}</span>
     </div>
@@ -77,7 +77,7 @@
     <div class="scheduler-date-picker" slot="footer">
         <InlineCalendar bind:value={goal.deadline} withTime/>
     </div>
-</SchedulerModal>
+</MenuContainer>
 
 
 <style>

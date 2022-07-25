@@ -1,5 +1,5 @@
 <script lang="ts">
-    import SchedulerModal from "../modals/SchedulerModal.svelte";
+    import MenuContainer from "../modals/MenuContainer.svelte";
     import Scheduler from "./SchedulerComponent.svelte";
     import Icon from "@iconify/svelte";
     import dayjs from "dayjs";
@@ -33,7 +33,7 @@
 
 </script>
 
-<SchedulerModal on:close={close}>
+<MenuContainer on:close={close}>
     <div class="menu-actions" slot="header">
         <button class="actions-btn">
             <Icon icon="bx:bx-arrow-to-top" width="20" height="20"/>
@@ -123,7 +123,7 @@
             <span>Удалить цель</span>
         </button>
     </div>
-</SchedulerModal>
+</MenuContainer>
 
 <style>
     .menu-actions, .menu-delete {

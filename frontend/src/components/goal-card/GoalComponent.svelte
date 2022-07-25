@@ -18,7 +18,6 @@
     export let goal: Goal;
     export let indent = 1;
     export let showSub = true;
-    export let fromGoalCard = true;
 
     let subs: Goal[] = [];
 
@@ -35,27 +34,13 @@
     const createGoal = () => {
         dispatch('createGoal')
     }
-    const createSubtask = () => {
-        dispatch('createSub', goal.id);
-    }
+
     const editGoal = () => {
         dispatch('edit', goal);
     }
-    const updateGoal = () => {
-        dispatch('update', goal)
-    }
-    const deleteGoal = () => {
-        dispatch('delete', goal.id)
-    }
 
-    const onMenuClose = () => {
-        updateGoal();
-        popoverClose();
-    }
 
     let showSubtasks = false;
-    let showActions = false;
-    let showScheduler = false;
 
     let diff;
     let color;

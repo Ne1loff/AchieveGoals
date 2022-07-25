@@ -1,5 +1,6 @@
 <script lang="ts">
     import type {SveltePopoverOptions} from "./Popover";
+    import {clickOutside} from "../../../scripts/clickOutside";
     import {createEventDispatcher, onMount} from "svelte";
 
     const dispatch = createEventDispatcher();
@@ -19,7 +20,7 @@
         if (!options.classStyle) return '';
 
         if (Array.isArray(options.classStyle)) {
-            return options.classStyle.join();
+            return options.classStyle.join(' ');
         } else {
             return options.classStyle;
         }
@@ -232,9 +233,14 @@
 
 <svelte:window on:resize={calculatePosition}/>
 <div id="popover-{options.id}" class="popover_container">
-    <div class="overlay" on:click={close}
-    ></div>
+    {#if options.useOverlay}
+        <div class="overlay" on:click={close}></div>
+    {/if}
     <div class="popover-item {getClasses()}"
+         use:clickOutside
+         on:clickOutside={() => {
+             if (!options.useOverlay) close();
+         }}
          bind:this={contentRef}
          style="{style} {positionStyle}"
     >
@@ -266,11 +272,6 @@
 
     .popover-item {
         position: absolute;
-
-        background: var(--own-popover-bg, var(--cds-field));
-        border: var(--own-popover-border, none);
-        border-radius: var(--own-popover-border-radius, 5px);
-        padding: var(--own-popover-padding, 0);
     }
 
 </style>
