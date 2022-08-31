@@ -1,9 +1,8 @@
 <script lang="ts">
     import MenuButton from '../components/MenuButton.svelte'
     import Navbar from "../components/Navbar.svelte";
-    import Sidebar from "../components/Sidebar.svelte";
     import Goal from "../data/models/Goal";
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import GoalService from "../services/GoalService";
     import ApiError from "../data/api/ApiError";
     import NotificationService, {ErrorMessage} from "../services/NotificationService";
@@ -15,7 +14,11 @@
     import {USER} from "../data/storage/storage";
     import LoadingScreen from "../components/LoadingScreen.svelte";
     import TopBarMenu from "../components/TopBarMenu.svelte";
-    import HomeMenu from "../components/homeComponents/HomeMenu.svelte";
+    import HomeMenu from "../components/home-components/HomeMenu.svelte";
+    import {popover} from "../components/popover/global/Popover";
+    import HomeSideBar from "../components/home-components/sidebar/HomeSideBar.svelte";
+
+    export let params: {tab: string};
 
     let pageIsReady = false;
 
@@ -24,7 +27,7 @@
     let notificationService: NotificationService;
     let localStorageService: LocalStorageService;
 
-    let open: boolean;
+    let open: boolean = true;
     let goals: Goal[] = [];
     let sideBarWasOpen: boolean;
     let wasCheck: boolean = false;
@@ -77,6 +80,11 @@
         setUp();
     });
 
+    onDestroy(() => {
+        popover.destroyAll();
+        notificationService.closeAll();
+    })
+
 </script>
 
 
@@ -91,9 +99,6 @@
                         --own-burger-color="var(--cds-icon-01)"
                         --own-menu-btn-hover-background="var(--cds-layer-hover)"
             />
-            <div class="nav-bar-title">
-                <span>Achieve Goals</span>
-            </div>
         </div>
         <svelte:fragment slot="right">
             <ThemeSelect/>
@@ -101,18 +106,15 @@
         </svelte:fragment>
     </Navbar>
     <div class="main-page">
-        <Sidebar bind:open
-                 --own-sidebar-background="var(--cds-layer)">
-            <div slot="bottom" class="footer"></div>
-        </Sidebar>
+        <HomeSideBar {open} {params}/>
         <div class="main-content-wrapper" class:full-size={!open}>
-            <div class="main-content elevation-6">
+            <div class="main-content">
                 <slot name="content"></slot>
             </div>
         </div>
     </div>
 </div>
-
+<slot/>
 
 <style lang="scss">
 
@@ -222,15 +224,19 @@
     padding: .5rem 1rem 1rem .25rem;
     box-sizing: border-box;
 
+    margin-left: 16rem;
+
     display: flex;
     flex-direction: row;
     flex-grow: 1;
 
-    transition: padding-left var(--own-sidebar-transition-time) ease-in-out;
+    transition: padding-left var(--own-sidebar-transition-time) cubic-bezier(.4,0,.2,1),
+    margin-left var(--own-sidebar-transition-time) cubic-bezier(.4,0,.2,1);
   }
 
   .main-content-wrapper.full-size {
     padding: .5rem 1rem 1rem 1rem;
+    margin-left: 0;
   }
 
   .main-content {
@@ -240,7 +246,7 @@
     background: var(--cds-ui-background);
     overflow: hidden;
 
-    border-radius: 10px;
+    border-radius: 16px;
   }
 
 

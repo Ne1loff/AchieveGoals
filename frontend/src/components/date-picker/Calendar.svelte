@@ -126,7 +126,7 @@
         height: var(--calendar-header-height);
 
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
     }
 

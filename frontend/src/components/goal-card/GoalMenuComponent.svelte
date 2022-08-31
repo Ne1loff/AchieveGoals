@@ -6,8 +6,12 @@
     import {popoverTrigger} from "../popover/global/Popover";
     import Goal from "../../data/models/Goal";
     import {GOALS} from "../../data/storage/storage";
+    import {PRIORITIES} from "../../resources/constants";
+    import {createEventDispatcher} from "svelte";
 
     export let goalId: number;
+
+    const dispatch = createEventDispatcher();
 
     const goal: Goal = $GOALS.find((it) => it.id === goalId);
 
@@ -25,6 +29,10 @@
         $GOALS = goals;
     }
 
+    const edit = () => dispatch('edit');
+    const createOver = () => dispatch('create-over');
+    const createUnder = () => dispatch('create-under');
+
     $:{
         if (goal) {
             updateGoals();
@@ -33,17 +41,20 @@
 
 </script>
 
-<MenuContainer on:close={close}>
+<MenuContainer
+        --menu-container-hr-margin=".25rem -.25rem"
+        --menu-container-padding=".25rem"
+        --menu-container-border-radius="16px">
     <div class="menu-actions" slot="header">
-        <button class="actions-btn">
+        <button class="actions-btn first" on:click={createOver}>
             <Icon icon="bx:bx-arrow-to-top" width="20" height="20"/>
-            <span>Доавить новую цель</span>
+            <span>Добавить задачу выше</span>
         </button>
-        <button class="actions-btn">
+        <button class="actions-btn" on:click={createUnder}>
             <Icon icon="bx:bx-arrow-to-bottom" width="20" height="20"/>
-            <span>Добавиь подзадачу</span>
+            <span>Добавить задачу ниже</span>
         </button>
-        <button class="actions-btn">
+        <button class="actions-btn" on:click={edit}>
             <Icon icon="feather:edit-3" width="16" height="16"/>
             <span>Редактировать</span>
         </button>
@@ -80,6 +91,9 @@
                                 goalId: goal.id
                             }
                         },
+                        style: {
+                            "--own-popover-border-radius": "16px"
+                        },
                         classStyle: 'elevation-6'
                     }}
                 >
@@ -94,26 +108,13 @@
                 <h6>Приоритет</h6>
             </div>
             <div class="edit-parameters-holder">
-                <button class="parameters-holder-btn" class:selected={goal.priority === 1}
-                        on:click={() => goal.priority = 1}>
-                    <Icon icon="bi:flag-fill"
-                          style="width: 20px; height: 20px; color: var(--cds-inverse-support-01);"/>
-                </button>
-                <button class="parameters-holder-btn" class:selected={goal.priority === 2}
-                        on:click={() => goal.priority = 2}>
-                    <Icon icon="bi:flag-fill"
-                          style="width: 20px; height: 20px; color: var(--cds-inverse-support-03);"/>
-                </button>
-                <button class="parameters-holder-btn" class:selected={goal.priority === 3}
-                        on:click={() => goal.priority = 3}>
-                    <Icon icon="bi:flag-fill"
-                          style="width: 20px; height: 20px; color: var(--cds-inverse-support-04)"/>
-                </button>
-                <button class="parameters-holder-btn" class:selected={goal.priority === 4}
-                        on:click={() => goal.priority = 4}>
-                    <Icon icon="bi:flag"
-                          style="width: 20px; height: 20px; color: var(--cds-icon-01);"/>
-                </button>
+                {#each PRIORITIES as priority}
+                    <button class="parameters-holder-btn" class:selected={goal.priority === priority.priority}
+                            on:click={() => goal.priority = priority.priority}>
+                        <Icon icon={priority.icon}
+                              style="width: 20px; height: 20px; color: {priority.color};"/>
+                    </button>
+                {/each}
             </div>
         </div>
     </div>
@@ -127,7 +128,7 @@
 
 <style>
     .menu-actions, .menu-delete {
-        margin: 4px 0;
+        margin: 2px 0;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -141,6 +142,7 @@
         padding: 8px;
         box-sizing: border-box;
 
+
         background: var(--cds-field);
 
         display: flex;
@@ -149,6 +151,14 @@
 
         color: var(--cds-text-01);
         cursor: pointer;
+    }
+
+    .actions-btn.first {
+        border-radius: 1rem 1rem 0 0;
+    }
+
+    .menu-delete-btn {
+        border-radius: 0 0 1rem 1rem;
     }
 
     .actions-btn:hover, .menu-delete-btn:hover {
@@ -191,16 +201,15 @@
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
-        padding: 5px;
-        box-sizing: border-box;
     }
 
     .parameters-holder-btn, .parameters-holder-btn.selected {
         width: 28px;
         height: 28px;
 
-        padding: 0;
-        margin: 0 12px 0 0;
+        padding: .125rem;
+        margin-right: .5rem;
+        box-sizing: content-box;
 
         background: var(--cds-field);
 

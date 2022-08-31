@@ -1,5 +1,6 @@
 <script lang="ts">
-    import type {SveltePopoverOptions} from "./Popover";
+    import type {SveltePopoverOptions} from "./PopoverTypes";
+    import {validateOptions} from "./utils";
     import {clickOutside} from "../../../scripts/clickOutside";
     import {createEventDispatcher, onMount} from "svelte";
 
@@ -7,13 +8,21 @@
 
     export let options: SveltePopoverOptions;
 
+    validateOptions(options);
+
     let style: string = '';
     let positionStyle: string = '';
 
     let contentRef: HTMLElement;
 
-    const close = () => {
-        dispatch('close')
+    const close = () => dispatch('close');
+
+    const clickFromOverlay = () => {
+        if (options.useOverlay) close();
+    }
+
+    const clickFromOutside = () => {
+        if (!options.useOverlay) close();
     }
 
     const getClasses = (): string => {
@@ -224,6 +233,7 @@
         positionStyle = get.style;
     }
 
+
     onMount(() => {
         setStyle();
         calculatePosition();
@@ -234,17 +244,20 @@
 <svelte:window on:resize={calculatePosition}/>
 <div id="popover-{options.id}" class="popover_container">
     {#if options.useOverlay}
-        <div class="overlay" on:click={close}></div>
+        <div class="overlay" on:click={clickFromOverlay}></div>
     {/if}
     <div class="popover-item {getClasses()}"
          use:clickOutside
-         on:clickOutside={() => {
-             if (!options.useOverlay) close();
-         }}
+         on:clickOutside={clickFromOutside}
          bind:this={contentRef}
          style="{style} {positionStyle}"
     >
-        <svelte:component this={options.component.src} {...options.component.props}/>
+        {#if options.fromComponent}
+            <slot {close}/>
+        {:else}
+
+            <svelte:component this={options.component.src} {...options.component.props}/>
+        {/if}
     </div>
 </div>
 
@@ -272,6 +285,10 @@
 
     .popover-item {
         position: absolute;
+
+        border: var(--own-popover-border);
+        border-radius: var(--own-popover-border-radius);
+        padding: var(--own-popover-padding);
     }
 
 </style>

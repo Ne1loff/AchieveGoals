@@ -1,7 +1,7 @@
 <script lang="ts">
 
     export let width: number = 226;
-    export let classes: string | string[];
+    export let classes: string | string[] = [];
 
     const getClasses = (): string => {
         if (!classes) return '';
@@ -16,7 +16,7 @@
 
 <style>
 
-    .root {
+    :root {
         --menu-container-padding: 0;
         --menu-container-border-radius: 3px;
         --menu-container-hr-margin: 0;
@@ -36,7 +36,7 @@
     }
 
     .container hr {
-        width: 100%;
+        width: calc(100% + var(--menu-container-hr-margin));
         border: 0;
         border-bottom: 1px solid var(--cds-border-subtle);
         margin: var(--menu-container-hr-margin);

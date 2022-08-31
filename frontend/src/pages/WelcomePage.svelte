@@ -3,9 +3,10 @@
     import {Button} from "carbon-components-svelte";
     import Navbar from "../components/Navbar.svelte";
     import {onMount} from "svelte";
+    import {hrefs} from "../resources/config";
 
     onMount(() => {
-        navigate('/login');
+        navigate(hrefs.home);
     });
 </script>
 
@@ -19,8 +20,8 @@
         <img class="logo" on:click={() => navigate('/')} src="/static/logo_200x44.png" alt="logo">
     </div>
     <svelte:fragment slot="right">
-        <Button on:click={() => navigate('/login')}>Вход</Button>
-        <Button on:click={() => navigate('/registration')}>Регистрация</Button>
+        <Button on:click={() => navigate(hrefs.login)}>Вход</Button>
+        <Button on:click={() => navigate(hrefs.registration)}>Регистрация</Button>
     </svelte:fragment>
 </Navbar>
 <div class="main-content">
@@ -60,7 +61,6 @@
         bottom: 0;
 
         background: linear-gradient(135deg, #71b7e6, #9b59b6);
-        /*background: url("/static/intro.jpg") center no-repeat;*/
         -webkit-background-size: cover;
     }
 

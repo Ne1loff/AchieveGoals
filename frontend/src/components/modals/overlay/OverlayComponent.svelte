@@ -16,6 +16,7 @@
         height: 100vh;
 
         background: var(--own-overlay-bg);
+        z-index: 900;
     }
 
 </style>

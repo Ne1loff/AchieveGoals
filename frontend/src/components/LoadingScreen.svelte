@@ -5,11 +5,13 @@
 
 </script>
 
-<div class="loading-background" class:show>
-    <div class="loading-spinner">
-        <Circle3/>
+{#if show}
+    <div class="loading-background">
+        <div class="loading-spinner">
+            <Circle3/>
+        </div>
     </div>
-</div>
+{/if}
 
 <style>
 
@@ -20,7 +22,7 @@
         bottom: 0;
         left: 0;
 
-        display: none;
+        display: flex;
         justify-content: center;
         align-items: center;
 
@@ -28,8 +30,5 @@
         z-index: 1111;
     }
 
-    .loading-background.show {
-        display: flex;
-    }
 
 </style>

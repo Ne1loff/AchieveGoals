@@ -20,7 +20,7 @@
     export let IconWhenPass = 'akar-icons:eye-closed';
     export let IconWhenText = 'akar-icons:eye-open';
 
-    let error: boolean = false;
+    let error: boolean;
     let requiredError: boolean = false;
     let patternError: boolean = false;
 
@@ -42,7 +42,7 @@
         }
     }
 
-    $: patternError = (value && validate && pattern !== undefined) ? !pattern.test(value) : patternError;
+    $: patternError = (value && validate && pattern !== undefined) ? !pattern?.test(value) : patternError;
     $: error = requiredError || patternError;
     $: {
         if (type === 'password' && inputEl) inputEl.type = showPassword ? 'text' : 'password';
@@ -81,7 +81,7 @@
 <style lang="scss">
 
   :root {
-    --custom-background-color: #fff;
+    --custom-background-color: inerhit;
     --custom-height: 22px;
     --custom-width: 100%;
     --custom-margin: 0;
@@ -93,7 +93,7 @@
     position: relative;
 
     background: var(--custom-background-color);
-    width: var(--custom-width);
+    max-width: var(--custom-width);
     max-height: var(--custom-height);
     margin: var(--custom-margin);
 

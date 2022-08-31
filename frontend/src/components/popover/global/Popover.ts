@@ -1,44 +1,14 @@
-import type {SvelteComponent} from "svelte";
 import PopoverItem from "./PopoverItem.svelte";
+import type {ComponentInfo, SveltePopoverOptions} from "./PopoverTypes";
+import {validateOptions} from "./utils";
 
-
-interface SvelteComponentOptions {
-    src: typeof SvelteComponent,
-    props?: { [key: string]: any }
-}
-
-interface SveltePopoverOptions {
-    id?: string,
-    target?: HTMLElement,
-    component: SvelteComponentOptions,
-    useOverlay?: boolean,
-    placement?: 'auto' |
-        'top-start' | 'top-center' | 'top-end' |
-        'left-start' | 'left-center' | 'left-end' |
-        'right-start' | 'right-center' | 'right-end' |
-        'bottom-start' | 'bottom-center' | 'bottom-end',
-    style?: { [key: string]: string },
-    classStyle: string | string[]
-}
-
-interface ComponentInfo {
-    id: string,
-    target: HTMLElement,
-    component: SvelteComponent
-}
 
 class Popover {
 
     private components: ComponentInfo[] = [];
 
     show(options: SveltePopoverOptions): string {
-        if (!options.placement) options.placement = 'auto';
-        if (options.useOverlay === undefined) options.useOverlay = true;
-
-        let id = Math.random().toString(4).slice(2);
-
-        if (!options.id) options.id = id;
-        else id = options.id;
+        const id = validateOptions(options);
 
         options.target.setAttribute('aria-expanded', 'true');
 
@@ -59,6 +29,8 @@ class Popover {
                 options: options
             }
         })
+
+        document.getElementById(`popover-${options.id}`).focus();
 
         component.$on("close", close);
 
@@ -84,6 +56,10 @@ class Popover {
         item.component.$destroy();
     }
 
+    destroyOther(item: ComponentInfo) {
+        this.components.filter(it => it !== item).forEach(it => this.destroy(it));
+    }
+
     destroyAll() {
         this.components.forEach(it => this.destroy(it))
     }
@@ -93,7 +69,8 @@ const popover = new Popover();
 
 const popoverTrigger = (node: HTMLElement, options: SveltePopoverOptions) => {
 
-    const createPopover = () => {
+    const createPopover = (event) => {
+        if (options.stopPropagation) event.stopPropagation();
         options.target = node;
         popover.show(options);
     };
@@ -108,5 +85,5 @@ const popoverTrigger = (node: HTMLElement, options: SveltePopoverOptions) => {
     }
 }
 
-export type {SvelteComponentOptions, SveltePopoverOptions};
+
 export {popover, popoverTrigger}

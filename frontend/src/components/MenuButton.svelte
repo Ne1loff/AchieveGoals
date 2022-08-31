@@ -18,7 +18,7 @@
         --own-menu-btn-size: 2rem;
         --own-menu-btn-transition-time: .3s;
         --own-menu-btn-border: 3px solid #000;
-        --own-menu-btn-border-radius: 4px;
+        --own-menu-btn-border-radius: 8px;
         --own-menu-btn-background: transparent;
         --own-menu-btn-hover-background: #e1e1e1;
 

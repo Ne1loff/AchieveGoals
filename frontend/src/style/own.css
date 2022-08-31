@@ -163,3 +163,30 @@ html[theme=g90] .login-page {
 html[theme=g100] .login-page {
     --own-login-page-background: linear-gradient(to right, #6441a5, #2a0845);
 }
+
+html[theme=white], html[theme=g10] {
+    --own-next-week-color: #692fc2;
+}
+
+html[theme=g80], html[theme=g90], html[theme=g100] {
+    --own-next-week-color: #a970ff;
+}
+
+.spacing-xsmall:not(:first-child) {
+    margin-top: .25rem;
+}
+.spacing-small:not(:first-child) {
+    margin-top: .5rem;
+}
+.spacing-medium:not(:first-child) {
+    margin-top: .75rem;
+}
+.spacing-large:not(:first-child) {
+    margin-top: 1rem;
+}
+.spacing-xlarge:not(:first-child) {
+    margin-top: 1.5rem;
+}
+.spacing-xxlarge:not(:first-child) {
+    margin-top: 2rem;
+}

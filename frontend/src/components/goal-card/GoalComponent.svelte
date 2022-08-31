@@ -1,7 +1,6 @@
 <script lang="ts">
-    import {slide} from 'svelte/transition';
     import Icon from "@iconify/svelte"
-    import {createEventDispatcher, onMount} from 'svelte';
+    import {onDestroy, onMount} from 'svelte';
     import dayjs from 'dayjs';
     import {PRIORITY_COLORS} from "../../resources/constants";
     import Goal from '../../data/models/Goal'
@@ -10,105 +9,136 @@
     import GoalCheckbox from "./GoalCheckbox.svelte";
     import Scheduler from "./SchedulerComponent.svelte";
     import GoalMenu from "./GoalMenuComponent.svelte";
+    import GoalEditorComponent from "./GoalEditorComponent.svelte";
     import {popoverTrigger} from "../popover/global/Popover";
+    import {navigate} from "svelte-routing";
+    import {hrefs} from "../../resources/config";
+    import {getColorFromDayDiff} from "./utils";
+    import AnimationContainer from "./AnimationContainer.svelte";
+    import PortablePopover from "../popover/global/PortablePopover.svelte";
+    import type {Unsubscriber} from "svelte/store";
 
-
-    const dispatch = createEventDispatcher();
-
+    export let style: string = "";
     export let goal: Goal;
-    export let indent = 1;
-    export let showSub = true;
+    export let indent: 1 | 2 | 3 | 4 | 5 = 1;
+    export let withoutSubs: boolean = false;
+    export let animationDurationIn: number = 200;
+    export let animationDurationOut: number = 200;
+    export let root: boolean = true;
+
+    let animDurationIn: number = animationDurationIn;
+    let animDurationOut: number = animationDurationOut;
 
     let subs: Goal[] = [];
 
     const priorityColors = PRIORITY_COLORS;
-
-    const popoverOpen = () => {
-        dispatch('popoverOpen')
-    }
-
-    const popoverClose = () => {
-        dispatch('popoverClose')
-    }
-
-    const createGoal = () => {
-        dispatch('createGoal')
-    }
-
-    const editGoal = () => {
-        dispatch('edit', goal);
-    }
-
-
     let showSubtasks = false;
 
-    let diff;
-    let color;
+    let edit: boolean = false;
+    const editGoal = () => edit = true;
 
-    $: {
-        if (goal) {
-            diff = dayjs(goal.deadline).diff(dayjs(), 'day');
-            color = diff === 0 ? "var(--cds-support-success)"
-                : diff === 1 ? "var(--cds-support-warning)"
-                    : diff > 1 && diff < 8 ? "var(--cds-support-info)"
-                        : diff < 0 || isNaN(diff) ? "var(--cds-text-error)"
-                            : "var(--cds-disabled-03)";
-        }
+    let createOver: boolean = false;
+    let createUnder: boolean = false;
+    let newGoal: Goal;
+
+    const createGoalOver = () => {
+        createOver = true;
+        newGoal = new Goal();
+    }
+    const createGoalUnder = () => {
+        createUnder = true;
+        newGoal = new Goal();
+        newGoal.gid = goal.id;
     }
 
+    const saveNewGoal = () => {
+        const goals = $GOALS;
+        goals.push(newGoal);
+        $GOALS = goals;
+    }
+
+    $: if (goal) {
+        goal.subtasks.total = subs.length;
+        goal.subtasks.completed = subs.filter(it => it.isDone).length;
+    }
+
+    let unsubscribe: Unsubscriber;
+
     onMount(() => {
-        subs = $GOALS.filter(it => it.gid === goal.id);
-        GOALS.subscribe((g) => subs = g.filter(it => it.gid === goal.id))
+        if (!withoutSubs) {
+            subs = $GOALS.filter(it => it.gid === goal.id);
+            unsubscribe = GOALS.subscribe((g) => subs = g.filter(it => it.gid === goal.id));
+        }
+    });
+
+    onDestroy(() => {
+        if (typeof unsubscribe === 'function')
+            unsubscribe()
     });
 
 </script>
 
-<div class="goal-body" data-item-indent="{indent > 5 || indent < 1 ? 1 : indent}"
-     transition:slide={{ duration: 200 }}>
-    <div class="body-container">
-        <div class="body-container-left">
-            {#if goal.subtasks.total > 0 && showSub}
-                <div class="container-actions-left" on:click={() => showSubtasks = !showSubtasks}>
-                    <div class="btn-icon-container" data-item-rotate={showSubtasks ? '90' : '0'}>
-                        <Icon class="action-left-btn"
-                              icon="uil:angle-right-b"
-                              width="32" height="32"
-                              color="color: var(--cds-icon-01)"
-                        />
-                    </div>
-                </div>
-            {:else}
-                <div style="width: 28px"></div>
-            {/if}
-            <GoalCheckbox
-                    bind:done={goal.isDone}
-                    round
-                    --own-checkbox-size="1.5rem"
-                    --own-checkbox-border-color={priorityColors[goal.priority].icon}
-                    --own-checkbox-hover-border-color={priorityColors[goal.priority].icon}
-                    --own-checkbox-done-border-color={priorityColors[goal.priority].icon}
 
-                    --own-checkbox-bg-color={priorityColors[goal.priority].background}
-                    --own-checkbox-hover-bg-color={priorityColors[goal.priority].background}
-                    --own-checkbox-done-bg-color={priorityColors[goal.priority].icon}
-
-                    --own-check-mark-bg-color={priorityColors[goal.priority].icon}
-                    --own-check-mark-hover-bg-color={priorityColors[goal.priority].icon}
-            />
-        </div>
-        <div class="container-content">
-            <div class="content-title" class:done={goal.isDone}>{goal.title}</div>
-            <div class="content-info-tags">
-                {#if goal.subtasks.total > 0}
-                    <div class="info-tags-subtasks">
-                        <div class="info-tags-icon">
-                            <Icon icon="ant-design:node-index-outlined" style="width: 16px; height: 16px"/>
+{#if createOver}
+    <GoalEditorComponent bind:goal={newGoal} {indent}
+                         on:save={saveNewGoal}
+                         on:done={() => createOver = false}
+    />
+{/if}
+<AnimationContainer animate={!root}
+                    animationDurationIn={animDurationIn}
+                    animationDurationOut={animDurationOut}>
+    {#if !edit}
+        <div class="goal-body" data-item-indent="{indent > 5 || indent < 1 ? 1 : indent}"
+             tabindex="1"
+             style={style}
+             on:click={() => navigate(hrefs.task(goal.id))}
+        >
+            <div class="body-container">
+                <div class="body-container-left">
+                    {#if !withoutSubs && goal.subtasks.total > 0}
+                        <div class="container-actions-left"
+                             on:click|stopPropagation={() => showSubtasks = !showSubtasks}>
+                            <div class="btn-icon-container" data-item-rotate={showSubtasks ? '90' : '0'}>
+                                <Icon class="action-left-btn"
+                                      icon="uil:angle-right-b"
+                                      width="32" height="32"
+                                      color="color: var(--cds-icon-01)"
+                                />
+                            </div>
                         </div>
-                        <div class="info-tags-text">{goal.subtasks.completed + '/' + goal.subtasks.total}</div>
-                    </div>
-                {/if}
-                <div class="info-tags-date"
-                     use:popoverTrigger={{
+                    {:else}
+                        <div style="width: 28px"></div>
+                    {/if}
+                    <GoalCheckbox
+                            bind:done={goal.isDone}
+                            round
+                            --own-checkbox-size="1.5rem"
+                            --own-checkbox-border-color={priorityColors[goal.priority].icon}
+                            --own-checkbox-hover-border-color={priorityColors[goal.priority].icon}
+                            --own-checkbox-done-border-color={priorityColors[goal.priority].icon}
+
+                            --own-checkbox-bg-color={priorityColors[goal.priority].background}
+                            --own-checkbox-hover-bg-color={priorityColors[goal.priority].background}
+                            --own-checkbox-done-bg-color={priorityColors[goal.priority].icon}
+
+                            --own-check-mark-bg-color={priorityColors[goal.priority].icon}
+                            --own-check-mark-hover-bg-color={priorityColors[goal.priority].icon}
+                    />
+                </div>
+                <div class="container-content">
+                    <div class="content-title" class:done={goal.isDone}>{goal.title}</div>
+                    <div class="content-info-tags">
+                        {#if goal.subtasks.total > 0}
+                            <div class="info-tags-subtasks">
+                                <div class="info-tags-icon">
+                                    <Icon icon="ant-design:node-index-outlined" style="width: 16px; height: 16px"/>
+                                </div>
+                                <div class="info-tags-text">{goal.subtasks.completed + '/' + goal.subtasks.total}</div>
+                            </div>
+                        {/if}
+                        <div class="info-tags-date"
+                             use:popoverTrigger={{
                         component: {
                             src: InlineCalendar,
                             props: {
@@ -117,82 +147,106 @@
                             }
                         },
                         style: {
-                            width: "274px",
-                            padding: '.25rem',
-                            'border-radius': '5px',
-                            background: 'var(--cds-field)'
+                            "--own-popover-border-radius": "16px"
                         },
+                        stopPropagation: true,
                         classStyle: 'elevation-6'
                     }}>
-                    <div class="info-tags-icon">
-                        <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
+                            <div class="info-tags-icon">
+                                <Icon class="action-icons" icon="bi:calendar-event" style="width: 12px; height: 12px"/>
+                            </div>
+                            <div class="info-tags-text" style="color:{getColorFromDayDiff(goal.deadline)}">
+                                {dayjs(goal.deadline).format('DD dddd HH:mm')}</div>
+                        </div>
                     </div>
-                    <div class="info-tags-text" style="color:{color}">
-                        {dayjs(goal.deadline).format('DD dddd HH:mm')}</div>
+                </div>
+                <div class="container-actions-right">
+                    <div class="action-btn"
+                         on:click|stopPropagation={editGoal}
+                    >
+                        <Icon class="action-icons" icon="feather:edit-3"
+                              height="16" width="16"
+                              color="var(--cds-icon-01)"
+                        />
+                    </div>
+                    <div class="action-btn"
+                         use:popoverTrigger={{
+                            component: {
+                                src: Scheduler,
+                                props: {
+                                    goalId: goal.id
+                                }
+                            },
+                            style: {
+                                    "--own-popover-border-radius": "16px"
+                            },
+                            stopPropagation: true,
+                            classStyle: 'elevation-6'
+                        }}
+                    >
+                        <Icon class="action-icons" icon="bi:calendar-event"
+                              height="16" width="16"
+                              color="var(--cds-icon-01)"
+                        />
+                    </div>
+                    <PortablePopover options={{
+                        stopPropagation: true,
+                        classStyle: 'elevation-6'
+                    }}>
+                        <div slot="target" class="action-btn" let:toggle on:click|stopPropagation={toggle}>
+                            <Icon class="action-icons" icon="bi:three-dots"
+                                  height="16" width="16"
+                                  color="var(--cds-icon-01)"
+                            />
+                        </div>
+                        <GoalMenu slot="content" goalId={goal.id}
+                                  let:close
+                                  on:edit={() => {editGoal(); close();}}
+                                  on:create-over={() => {createGoalOver(); close();}}
+                                  on:create-under={() => {createGoalUnder(); close();}}
+                        />
+                    </PortablePopover>
                 </div>
             </div>
         </div>
-        <div class="container-actions-right">
-            <div class="action-btn"
-                 on:click={editGoal}
-            >
-                <Icon class="action-icons" icon="feather:edit-3"
-                      height="16" width="16"
-                      color="var(--cds-icon-01)"
-                />
-            </div>
-            <div class="action-btn"
-                 use:popoverTrigger={{
-                    component: {
-                        src: Scheduler,
-                        props: {
-                            goalId: goal.id
-                        }
-                    },
-                    classStyle: 'elevation-6'
-                }}
-            >
-                <Icon class="action-icons" icon="bi:calendar-event"
-                      height="16" width="16"
-                      color="var(--cds-icon-01)"
-                />
-            </div>
-            <div class="action-btn"
-                 use:popoverTrigger={{
-                        component: {
-                            src: GoalMenu,
-                            props: {
-                                goalId: goal.id
-                            }
-                        },
-                        classStyle: 'elevation-6'
-                    }}
-            >
-                <Icon class="action-icons" icon="bi:three-dots"
-                      height="16" width="16"
-                      color="var(--cds-icon-01)"
-                />
-            </div>
-        </div>
-    </div>
-</div>
-{#if showSubtasks}
+    {:else }
+        <GoalEditorComponent bind:goal {indent}
+                             on:done={() => edit = false}
+        />
+    {/if}
+</AnimationContainer>
+{#if !withoutSubs && showSubtasks}
     {#each subs as goal}
-        <svelte:self bind:goal indent={indent + 1}/>
+        <svelte:self bind:goal indent={indent + 1} {animationDurationIn} {animationDurationOut} root={false}/>
     {/each}
+{/if}
+{#if createUnder}
+    <GoalEditorComponent bind:goal={newGoal} indent={indent + 1}
+                         on:save={saveNewGoal}
+                         on:done={() => createUnder = false}
+    />
 {/if}
 
 <style>
 
     :root {
         --own-btn-hover-color: #f0f0f0;
+        --own-component-border-width: calc(100% - 28px);
+        --own-component-border-right: -28px;
+        --own-component-width: 100%;
     }
 
     .goal-body {
         position: relative;
         min-width: 300px;
-        width: 100%;
+        width: var(--own-component-width);
         user-select: none;
+        cursor: pointer;
+    }
+
+    .goal-body:focus-visible {
+        outline: var(--cds-focus) solid 1px;
+        background-color: var(--cds-hover-ui);
     }
 
     .goal-body:before {
@@ -329,7 +383,7 @@
 
     .info-tags-text {
         font-size: 12px;
-        color: #838383;
+        color: var(--cds-text-secondary);
     }
 
     .btn-icon-container {

@@ -15,7 +15,8 @@
     import ApiError from "../data/api/ApiError";
     import ServiceFactory from "../services/ServiceFactory";
     import UserService from "../services/UserService";
-    import CheckboxLine from "../components/CheckboxLine.svelte";
+    import CheckboxLine from "../components/checkbox/CheckboxLine.svelte";
+    import {hrefs} from "../resources/config";
 
     const handleKeydown = (e) => {
         if (e.key !== 'Enter') return;
@@ -31,7 +32,7 @@
     function sigIn() {
         if (login.login.length > 0 && login.password.length > 0) {
             signUIOService.logIn(login)
-                .then(() => navigate('/home/goals'))
+                .then(() => navigate(hrefs.home))
                 .catch((apiResponse: ApiResponse<ApiError>) =>
                     notificationService.errorFromErrorMessage(new ErrorMessage().fromApiError(apiResponse.error))
                 );
@@ -112,7 +113,7 @@
         padding: 20px;
         position: center;
         background: var(--cds-ui-01);
-        border-radius: 10px;
+        border-radius: 16px;
         text-align: center;
     }
 

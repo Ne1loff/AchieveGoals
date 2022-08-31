@@ -108,7 +108,7 @@
 
 </script>
 
-<div class="time_picker">
+<div class="time_picker elevation-8">
     <Picker>
         <PickerColumn data={months} bind:selected={month}
                       options={{
@@ -137,7 +137,7 @@
         -webkit-user-select: none;
         user-select: none;
         background: var(--cds-field);
-        border-radius: 10px;
+        border-radius: 16px;
     }
 
 </style>

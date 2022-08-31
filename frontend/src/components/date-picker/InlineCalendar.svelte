@@ -5,10 +5,10 @@
     import Goal from "../../data/models/Goal";
     import {GOALS} from "../../data/storage/storage";
 
-    export let goalId: number | undefined = undefined;
-    const goal: Goal | undefined = goalId ? $GOALS.find((it) => it.id === goalId) : undefined;
+    export let goalId: number = undefined;
+    const goal: Goal = goalId ? $GOALS.find((it) => it.id === goalId) : undefined;
 
-    export let value: Date = goal ? goal!.deadline : new Date();
+    export let value: Date = goal ? goal.deadline : new Date();
     export let minDate: Date = dayjs().add(-1, 'day').toDate();
     export let withTime: boolean = false;
 
@@ -20,7 +20,7 @@
 
     $:{
         if (goal) {
-            goal!.deadline = value;
+            goal.deadline = value;
             updateGoals();
         }
     }
@@ -28,6 +28,10 @@
 </script>
 
 <style>
+
+    :root {
+        --calendar-padding: .3rem;
+    }
 
     .calendar-container {
         width: 100%;
@@ -38,6 +42,8 @@
         flex-direction: column;
         justify-content: center;
 
+        padding: var(--calendar-padding);
+        border-radius: 16px;
         user-select: none;
     }
 

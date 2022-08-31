@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import Checkbox from "./checkbox/Checkbox.svelte";
+    import Checkbox from "./Checkbox.svelte";
 
     export let position: 'left' | 'center' | 'right' = 'center';
     export let checked: boolean;
@@ -15,12 +15,18 @@
 
     let id = "id" + Math.random().toString(16).slice(2);
     let canChange;
+    let focus
 </script>
 
 <div class="checkbox-line" style="justify-content: {position}">
-    <div class="checkbox-container" on:click={() => {if (activeContainer && canChange) checked = !checked}}
+    <div class="checkbox-container"
+         class:focus
+         on:click={() => {if (activeContainer && canChange) checked = !checked}}
          style="cursor: {activeContainer ? 'pointer' : 'default'};">
-        <Checkbox {id} class="custom-checkbox" {...props} bind:checked bind:canChange duration={350}/>
+        <Checkbox {id} class="custom-checkbox" {...props} bind:checked bind:canChange duration={350}
+                  on:focusin={() => focus = true}
+                  on:focusout={() => focus = false}
+        />
         <label for={id} style="cursor: {activeContainer ? 'pointer' : 'default'};">{labelText}</label>
     </div>
 </div>
@@ -50,8 +56,14 @@
         height: 100%;
     }
 
+    .checkbox-container.focus {
+        outline: 1px solid var(--cds-focus, #0f62fe);
+        outline-offset: 1px
+    }
+
     .checkbox-container label {
         padding-left: .5rem;
+        padding-right: 2px;
         user-select: none;
     }
 

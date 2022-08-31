@@ -70,6 +70,6 @@
 
 </style>
 
-<div class="check" class:done class:round on:click={() => done = !done}>
+<div class="check" class:done class:round on:click|stopPropagation={() => done = !done}>
     <div class="check-mark">✔</div>
 </div>

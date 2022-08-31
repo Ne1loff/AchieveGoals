@@ -20,6 +20,7 @@
     import {EMAIL_REGEX, PASSWORD_REGEX} from "../resources/regexes";
     import {l10n} from "../resources/localization/l10n";
     import ServiceFactory from "../services/ServiceFactory";
+    import {hrefs} from "../resources/config";
 
     let countryService: CountryService;
     let signUIOService: SignUIOService;
@@ -50,7 +51,7 @@
         signUIOService.signUp(registration)
             .then(() => {
                 signUIOService.logIn(new Login().fromRegistration(registration))
-                    .then(() => navigate('/home'))
+                    .then(() => navigate(hrefs.home))
                     .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error));
             }).catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error))
     }
@@ -243,7 +244,7 @@
         padding: 20px;
         position: center;
         background: var(--cds-ui-01);
-        border-radius: 10px;
+        border-radius: 16px;
         text-align: center;
     }
 

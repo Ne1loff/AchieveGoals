@@ -1,6 +1,7 @@
 <script lang="ts">
 
     import TimeComponent from "./TimeComponent.svelte";
+    import TimeInput from "./TimeInput.svelte";
 
     export let value: Date;
 </script>
@@ -9,7 +10,10 @@
     <div class="time-label">
         <span>Время:</span> <!-- TODO: l10n -->
     </div>
-    <TimeComponent bind:value/>
+    <div class="time-action">
+        <TimeInput bind:value/>
+        <TimeComponent bind:value/>
+    </div>
 </div>
 
 <style>
@@ -25,5 +29,11 @@
 
     .time-label {
         flex-grow: 1;
+    }
+
+    .time-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

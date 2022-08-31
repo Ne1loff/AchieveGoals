@@ -6,18 +6,21 @@
     import {USER} from "../../data/storage/storage";
     import Icon from "@iconify/svelte";
     import ServiceFactory from "../../services/ServiceFactory";
+    import {hrefs} from "../../resources/config";
+    import {SettingsUrl} from "../../resources/basicFilter.config";
 
     let user: User;
 
     const logout = () => {
         ServiceFactory.INSTANCE.signUIOService.logOut()
             .then(() => {
-                if (typeof $$props.closePopover === "function") {
-                    $$props.closePopover();
-                }
-                navigate("/login");
+                close();
+                navigate(hrefs.login);
             });
     }
+
+    const close = () => typeof $$props.closePopover === "function" ? $$props.closePopover() : '';
+
 
     onMount(() => {
         user = $USER;
@@ -28,10 +31,12 @@
 <MenuContainer width="268"
                --menu-container-padding="6px 0"
                --menu-container-hr-margin="4px 0"
-               --menu-container-border-radius="10px"
+               --menu-container-border-radius="16px"
                classes="elevation-2"
 >
-    <a slot="header" class="user-settings menu-item" use:link href="/settings/account">
+    <a slot="header" class="user-settings menu-item" use:link href={hrefs.settings(SettingsUrl.ACCOUNT)}
+       on:click={close}
+    >
         {#if user}
             <div class="user-info">
                 <div class="user-avatar">
@@ -51,7 +56,7 @@
         {/if}
     </a>
     <svelte:fragment slot="content">
-        <a class="menu-item" use:link href="/settings/theme">
+        <a class="menu-item" use:link href={hrefs.settings(SettingsUrl.THEME)} on:click={close}>
             <div class="action">
                 <div class="icon">
                     <Icon icon="carbon:color-palette" width="20" color="var(--cds-icon-02)"/>
@@ -59,7 +64,7 @@
                 <span>Тема</span> <!--    TODO: l10n        -->
             </div>
         </a>
-        <a class="menu-item" use:link href="/application">
+        <a class="menu-item" use:link href={hrefs.mobile} on:click={close}>
             <div class="action">
                 <div class="icon">
                     <Icon icon="carbon:application-mobile" width="20" color="var(--cds-icon-02)"/>
@@ -68,18 +73,18 @@
             </div>
         </a>
         <hr/>
-        <a class="menu-item" use:link href="/user/teams">
+        <a class="menu-item" use:link href={hrefs.teams} on:click={close}>
             <div class="action">
                 <div class="icon">
-                    <Icon icon="fluent:people-team-20-regular" width="20" color="var(--cds-inverse-support-03)"/>
+                    <Icon icon="fluent:people-team-20-regular" width="20" color="var(--cds-support-03)"/>
                 </div>
                 <span>Команды</span> <!--    TODO: l10n        -->
             </div>
         </a>
-        <a class="menu-item" use:link href="/premium">
+        <a class="menu-item" use:link href={hrefs.premium} on:click={close}>
             <div class="action">
                 <div class="icon">
-                    <Icon icon="fluent:premium-20-regular" width="20" color="var(--cds-inverse-support-04)"/>
+                    <Icon icon="fluent:premium-20-regular" width="20" color="var(--cds-support-04)"/>
                 </div>
                 <span>Перейти на премиум</span> <!--    TODO: l10n        -->
             </div>
@@ -111,7 +116,7 @@
         margin: 0 6px;
         background: inherit;
         color: var(--cds-text-01);
-        border-radius: 5px;
+        border-radius: 16px;
         box-sizing: border-box;
         text-decoration: none;
 
@@ -119,10 +124,17 @@
         flex-direction: column;
         align-items: center;
         justify-content: left;
+
+        cursor: pointer;
+        user-select: none;
     }
 
     .menu-item:hover {
         background-color: var(--cds-field-hover);
+    }
+
+    .user-settings {
+        padding-top: .5rem;
     }
 
     .user-info, .action {

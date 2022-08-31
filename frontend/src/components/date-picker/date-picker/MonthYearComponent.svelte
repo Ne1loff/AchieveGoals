@@ -23,6 +23,11 @@
         color: var(--cds-text-04);
     }
 
+    .month-year-label:focus-visible {
+        outline: var(--cds-focus) solid 1px;
+        background-color: var(--cds-hover-ui);
+    }
+
     .month-year-label:hover {
         background: var(--cds-button-secondary-hover);
     }
@@ -36,7 +41,7 @@
 <div>
     <Popover>
         <div slot="target">
-            <div class="month-year-label">
+            <div class="month-year-label" tabindex="1">
                 {dayjs(value).format("MMMM YYYY")}
             </div>
         </div>

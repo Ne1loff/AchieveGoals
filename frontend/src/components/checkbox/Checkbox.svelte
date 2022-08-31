@@ -161,6 +161,8 @@
         class:-checked={checked || !canChange}
         style="width: {size};height: {size};">
     <input id={labelId} type="checkbox" {name}
+           on:focusin
+           on:focusout
            on:change={(event) => {
         if (canChange) checked = event.target.checked;
     }}

@@ -45,7 +45,7 @@
         -webkit-user-select: none;
         user-select: none;
         background: var(--cds-field);
-        border-radius: 10px;
+        border-radius: 16px;
     }
 
 </style>

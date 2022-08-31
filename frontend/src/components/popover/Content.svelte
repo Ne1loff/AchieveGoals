@@ -15,7 +15,7 @@
     }
 </style>
 
-<div bind:this={contentRef} class="content elevation-8" style="z-index: {zIndex + 10}; {positionStyle}">
+<div bind:this={contentRef} class="content" style="z-index: {zIndex + 10}; {positionStyle}">
     <slot/>
     {#if arrow}
         <div bind:this={arrowRef} class="arrow" style="position: absolute; color: {arrowColor}; {arrowStyleProps}">◥

@@ -5,10 +5,14 @@
     import Goal from "../../data/models/Goal";
     import InlineCalendar from "../date-picker/InlineCalendar.svelte";
     import {GOALS} from "../../data/storage/storage";
+    import type {Writable} from "svelte/types/runtime/store";
+    import {onDestroy} from "svelte";
 
-    export let goalId: number;
+    export let goalId: number = undefined;
+    export let goalStorage: Writable<Goal> = undefined;
+    export let useGlobalStore: boolean = true;
 
-    const goal: Goal = $GOALS.find((it) => it.id === goalId);
+    const goal: Goal = useGlobalStore ? $GOALS.find((it) => it.id === goalId) : $goalStorage;
 
     const daysName = (dayNum) => {
         let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -23,21 +27,21 @@
     }
 
     const updateGoals = () => {
-        const goals = $GOALS;
-        goals[goals.indexOf(goal)] = goal;
-        $GOALS = goals;
-    }
-
-    $:{
-        if (goal) {
-            updateGoals();
+        if (useGlobalStore) {
+            const goals = $GOALS;
+            goals[goals.indexOf(goal)] = goal;
+            $GOALS = goals;
+        } else {
+            $goalStorage = goal;
         }
     }
+
+    onDestroy(updateGoals);
 
 </script>
 
 
-<MenuContainer>
+<MenuContainer --menu-container-border-radius="16px">
     <div class="scheduler-title" slot="header">
         <span>{dayjs(goal.deadline).format('DD dd HH:mm')}</span>
     </div>
@@ -75,7 +79,7 @@
         </button>
     </div>
     <div class="scheduler-date-picker" slot="footer">
-        <InlineCalendar bind:value={goal.deadline} withTime/>
+        <InlineCalendar bind:value={goal.deadline} withTime --calendar-padding=".125rem"/>
     </div>
 </MenuContainer>
 
@@ -91,7 +95,9 @@
         align-items: center;
         justify-content: flex-start;
 
-        padding: 8px 10px;;
+        padding: 8px 10px;
+
+        font-size: var(--cds-body-long-02-font-size);
     }
 
     .scheduler-suggestion {
@@ -117,6 +123,11 @@
         color: var(--cds-text-01);
 
         width: 100%;
+    }
+
+    .scheduler-suggestion-item:focus-visible {
+        outline: var(--cds-focus) solid 1px;
+        background-color: var(--cds-hover-ui);
     }
 
     .scheduler-suggestion-item:hover {

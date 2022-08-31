@@ -1,4 +1,4 @@
-import {base} from "../resources/config";
+import {base, hrefs} from "../resources/config";
 import {DataType} from "../data/enums/_enums";
 import ApiResponse from "../data/api/ApiResponse";
 import type ApiError from "../data/api/ApiError";
@@ -67,7 +67,7 @@ export default class Request {
             if (response.ok)
                 return new ApiResponse(response.status, data as T);
             else if (response.status === 403 || response.status === 401)
-                navigate('/login');
+                navigate(hrefs.login);
             else throw new ApiResponse(response.status, null, data as ApiError)
         });
     }

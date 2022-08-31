@@ -49,7 +49,7 @@
         transform: translateY(-50%);
         pointer-events: none;
         background-color: var(--cds-selected-ui);
-        border-radius: 8px;
+        border-radius: 16px;
     }
 
 </style>

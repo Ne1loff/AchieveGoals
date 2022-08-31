@@ -1,6 +1,7 @@
 <script lang="ts">
-    import {popoverTrigger, SvelteComponentOptions} from "./popover/global/Popover";
+    import {popoverTrigger} from "./popover/global/Popover";
     import Icon from "@iconify/svelte";
+    import type {SvelteComponentOptions} from "./popover/global/PopoverTypes";
 
     export let src: string = undefined;
     export let useIcon: boolean = true;
@@ -20,7 +21,7 @@
                         component: dropdownComponent,
                         useOverlay: false,
                         style: {
-                            "--own-popover-border-radius": "10px"
+                            "--own-popover-border-radius": "16px"
                         }
                     }}
     >

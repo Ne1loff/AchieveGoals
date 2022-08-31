@@ -15,7 +15,8 @@ const languages = {
 
 const setLanguage = (lang: Languages) => {
     l10n = languages[lang];
-    dayjs.locale(lang === Languages.RU ? 'ru' : 'en');
+    dayjs.locale(lang);
+    document.documentElement.setAttribute('lang', lang);
 };
 
 let l10n: Dictionary = languages[Languages.EN];
