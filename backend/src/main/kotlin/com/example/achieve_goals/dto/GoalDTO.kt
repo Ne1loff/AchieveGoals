@@ -14,6 +14,8 @@ data class GoalDTO(
 
     val gid: Long?,
 
+    val root: Long,
+
     val priority: Int?,
 
     val createdAt: Date?,

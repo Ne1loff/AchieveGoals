@@ -2,6 +2,7 @@ package com.example.achieve_goals.service
 
 import com.example.achieve_goals.dto.CreateGoalRequest
 import com.example.achieve_goals.dto.GoalDTO
+import com.example.achieve_goals.dto.SubGoalParentDTO
 import com.example.achieve_goals.entities.Goal
 import com.example.achieve_goals.exceptions.notFound.GoalNotFoundException
 import com.example.achieve_goals.mapper.GoalMapperImpl
@@ -34,6 +35,20 @@ class GoalService(
         throw GoalNotFoundException()
     }
 
+    fun getSubGoalParents(userId: Long, goalId: Long): MutableList<SubGoalParentDTO> {
+        val goal = goalRepository.getGoalById(goalId) ?: throw GoalNotFoundException()
+        if (goal.uid == userId) {
+            val goals = goalRepository.getGoalsByRoot(goal.root)
+            val parents = ArrayList<Goal>()
+            var currentGoal: Goal = goal
+            while (currentGoal.gid != null) {
+                currentGoal = goals.find { it.id == currentGoal.gid }!!
+                parents.add(currentGoal)
+            }
+            return parents.map { mapper.subGoalParentDtoFromGoal(it) }.toMutableList()
+        }
+        throw GoalNotFoundException()
+    }
 
     fun getSubGoalsByGid(userId: Long, gid: Long): MutableList<GoalDTO> {
         val goal = goalRepository.getGoalById(gid) ?: throw GoalNotFoundException()
@@ -54,11 +69,14 @@ class GoalService(
             description = goalRequest.description,
             isDone = false,
             gid = goalRequest.gid,
+            root = -1,
             priority = goalRequest.priority,
             createdAt = date,
             updatedAt = date,
             deadline = goalRequest.deadline
         )
+
+        goal.root = goal.id // TODO: check for working
 
         goalRepository.save(goal)
     }

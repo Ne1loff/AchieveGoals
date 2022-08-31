@@ -23,7 +23,7 @@ class MinioService(
         val updFile = "$uid.$fileExtension"
 
         if (photoExist(updFile))
-            deletePhoto(uid, fileExtension);
+            deletePhoto(uid, fileExtension)
 
         minioClient.putObject(
             PutObjectArgs.builder()
@@ -64,7 +64,7 @@ class MinioService(
                     .bucket(bucketName)
                     .`object`(filename)
                     .method(Method.GET)
-                    .expiry(1, TimeUnit.MINUTES)
+                    .expiry(2, TimeUnit.HOURS)
                     .build()
             )
         } catch (e: Exception) {

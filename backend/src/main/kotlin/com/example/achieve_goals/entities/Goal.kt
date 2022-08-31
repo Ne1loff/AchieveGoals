@@ -34,6 +34,8 @@ data class Goal(
 
     val gid: Long? = null,
 
+    var root: Long,
+
     var priority: Int,
 
     @Temporal(TemporalType.TIMESTAMP)

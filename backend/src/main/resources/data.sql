@@ -1,25 +1,3 @@
--- INSERT INTO public.goal_table (id, uid, title, description, is_done, gid, priority, created_at, updated_at, deadline)
--- VALUES (1, 15, 'Убраться в квартире', null, false, null, 1, '2021-11-16 10:18:13.865428 +00:00',
---         '2021-11-16 13:18:19.669000 +00:00', '2021-11-16 15:17:54.307000 +00:00');
--- INSERT INTO public.goal_table (id, uid, title, description, is_done, gid, priority, created_at, updated_at, deadline)
--- VALUES (2, 15, 'Помыть полы', null, false, 1, 2, '2021-11-16 10:35:48.990318 +00:00', '2021-11-16 13:35:34.454000 +00:00',
---         '2021-11-16 14:35:39.396000 +00:00');
--- INSERT INTO public.goal_table (id, uid, title, description, is_done, gid, priority, created_at, updated_at, deadline)
--- VALUES (3, 15, 'Пропылесосить', null, false, 1, 2, '2021-11-16 10:36:14.153151 +00:00',
---         '2021-11-16 13:36:08.419000 +00:00', '2021-11-16 14:36:10.240000 +00:00');
--- INSERT INTO public.goal_table (id, uid, title, description, is_done, gid, priority, created_at, updated_at, deadline)
--- VALUES (4, 15, 'Протереть пыль', null, true, 1, 2, '2021-11-16 10:36:43.983412 +00:00',
---         '2021-11-16 13:36:24.594000 +00:00', '2021-11-16 15:36:20.887000 +00:00');
--- INSERT INTO public.goal_table (id, uid, title, description, is_done, gid, priority, created_at, updated_at, deadline)
--- VALUES (5, 15, 'test', null, false, 3, 4, '2021-11-16 17:41:57.696831 +00:00', '2021-11-16 20:41:00.232000 +00:00',
---         '2021-11-16 20:41:03.085000 +00:00');
--- INSERT INTO public.goal_table (id, uid, title, description, is_done, gid, priority, created_at, updated_at, deadline)
--- VALUES (6, 15, 'test', null, false, 5, 3, '2021-11-16 17:41:57.696831 +00:00', '2021-11-16 20:41:52.599000 +00:00',
---         '2021-11-16 20:41:54.539000 +00:00');
--- INSERT INTO public.goal_table (id, uid, title, description, is_done, gid, priority, created_at, updated_at, deadline)
--- VALUES (7, 15, 'test', null, false, 6, 4, '2021-11-16 17:41:57.696831 +00:00', '2021-11-16 20:41:55.484000 +00:00',
---         '2021-11-16 20:41:56.146000 +00:00');
-
 insert into country(id, name)
 values (0, 'Россия')
 on CONFLICT DO NOTHING;
