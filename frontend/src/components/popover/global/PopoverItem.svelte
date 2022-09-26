@@ -34,6 +34,8 @@
     }
 
     const calculatePosition = () => {
+        if (!options.target) return;
+
         const targetBound = options.target.getBoundingClientRect();
         const contentBound = contentRef.getBoundingClientRect();
 
@@ -246,7 +248,6 @@
         {#if options.fromComponent}
             <slot {close}/>
         {:else}
-
             <svelte:component this={options.component.src} {...options.component.props}/>
         {/if}
     </div>

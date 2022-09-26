@@ -10,6 +10,7 @@
     import {createEventDispatcher} from "svelte";
 
     export let goalId: number;
+    export let indent: number;
 
     const dispatch = createEventDispatcher();
 
@@ -28,6 +29,8 @@
         goals[goals.indexOf(goal)] = goal;
         $GOALS = goals;
     }
+
+    $: console.log(indent);
 
     const edit = () => dispatch('edit');
     const createOver = () => dispatch('create-over');
@@ -51,10 +54,12 @@
             <Icon icon="bx:bx-arrow-to-top" width="20" height="20"/>
             <span>Добавить задачу выше</span>
         </button>
-        <button class="actions-btn" on:click={createUnder}>
-            <Icon icon="bx:bx-arrow-to-bottom" width="20" height="20"/>
-            <span>Добавить задачу ниже</span>
-        </button>
+        {#if indent < 5}
+            <button class="actions-btn" on:click={createUnder}>
+                <Icon icon="bx:bx-arrow-to-bottom" width="20" height="20"/>
+                <span>Добавить задачу ниже</span>
+            </button>
+        {/if}
         <button class="actions-btn" on:click={edit}>
             <Icon icon="feather:edit-3" width="16" height="16"/>
             <span>Редактировать</span>

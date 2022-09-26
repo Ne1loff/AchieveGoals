@@ -48,6 +48,7 @@
     const createGoalOver = () => {
         createOver = true;
         newGoal = new Goal();
+        newGoal.gid = goal.gid;
     }
     const createGoalUnder = () => {
         createUnder = true;
@@ -56,14 +57,16 @@
     }
 
     const saveNewGoal = () => {
+        const wasChildren = subs.length;
         goalService.createGoal(newGoal)
             .then((_) => {
+                if (subs.length > wasChildren) showSubtasks = true;
             });
     }
 
     const deleteGoal = () => {
         let isCancel: boolean = false;
-        $GOALS = $GOALS.filter(it => it.id !== goal.id);
+        $GOALS = $GOALS.filter(it => it.id !== goal.id); // TODO: Multiple deleted.
         ServiceFactory.INSTANCE.toastService.dialog('Task was successfully deleted.',
             {
                 accept: () => {
@@ -74,9 +77,8 @@
                 },
                 reject: () => {
                     isCancel = true;
-                    const goals = $GOALS;
-                    goals.push(goal);
-                    $GOALS = goals;
+                    $GOALS.push(goal)
+                    $GOALS = $GOALS;
                 }
             }
         );
@@ -226,7 +228,9 @@
                                   color="var(--cds-icon-01)"
                             />
                         </div>
+                        <!--TODO: Something new-->
                         <GoalMenu slot="content" goalId={goal.id}
+                                  {indent}
                                   let:close
                                   on:edit={() => {editGoal(); close();}}
                                   on:create-over={() => {createGoalOver(); close();}}

@@ -5,10 +5,9 @@
     import {onDestroy, onMount} from "svelte";
     import GoalService from "../services/GoalService";
     import ApiError from "../data/api/ApiError";
-    import NotificationService, {ErrorMessage} from "../services/NotificationService";
+    import ToastService, {ErrorMessage} from "../services/ToastService";
     import ApiResponse from "../data/api/ApiResponse";
     import ServiceFactory from "../services/ServiceFactory";
-    import ThemeSelect from "../components/ThemeSelect.svelte";
     import LocalStorageService from "../services/LocalStorageService";
     import UserService from "../services/UserService";
     import {USER} from "../data/storage/storage";
@@ -18,13 +17,13 @@
     import {popover} from "../components/popover/global/Popover";
     import HomeSideBar from "../components/home-components/sidebar/HomeSideBar.svelte";
 
-    export let params: {tab: string};
+    export let params: { tab: string };
 
     let pageIsReady = false;
 
     let goalService: GoalService;
     let userService: UserService;
-    let notificationService: NotificationService;
+    let notificationService: ToastService;
     let localStorageService: LocalStorageService;
 
     let open: boolean = true;
@@ -33,8 +32,8 @@
     let wasCheck: boolean = false;
 
     $: {
-        if (sideBarWasOpen !== undefined && localStorageService && $USER !== null) {
-            localStorageService.setSideBarWasOpen($USER.id, sideBarWasOpen)
+        if (localStorageService && $USER) {
+            localStorageService.setSideBarWasOpen($USER.id!!, sideBarWasOpen)
         }
     }
 
@@ -54,29 +53,33 @@
     };
 
     const setUp = () => {
-        if ($USER === null) {
+        if (!$USER) {
             userService.getCurrentUser().then(() => {
+                if ($USER?.id) {
+                    sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
+                    open = sideBarWasOpen;
+                    handleResize();
+                    setInterval(() => pageIsReady = true, 200);
+                }
+            });
+        } else {
+            if ($USER.id) {
                 sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
                 open = sideBarWasOpen;
                 handleResize();
                 setInterval(() => pageIsReady = true, 200);
-            });
-        } else {
-            sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
-            open = sideBarWasOpen;
-            handleResize();
-            setInterval(() => pageIsReady = true, 200);
+            }
         }
     }
 
     onMount(() => {
         goalService = ServiceFactory.INSTANCE.goalService;
         userService = ServiceFactory.INSTANCE.userService;
-        notificationService = ServiceFactory.INSTANCE.notificationService;
+        notificationService = ServiceFactory.INSTANCE.toastService;
         localStorageService = ServiceFactory.INSTANCE.localStorageService;
         goalService.getUserGoals()
             .then((response: Goal[]) => goals = response)
-            .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error));
+            .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error!!));
         setUp();
     });
 
@@ -101,7 +104,6 @@
             />
         </div>
         <svelte:fragment slot="right">
-            <ThemeSelect/>
             <TopBarMenu dropdownComponent={{src: HomeMenu}}/>
         </svelte:fragment>
     </Navbar>
@@ -230,8 +232,8 @@
     flex-direction: row;
     flex-grow: 1;
 
-    transition: padding-left var(--own-sidebar-transition-time) cubic-bezier(.4,0,.2,1),
-    margin-left var(--own-sidebar-transition-time) cubic-bezier(.4,0,.2,1);
+    transition: padding-left calc(var(--own-sidebar-transition-time) / 2) cubic-bezier(.4, 0, .2, 1),
+    margin-left var(--own-sidebar-transition-time) cubic-bezier(.4, 0, .2, 1);
   }
 
   .main-content-wrapper.full-size {

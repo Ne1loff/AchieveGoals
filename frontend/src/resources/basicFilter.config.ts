@@ -13,4 +13,9 @@ enum SettingsUrl {
     NOTIFICATIONS = 'notifications'
 }
 
-export {HomeUrl, SettingsUrl}
+enum SettingsSubUrl {
+    PASSWORD = 'password',
+    EMAIL = 'email'
+}
+
+export {HomeUrl, SettingsUrl, SettingsSubUrl}

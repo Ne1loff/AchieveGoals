@@ -34,7 +34,9 @@
             goalCopy.deadline = g.deadline;
         });
 
-        priorityStorage = writable(goalCopy.priority);
+        if (!priorityStorage) priorityStorage = writable(goalCopy.priority);
+        else priorityStorage.set(goalCopy.priority);
+
         priorityStorage.subscribe((p) => goalCopy.priority = p);
     }
 
@@ -58,6 +60,9 @@
     } else {
         reset();
     }
+
+    let saveBtnDisable: boolean;
+    $: saveBtnDisable = !(goalCopy?.title.length > 0 && !isNaN(goalCopy?.deadline.valueOf())) ?? true;
 
     onDestroy(() => dispatch('destroy'));
 
@@ -122,7 +127,7 @@
     <div class="submit-buttons">
         <ButtonSet>
             <Button size="small" kind="secondary" on:click={cancel}>Отмена</Button>
-            <Button size="small" on:click={save}>{saveButtonTitle}</Button>
+            <Button size="small" disabled={saveBtnDisable} on:click={save}>{saveButtonTitle}</Button>
         </ButtonSet>
     </div>
 </div>

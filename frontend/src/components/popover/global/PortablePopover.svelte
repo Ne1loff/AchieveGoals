@@ -24,7 +24,7 @@
 </div>
 {#if show}
     <Portal target="#popover-holder">
-        <PopoverItem {options} on:close={toggle}>
+        <PopoverItem {options} on:close={toggle} --own-popover-border-radius="1rem">
             <svelte:fragment let:close>
                 <slot name="content" {close}/>
             </svelte:fragment>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import ModalWindow from "../modals/ModalWindow.svelte";
-    import GoalsHolder from "../home-components/ProjectTaskHolder.svelte";
+    import ProjectTaskHolder from "../home-components/ProjectTaskHolder.svelte";
     import {links, navigate} from "svelte-routing";
     import {Breadcrumb, BreadcrumbItem, OverflowMenu, OverflowMenuItem} from "carbon-components-svelte";
     import {hrefs} from "../../resources/config";
@@ -103,16 +103,16 @@
         <div class="content">
             <div class="main-content">
                 <GoalEditorComponent {goal}/>
-                <GoalsHolder goals={children}
-                             withoutHeader
-                             collapsible
-                             goalProps={{withoutSubs: true}}
-                             goalStyle={[
+                <ProjectTaskHolder goals={children}
+                                   withoutHeader
+                                   collapsible
+                                   goalProps={{withoutSubs: true}}
+                                   goalStyle={[
                                  "--own-component-border-width: calc(100% + 8px);",
                                  "--own-component-border-margin : 0 -38px 0 0;"
                                  ]}
-                             --holder-padding-right="38px"
-                             --holder-padding-left="0"
+                                   --holder-padding-right="38px"
+                                   --holder-padding-left="0"
                 />
             </div>
             <div class="side-panel">

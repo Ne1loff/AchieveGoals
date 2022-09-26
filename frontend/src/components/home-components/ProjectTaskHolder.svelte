@@ -42,12 +42,12 @@
         </div>
     </svelte:fragment>
     <svelte:fragment>
-        {#each goals.filter(it => !it.isDone) as goal}
+        {#each goals.filter(it => !it.isDone) as goal (goal.id)}
             <GoalComponent bind:goal {...goalProps} style={goalStyle.join('')}/>
         {/each}
         <GoalCreator bind:taskStorage={goals}/>
         {#if showCompleted}
-            {#each goals.filter(it => it.isDone) as goal}
+            {#each goals.filter(it => it.isDone) as goal (goal.id)}
                 <GoalComponent bind:goal {...goalProps} style={goalStyle.join('')}/>
             {/each}
         {/if}

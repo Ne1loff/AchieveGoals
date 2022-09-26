@@ -1,5 +1,5 @@
 import {NotificationType} from "../data/enums/_enums";
-import {SettingsUrl} from "./basicFilter.config";
+import {SettingsSubUrl, SettingsUrl} from "./basicFilter.config";
 import {hrefs} from "./config";
 
 const PRIORITIES = [
@@ -91,4 +91,19 @@ const SETTING_BUTTONS = [
     }
 ]
 
-export {PRIORITIES, PRIORITY_COLORS, THEMES, ICONS, SETTING_BUTTONS}
+const SETTINGS_SUB_TABS = [
+    {
+        obj: SettingsSubUrl.EMAIL,
+        title: 'Изменить Email-адрес',
+        icon: 'akar-icons:bell',
+        href: `${hrefs.settings(SettingsUrl.NOTIFICATIONS)}/${SettingsSubUrl.EMAIL}`
+    },
+    {
+        obj: SettingsSubUrl.PASSWORD,
+        title: 'Изменить пароль',
+        icon: 'akar-icons:bell',
+        href: `${hrefs.settings(SettingsUrl.NOTIFICATIONS)}/${SettingsSubUrl.PASSWORD}`
+    }
+]
+
+export {PRIORITIES, PRIORITY_COLORS, THEMES, ICONS, SETTING_BUTTONS, SETTINGS_SUB_TABS}
