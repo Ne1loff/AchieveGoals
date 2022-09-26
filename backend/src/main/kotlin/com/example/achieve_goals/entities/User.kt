@@ -14,38 +14,41 @@ import javax.persistence.*
 data class User(
 
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
-    @Column(name="username")
+    @Column(name = "username")
     var usernameSalt: String = "",
 
-    @Column(name="name")
+    @Column(name = "name")
     var name: String? = null,
 
-    @Column(name="surname")
+    @Column(name = "surname")
     var surname: String? = null,
 
-    @Column(name="male")
+    @Column(name = "male")
     var male: Boolean = true,
 
-    @Column(name="email")
+    @Column(name = "email")
     var email: String = "",
 
-    @Column(name="locality")
+    @Column(name = "locality")
     var locality: Long = 1,
 
-    @Column(name="password")
+    @Column(name = "password")
     var passwordHash: String = "",
 
-
-    @Column(name="admin")
+    @Column(name = "admin")
     var admin: Boolean = false,
 
     @OneToOne(fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn
-    var userPhoto: UserAvatar? = null
+    var userPhoto: UserAvatar? = null,
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @PrimaryKeyJoinColumn
+    var settings: UserSettings? = null
 
 ) : UserDetails {
 

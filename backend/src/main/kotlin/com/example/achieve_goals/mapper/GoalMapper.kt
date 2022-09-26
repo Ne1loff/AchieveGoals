@@ -5,6 +5,6 @@ import com.example.achieve_goals.dto.SubGoalParentDTO
 import com.example.achieve_goals.entities.Goal
 
 interface GoalMapper {
-    fun dtoFromGoal(goal: Goal) : GoalDTO
+    fun toDto(goal: Goal) : GoalDTO
     fun subGoalParentDtoFromGoal(goal: Goal) : SubGoalParentDTO
 }

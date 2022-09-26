@@ -1,7 +1,7 @@
 package com.example.achieve_goals.controller
 
-import com.example.achieve_goals.dto.RegistrationRequest
 import com.example.achieve_goals.dto.ChangePasswordRequest
+import com.example.achieve_goals.dto.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.exceptions.notFound.FileNotFoundException
@@ -24,8 +24,10 @@ class UserController(
 
     @PostMapping("registration")
     fun registration(@RequestBody newUser: RegistrationRequest): ResponseEntity<Any> {
+        val user = userService.saveUser(newUser)
+        userService.setupUserSettings(user)
         return ResponseEntity
-            .status(if (userService.saveUser(newUser)) HttpStatus.CREATED else HttpStatus.CONFLICT)
+            .status(HttpStatus.CREATED)
             .build()
     }
 

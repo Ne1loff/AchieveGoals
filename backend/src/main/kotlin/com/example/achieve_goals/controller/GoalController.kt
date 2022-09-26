@@ -45,11 +45,11 @@ class GoalController(
     }
 
     @PostMapping
-    fun createMainGoal(@RequestBody goalRequest: CreateGoalRequest, auth: Authentication): ResponseEntity<HttpStatus> {
+    fun createMainGoal(@RequestBody goalRequest: CreateGoalRequest, auth: Authentication): ResponseEntity<GoalDTO> {
         val principal = auth.principal
         if (principal is User) {
-            goalService.createMainGoal(goalRequest, principal.id)
-            return ResponseEntity.status(HttpStatus.CREATED).build()
+            val task = goalService.createTask(goalRequest, principal.id)
+            return ResponseEntity(task, HttpStatus.CREATED)
         }
         throw UserNotFoundException()
     }
@@ -60,6 +60,16 @@ class GoalController(
         if (principal is User) {
             goalService.updateGoal(goalsDTO, principal.id)
             return ResponseEntity.accepted().build()
+        }
+        throw UserNotFoundException()
+    }
+
+    @DeleteMapping("{id}")
+    fun deleteTaskById(@PathVariable id: Long, auth: Authentication): ResponseEntity<HttpStatus> {
+        val principal = auth.principal
+        if (principal is User) {
+            goalService.deleteGoalById(id, principal.id)
+            return ResponseEntity.ok().build()
         }
         throw UserNotFoundException()
     }

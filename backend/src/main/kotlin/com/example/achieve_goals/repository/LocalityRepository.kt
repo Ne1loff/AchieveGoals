@@ -11,5 +11,5 @@ interface LocalityRepository : JpaRepository<Locality, Long> {
     @Query("select * from country order by name", nativeQuery = true)
     fun getAllOrderByName(): List<Locality>
 
-    fun getLocalityById(id: Long) : Locality
+    fun getLocalityById(id: Long): Locality
 }

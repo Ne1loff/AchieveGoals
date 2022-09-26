@@ -16,7 +16,12 @@ import javax.persistence.*
 data class Goal(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+        name = "task_seq",
+        sequenceName = "task_sequence",
+        allocationSize = 10
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_seq")
     val id: Long,
 
     @JoinTable(
@@ -38,14 +43,14 @@ data class Goal(
 
     var priority: Int,
 
-    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
     val createdAt: Date,
 
-    @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     var updatedAt: Date,
 
     @Temporal(TemporalType.TIMESTAMP)

@@ -38,7 +38,8 @@ fun main(args: Array<String>) {
         adminAccount.usernameSalt = "admin"
         adminAccount.passwordHash = password
         adminAccount.admin = true
-        userService.saveAdmin(adminAccount)
+        val user = userService.saveAdmin(adminAccount)
+        userService.setupUserSettings(user)
 
         val logger: Logger = LoggerFactory.getLogger(AchieveGoalsApplication::class.java)
         logger.info("Admin account created with password: $password")

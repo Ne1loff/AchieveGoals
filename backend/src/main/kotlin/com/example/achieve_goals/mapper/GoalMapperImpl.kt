@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class GoalMapperImpl : GoalMapper {
-    override fun dtoFromGoal(goal: Goal): GoalDTO {
+    override fun toDto(goal: Goal): GoalDTO {
         return GoalDTO(
             id = goal.id,
             title = goal.title,

@@ -1,12 +1,12 @@
 package com.example.achieve_goals.repository
 
 import com.example.achieve_goals.entities.Goal
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface GoalRepository : CrudRepository<Goal, Long> {
+interface GoalRepository : JpaRepository<Goal, Long> {
 
     fun getGoalsByGid(gid: Long): MutableList<Goal>
 
