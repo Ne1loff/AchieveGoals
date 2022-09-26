@@ -32,6 +32,7 @@
     const edit = () => dispatch('edit');
     const createOver = () => dispatch('create-over');
     const createUnder = () => dispatch('create-under');
+    const deleteTask = () => dispatch('delete');
 
     $:{
         if (goal) {
@@ -119,7 +120,7 @@
         </div>
     </div>
     <div class="menu-delete" slot="footer">
-        <button class="menu-delete-btn">
+        <button class="menu-delete-btn" on:click={deleteTask}>
             <Icon icon="bi:trash"/>
             <span>Удалить цель</span>
         </button>

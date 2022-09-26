@@ -34,7 +34,8 @@
     }
 
     .accordion-container {
-        overflow: hidden;
+        overflow-y: clip;
+        overflow-x: visible;
         height: 0;
 
         transition: height .2s cubic-bezier(0.4, 0, 0.2, 1);

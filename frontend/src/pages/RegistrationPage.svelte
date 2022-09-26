@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Link, navigate} from "svelte-routing";
+    import {link, navigate} from "svelte-routing";
     import {Button, ContentSwitcher, Switch} from "carbon-components-svelte";
     import Icon from "@iconify/svelte";
     import {Login as LoginIcon} from "carbon-icons-svelte";
@@ -28,6 +28,7 @@
 
     let registration: Registration = new Registration();
     let confirmedPassword: string = '';
+    let selectedCountry: number | null = 0;
     let countries: Country[] = [];
 
     onMount(() => {
@@ -42,7 +43,7 @@
         countryService.getCountries()
             .then((it: Country[]) => countries = it)
             .catch((apiResponse: ApiResponse<ApiError>) => {
-                onError(apiResponse.error);
+                onError(apiResponse.error!!);
                 countries = [];
             });
     }
@@ -52,26 +53,32 @@
             .then(() => {
                 signUIOService.logIn(new Login().fromRegistration(registration))
                     .then(() => navigate(hrefs.home))
-                    .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error));
-            }).catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error))
+                    .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error!!));
+            }).catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error!!))
     }
 
     const onError = (apiError: ApiError) => {
         notificationService.errorFromErrorMessage(new ErrorMessage().fromApiError(apiError));
     }
 
+    const notEmpty = (str: string): boolean => str?.length > 0 ?? false;
+
     let clickable: boolean;
     let passNotMatch: boolean;
     let showPassword: boolean;
     let selectedIndex: number = 0;
 
+    $:registration.locality = selectedCountry ?? -1;
     $:registration.male = selectedIndex === 0
-    $:passNotMatch = (confirmedPassword !== undefined && registration.password !== confirmedPassword);
-    $:clickable = (registration.password === confirmedPassword
-        && registration.password
-        && confirmedPassword
-        && registration.locality
-        && registration.password.length >= 6);
+
+    $:passNotMatch = (notEmpty(confirmedPassword) && registration.password !== confirmedPassword);
+    $:clickable = (notEmpty(registration.username)
+        && notEmpty(registration.email)
+        && notEmpty(registration.password)
+        && notEmpty(confirmedPassword)
+        && (registration?.locality > -1 ?? false)
+        && !passNotMatch
+        && registration.password.length >= 8);
 
     const handleKeydown = (e) => {
         if (e.key === 'Enter' && clickable) signUp();
@@ -86,30 +93,26 @@
 <div class="main-content login-page">
     <form class="box elevation-6" method="post">
         <h1>Sign up</h1>
-        <div class="user_details">
+        <div class="user_details" style="
+        --custom-height: 45px;
+        --custom-width: 285px;
+        --custom-margin: 8px 0 4px 0;
+        --custom-border-color: var(--cds-border-inverse);
+        --custom-background-color: var(--cds-ui-background);
+        --own-input-error-color: var(--cds-text-error);
+">
             <InputField bind:value={registration.username} label={l10n.username}
                         required
-                        --custom-height="45px"
-                        --custom-width="285px"
-                        --custom-margin="8px 0 4px 0"
-                        --custom-border-color="var(--cds-border-inverse)"
-                        --custom-background-color="var(--cds-ui-01)"
-                        --own-input-error-color="var(--cds-text-error)"
+                        disableAutocomplete
             />
             <InputField bind:value={registration.email} label={l10n.email}
                         required
                         type="email"
                         pattern={EMAIL_REGEX}
                         patternErrorMessage={l10n.emailPatternErrorText}
-                        --custom-height="45px"
-                        --custom-width="285px"
-                        --custom-margin="8px 0 4px 0"
-                        --custom-border-color="var(--cds-border-inverse)"
-                        --custom-background-color="var(--cds-ui-01)"
-                        --own-input-error-color="var(--cds-text-error)"
             />
             <Svelecte options={countries}
-                      bind:value={registration.locality}
+                      bind:value={selectedCountry}
                       placeholder={l10n.selectCountry}
                       selectOnTab
                       clearable
@@ -118,14 +121,15 @@
                       --sv-dropdown-height: 200px;
                       --sv-border-color: var(--cds-border-inverse);
                       --sv-border: 1px solid var(--sv-border-color);
-                      --sv-active-border: 1px solid var(--cds-border-interactive);
-                      --sv-bg: var(--cds-ui-01);
+                      --sv-active-outline: 2px solid var(--cds-focus, #0f62fe);
+                      --sv-bg: var(--cds-ui-background);
                       --sv-min-height: 45px;
                       --sv-icon-color: var(--cds-icon-01);
                       --sv-item-selected-bg: var(--cds-background-selected);
                       --sv-item-color: var(--cds-text-01);
                       --sv-item-active-color: var(--cds-text-01);
                       --sv-item-active-bg: var(--cds-background-active);
+                      --sv-dropdown-shadow: var(--own-elevation-4);
                       --sv-item-btn-bg: var(--sv-item-selected-bg);
                       --sv-item-btn-bg-hover: var(--cds-hover-ui);
                       --sv-placeholder-color: var(--cds-text-01);
@@ -138,30 +142,19 @@
             </Svelecte>
             <InputField bind:value={registration.password} label={l10n.password}
                         type="password"
+                        showPasswordDifficult
                         newPass
                         required
                         pattern={PASSWORD_REGEX}
                         patternErrorMessage={l10n.passwordPatternErrorText}
                         forceError={passNotMatch}
                         bind:showPassword
-                        --custom-height="45px"
-                        --custom-width="285px"
-                        --custom-margin="8px 0 4px 0"
-                        --custom-border-color="var(--cds-border-inverse)"
-                        --custom-background-color="var(--cds-ui-01)"
-                        --own-input-error-color="var(--cds-text-error)"
             />
             <InputField bind:value={confirmedPassword} label={l10n.confirmPass}
                         type="password"
                         newPass
                         forceError={passNotMatch}
                         bind:showPassword
-                        --custom-height="45px"
-                        --custom-width="285px"
-                        --custom-margin="8px 0 4px 0"
-                        --custom-border-color="var(--cds-border-inverse)"
-                        --custom-background-color="var(--cds-ui-01)"
-                        --own-input-error-color="var(--cds-text-error)"
             />
             {#if passNotMatch}
                 <legend class="pass_match">{l10n.passwordsNotMatch}!</legend>
@@ -183,10 +176,17 @@
                 </Switch>
             </ContentSwitcher>
         </div>
-        <Button size="small" icon={LoginIcon} on:click={signUp} disabled={!clickable}>{l10n.logUpAction}</Button>
+        <Button size="small" disabled={!clickable} on:click={signUp}
+                --ag-bnt-padding=".125rem 1.125rem"
+        >
+            <div class="btn-title">
+                {l10n.logUpAction}
+            </div>
+            <LoginIcon/>
+        </Button>
         <div class="sign_in_link">
             {l10n.alreadyHaveAccount}?
-            <Link to="/login">{l10n.login}</Link>
+            <a class="bx--link" use:link href={hrefs.login}>{l10n.login}</a>
         </div>
     </form>
 </div>
@@ -199,6 +199,28 @@
 
     :global(.sv-dd-item) {
         height: 2rem;
+    }
+
+    :global(.sv-control.is-active) {
+        outline-offset: -2px !important;
+    }
+
+    :global(.sv-dropdown-scroll) {
+        scrollbar-width: .5rem;
+        scrollbar-color: var(--cds-active-ui) var(--cds-ui-background);
+    }
+
+    :global(.sv-dropdown-scroll::-webkit-scrollbar) {
+        width: .5rem;
+    }
+
+    :global(.sv-dropdown-scroll::-webkit-scrollbar-track) {
+        background: var(--cds-ui-background);
+    }
+
+    :global(.sv-dropdown-scroll::-webkit-scrollbar-thumb) {
+        background: var(--cds-active-ui);
+        border-radius: .5rem;
     }
 
     :global(.sv-item) {
@@ -225,6 +247,10 @@
         cursor: pointer;
     }
 
+    .btn-title {
+        margin-right: .5rem;
+    }
+
     /* Intro */
     .main-content {
         display: flex;
@@ -243,7 +269,7 @@
         width: 350px;
         padding: 20px;
         position: center;
-        background: var(--cds-ui-01);
+        background: var(--cds-ui-background);
         border-radius: 16px;
         text-align: center;
     }
@@ -267,7 +293,7 @@
         margin: 0;
         padding: 5px;
         display: compact;
-        color: red;
+        color: var(--own-input-error-color);
     }
 
     /* Check for male */

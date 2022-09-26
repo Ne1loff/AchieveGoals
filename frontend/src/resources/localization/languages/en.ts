@@ -18,8 +18,7 @@ const en: Dictionary = {
     username: 'Username',
     login: 'Login',
     emailPatternErrorText: 'Example of mail: example@example.com',
-    passwordPatternErrorText: 'The minimum password length is 8 characters.' +
-        ' The password must contain at least one digit, uppercase and lowercase letters.',
+    passwordPatternErrorText: 'The minimum password length is 8 characters.',
     requiredErrorText: 'Please fill in this field',
     passwordsNotMatch: 'Passwords don\'t match'
 } as const;

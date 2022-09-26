@@ -17,6 +17,8 @@
     import AnimationContainer from "./AnimationContainer.svelte";
     import PortablePopover from "../popover/global/PortablePopover.svelte";
     import type {Unsubscriber} from "svelte/store";
+    import GoalService from "../../services/GoalService";
+    import ServiceFactory from "../../services/ServiceFactory";
 
     export let style: string = "";
     export let goal: Goal;
@@ -28,6 +30,8 @@
 
     let animDurationIn: number = animationDurationIn;
     let animDurationOut: number = animationDurationOut;
+
+    let goalService: GoalService;
 
     let subs: Goal[] = [];
 
@@ -52,9 +56,16 @@
     }
 
     const saveNewGoal = () => {
-        const goals = $GOALS;
-        goals.push(newGoal);
-        $GOALS = goals;
+        goalService.createGoal(newGoal)
+            .then((_) => {
+            });
+    }
+
+    const deleteGoal = () => {
+        goalService.deleteTask(goal.id)
+        .then(() => {
+            ServiceFactory.INSTANCE.notificationService.success('Success', 'Task was successfully deleted.')
+        })
     }
 
     $: if (goal) {
@@ -69,6 +80,7 @@
             subs = $GOALS.filter(it => it.gid === goal.id);
             unsubscribe = GOALS.subscribe((g) => subs = g.filter(it => it.gid === goal.id));
         }
+        goalService = ServiceFactory.INSTANCE.goalService;
     });
 
     onDestroy(() => {
@@ -79,12 +91,12 @@
 </script>
 
 
-{#if createOver}
+<AnimationContainer animate show={createOver}>
     <GoalEditorComponent bind:goal={newGoal} {indent}
                          on:save={saveNewGoal}
                          on:done={() => createOver = false}
     />
-{/if}
+</AnimationContainer>
 <AnimationContainer animate={!root}
                     animationDurationIn={animDurationIn}
                     animationDurationOut={animDurationOut}>
@@ -204,6 +216,7 @@
                                   on:edit={() => {editGoal(); close();}}
                                   on:create-over={() => {createGoalOver(); close();}}
                                   on:create-under={() => {createGoalUnder(); close();}}
+                                  on:delete={() => {deleteGoal(); close();}}
                         />
                     </PortablePopover>
                 </div>
@@ -215,17 +228,17 @@
         />
     {/if}
 </AnimationContainer>
-{#if !withoutSubs && showSubtasks}
+<AnimationContainer animate show={!withoutSubs && showSubtasks}>
     {#each subs as goal}
         <svelte:self bind:goal indent={indent + 1} {animationDurationIn} {animationDurationOut} root={false}/>
     {/each}
-{/if}
-{#if createUnder}
+</AnimationContainer>
+<AnimationContainer animate show={createUnder}>
     <GoalEditorComponent bind:goal={newGoal} indent={indent + 1}
                          on:save={saveNewGoal}
                          on:done={() => createUnder = false}
     />
-{/if}
+</AnimationContainer>
 
 <style>
 

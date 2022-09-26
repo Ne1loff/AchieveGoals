@@ -1,12 +1,12 @@
 <script lang="ts">
     import OverflowMenuVertical from "carbon-icons-svelte/lib/OverflowMenuVertical.svelte";
-    import {Button} from "carbon-components-svelte";
     import Icon from "@iconify/svelte";
     import Goal from "../../data/models/Goal";
     import AppHeadTitle from "../AppHeadTitle.svelte";
     import GoalComponent from "../goal-card/GoalComponent.svelte";
     import GoalCreator from "../goal-card/GoalCreator.svelte";
     import HomeComponentsHolder from "./component-holder/HomeComponentsHolder.svelte";
+    import Button from "../button/Button.svelte";
 
     export let goals: Goal[] = [];
     export let goalProps: { [key: string]: any } = {};
@@ -19,23 +19,25 @@
 <AppHeadTitle text={'Goals'}/>
 <HomeComponentsHolder {...$$props}>
     <svelte:fragment slot="head">
-        <h1>Goals</h1>
+        <h3>Goals</h3>
         <div class="header-actions">
-            <Button kind="ghost" size="small" as let:props>
-                <p {...props} class:button-p={true}>
-                    <span class="button-span-icon">
-                        <Icon icon="akar-icons:settings-horizontal"
-                              width="18" height="18" color="var(--cds-icon-01)"/>
-                    </span>
-                    <span class="button-span">Отображение</span>
-                </p>
+            <Button kind="ghost" size="small"
+                    --ag-bnt-margin="0 .125rem 0 0"
+                    --ag-bnt-border-radius=".5rem"
+            >
+                <span class="button-span-icon">
+                    <Icon icon="akar-icons:settings-horizontal"
+                          width="18" height="18" color="var(--cds-icon-01)"/>
+                </span>
+                <span class="button-span">Отображение</span>
             </Button>
-            <Button kind="ghost" size="small" as let:props>
-                <p {...props} class:button-p={true}>
-                    <span class="button-span-icon">
-                        <OverflowMenuVertical size="18"/>
-                    </span>
-                </p>
+            <Button kind="ghost" size="small"
+                    --ag-bnt-padding="0 3px"
+                    --ag-bnt-border-radius=".5rem"
+            >
+                <span class="button-span-icon">
+                    <OverflowMenuVertical size="18"/>
+                </span>
             </Button>
         </div>
     </svelte:fragment>
@@ -58,13 +60,6 @@
     :root {
         --holder-padding-left: 28px;
         --holder-padding-right: 55px;
-    }
-
-    .button-p {
-        border-radius: 5px;
-        min-width: 2rem;
-        padding: 0 !important;
-        justify-content: center;
     }
 
     .button-span {

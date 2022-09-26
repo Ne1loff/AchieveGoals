@@ -1,5 +1,4 @@
 <script lang="ts">
-    import {Button} from "carbon-components-svelte";
     import Icon from "@iconify/svelte";
     import Goal from "../../data/models/Goal";
     import AppHeadTitle from "../AppHeadTitle.svelte";
@@ -10,11 +9,14 @@
     import dayjs from "dayjs";
     import {GOALS} from "../../data/storage/storage";
     import TodayCollapsibleTaskHolder from "./TodayCollapsibleTaskHolder.svelte";
+    import Button from "../button/Button.svelte";
 
 
     let todayDayjs = dayjs(getDateTodayLastMin());
     let yesterdayDayjs = todayDayjs.add(-1, 'day');
-    let tasksForToday: Goal[] = [];
+
+    let overdueTasks: Goal[];
+    let tasksForToday: Goal[];
 
     $: overdueTasks = $GOALS.filter((it) => it.deadline <= yesterdayDayjs.toDate());
     $: tasksForToday = $GOALS.filter((it) =>
@@ -30,14 +32,14 @@
             <h5>{todayDayjs.format("dd D MMM")}</h5>
         </div>
         <div class="header-actions">
-            <Button kind="ghost" size="small" as let:props>
-                <p {...props} class:button-p={true}>
-                    <span class="button-span-icon">
-                        <Icon icon="akar-icons:settings-horizontal"
-                              width="18" height="18" color="var(--cds-icon-01)"/>
-                    </span>
-                    <span class="button-span">Отображение</span>
-                </p>
+            <Button kind="ghost" size="small"
+                    --ag-bnt-border-radius=".5rem"
+            >
+                <span class="button-span-icon">
+                    <Icon icon="akar-icons:settings-horizontal"
+                          width="18" height="18" color="var(--cds-icon-01)"/>
+                </span>
+                <span class="button-span">Отображение</span>
             </Button>
         </div>
     </svelte:fragment>
@@ -46,14 +48,6 @@
             <TodayCollapsibleTaskHolder goals={overdueTasks}/>
         </div>
         <div class="section">
-            <div class="section-header">
-                <div class="header-title">
-                    Просрочено
-                </div>
-                <button>
-                    Перенести
-                </button>
-            </div>
             {#each tasksForToday as goal}
                 <GoalComponent bind:goal/>
             {/each}
@@ -84,18 +78,12 @@
         margin: .5rem 0;
     }
 
-    .button-p {
-        border-radius: 5px;
-        min-width: 2rem;
-        padding: 0 !important;
-        justify-content: center;
-    }
 
     .button-span {
         margin-left: 3px;
         margin-right: 6px;
 
-        color: var(--cds-text-02);
+        color: var(--cds-text-01);
     }
 
     .button-span-icon {

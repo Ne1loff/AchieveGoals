@@ -5,12 +5,16 @@
     import MonthYearPicker from "./MonthYearPicker.svelte";
 
     export let value: Date;
-    export let minValue: Date = undefined;
-    export let maxValue: Date = undefined;
+    export let minValue: Date | undefined = undefined;
+    export let maxValue: Date | undefined = undefined;
 
 </script>
 
 <style>
+
+    :root {
+        --ag-month-year-picker-border-radius: .25rem;
+    }
 
     .month-year-label {
         padding: .5rem;
@@ -21,6 +25,8 @@
         align-items: center;
         justify-content: center;
         color: var(--cds-text-04);
+
+        border-radius: var(--ag-month-year-picker-border-radius);
     }
 
     .month-year-label:focus-visible {

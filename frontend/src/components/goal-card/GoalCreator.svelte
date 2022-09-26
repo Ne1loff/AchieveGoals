@@ -3,22 +3,35 @@
     import Goal from "../../data/models/Goal";
     import GoalEditorComponent from "./GoalEditorComponent.svelte";
     import Icon from "@iconify/svelte";
+    import {onMount} from "svelte";
+    import GoalService from "../../services/GoalService";
+    import ServiceFactory from "../../services/ServiceFactory";
 
     export let taskStorage: Goal[];
     export let title: string = "Добавить цель";
 
-    let newTask: Goal = undefined;
+    let goalService: GoalService;
+
+    let newTask: Goal | undefined = undefined;
 
     const create = () => newTask = new Goal();
-
     const cancel = () => newTask = undefined;
 
     const save = () => {
-        const storage = taskStorage;
-        storage.push(newTask);
-        taskStorage = storage;
-        create();
+        if (!newTask) return;
+
+        const uniqIds = new Set(taskStorage.map(it => it.gid));
+        if (uniqIds.size === 1) newTask.gid = [...uniqIds][0];
+
+        goalService.createGoal(newTask)
+            .then((_) => {
+                create();
+            });
     }
+
+    onMount(() => {
+        goalService = ServiceFactory.INSTANCE.goalService;
+    })
 
 </script>
 

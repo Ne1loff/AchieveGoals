@@ -1,17 +1,11 @@
 <script lang="ts">
 
+    import {getClasses} from "../utils";
+
     export let width: number = 226;
     export let classes: string | string[] = [];
 
-    const getClasses = (): string => {
-        if (!classes) return '';
 
-        if (Array.isArray(classes)) {
-            return classes.join(' ');
-        } else {
-            return classes;
-        }
-    }
 </script>
 
 <style>
@@ -44,7 +38,7 @@
 
 </style>
 
-<div class="container {getClasses()}" style="width: {width}px">
+<div class="container {getClasses(classes)}" style="width: {width}px">
     {#if $$slots.header}
         <slot name="header"></slot>
         {#if $$slots.content}

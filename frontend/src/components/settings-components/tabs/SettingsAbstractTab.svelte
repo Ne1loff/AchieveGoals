@@ -11,7 +11,7 @@
 <style>
 
     .settings-container {
-        max-height: calc(var(--own-modal-max-height) - 56px - 8px);
+        height: 100%;
         overflow: auto;
 
         scrollbar-width: .5rem;

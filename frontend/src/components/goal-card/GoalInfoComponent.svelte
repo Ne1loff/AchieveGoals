@@ -16,7 +16,7 @@
 
     let parents: { id: number | string, title: string }[] = [];
     let children: Goal[] = [];
-    let goal: Goal = undefined;
+    let goal: Goal | undefined = undefined;
 
     const navigateToHome = () => navigate(getProjectPath());
 
@@ -50,8 +50,7 @@
         return ok;
     }
 
-
-    onMount(() => {
+    const loadData = (_: {}) => {
         ServiceFactory.INSTANCE.goalService.getUserGoals()
             .then(() => {
                 componentIsReady = loadGoalAndParents();
@@ -60,6 +59,12 @@
                         'Goal notfound!', `There is no target with id: ${props.id}`)
                 }
             });
+    }
+
+    $: loadData(props);
+
+    onMount(() => {
+        loadData(props);
     });
 
 </script>

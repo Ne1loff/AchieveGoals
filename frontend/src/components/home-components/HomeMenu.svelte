@@ -8,6 +8,7 @@
     import ServiceFactory from "../../services/ServiceFactory";
     import {hrefs} from "../../resources/config";
     import {SettingsUrl} from "../../resources/basicFilter.config";
+    import Button from "../button/Button.svelte";
 
     let user: User;
 
@@ -56,7 +57,7 @@
         {/if}
     </a>
     <svelte:fragment slot="content">
-        <a class="menu-item" use:link href={hrefs.settings(SettingsUrl.THEME)} on:click={close}>
+        <a class="menu-item spacing-small" use:link href={hrefs.settings(SettingsUrl.THEME)} on:click={close}>
             <div class="action">
                 <div class="icon">
                     <Icon icon="carbon:color-palette" width="20" color="var(--cds-icon-02)"/>
@@ -64,7 +65,7 @@
                 <span>Тема</span> <!--    TODO: l10n        -->
             </div>
         </a>
-        <a class="menu-item" use:link href={hrefs.mobile} on:click={close}>
+        <a class="menu-item spacing-small" use:link href={hrefs.mobile} on:click={close}>
             <div class="action">
                 <div class="icon">
                     <Icon icon="carbon:application-mobile" width="20" color="var(--cds-icon-02)"/>
@@ -91,14 +92,18 @@
         </a>
     </svelte:fragment>
     <svelte:fragment slot="footer">
-        <div class="menu-item" on:click={logout}>
+        <Button class="menu-item" size="small" kind="ghost" on:click={logout}
+                --ag-bnt-border-radius="1rem"
+                --ag-bnt-padding="0 6px"
+                --ag-bnt-margin="2px 6px"
+        >
             <div class="action">
                 <div class="icon">
                     <Icon icon="carbon:logout" width="20" color="var(--cds-icon-02)"/>
                 </div>
                 <span>Выход</span> <!--    TODO: l10n        -->
             </div>
-        </div>
+        </Button>
     </svelte:fragment>
 </MenuContainer>
 
@@ -113,7 +118,7 @@
 
     .menu-item {
         padding: 0 6px;
-        margin: 0 6px;
+        margin: 2px 6px;
         background: inherit;
         color: var(--cds-text-01);
         border-radius: 16px;
@@ -151,6 +156,10 @@
     .icon {
         margin-left: 3px;
         margin-right: .5rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .user-avatar {

@@ -1,49 +1,57 @@
-import GoalDto from "../data/dto/GoalDto";
+import {GoalDto} from "../data/dto/Dtos";
 import Goal from "../data/models/Goal";
+import {getProperty, hasProperty, setProperty} from "../utils/objects";
 
 class GoalMapper {
 
-    fromDto(goalDto: GoalDto): Goal {
+    toEntity(goalDto: GoalDto): Goal {
+
         const goal = new Goal();
-        Object.keys(goalDto)
-            .forEach(key => {
-                goal[key] = goal[key] instanceof Date ? new Date(goalDto[key]) : goalDto[key];
-            });
+        const keys = Object.keys(goal) as Array<keyof Goal>;
+
+        keys.forEach((key) => {
+            if (hasProperty(goalDto, key)) {
+                let value = getProperty(goalDto, key);
+                if (goal[key] instanceof Date && typeof value === 'string')
+                    value = new Date(value);
+                setProperty(goal, key, value);
+            }
+        })
+
         return goal;
     }
 
-    toDto(goals: Goal): GoalDto {
-        const dto = new GoalDto();
-        Object.keys(dto)
-            .forEach(key => {
-                dto[key] = goals[key];
-            });
-        return dto;
+    toDto(goal: Goal): GoalDto {
+
+        const goalDto = new GoalDto();
+        const keys = Object.keys(goalDto) as Array<keyof GoalDto>;
+
+        keys.forEach((key) => {
+            if (hasProperty(goal, key)) {
+                setProperty(goalDto, key, getProperty(goal, key));
+            }
+        });
+
+        return goalDto;
     }
 
-    fromDtos(dtos: GoalDto[]): Goal[] {
+    toEntities(goalDtos: GoalDto[]): Goal[] {
         const goals: Goal[] = [];
-        dtos.forEach(dto => {
-            const goal = new Goal();
-            Object.keys(dto)
-                .forEach(key => {
-                    goal[key] = goal[key] instanceof Date ? new Date(dto[key]) : dto[key];
-                });
-            goals.push(goal);
+
+        goalDtos.forEach((it) => {
+            goals.push(this.toEntity(it));
         });
+
         return goals;
     }
 
     toDtos(goals: Goal[]): GoalDto[] {
         const dtos: GoalDto[] = [];
-        goals.forEach(goal => {
-            const dto = new GoalDto();
-            Object.keys(new GoalDto())
-                .forEach(key => {
-                    dto[key] = goal[key];
-                });
-            dtos.push(dto);
+
+        goals.forEach((it) => {
+            dtos.push(this.toDto(it));
         });
+
         return dtos;
     }
 }

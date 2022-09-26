@@ -10,27 +10,31 @@ class Popover {
     show(options: SveltePopoverOptions): string {
         const id = validateOptions(options);
 
-        options.target.setAttribute('aria-expanded', 'true');
+        options.target?.setAttribute('aria-expanded', 'true');
 
         const close = () => {
             this.destroy(componentInfo);
         }
 
-        if (options.component.props) {
-            options.component.props['closePopover'] = close;
-        } else {
-            options.component.props = {closePopover: close}
+        if (options.component) {
+            if (options.component.props) {
+                options.component.props['closePopover'] = close;
+            } else {
+                options.component.props = {closePopover: close}
+            }
         }
 
+        let target = document.getElementById("popover-holder");
+        if (target === null) target = document.body;
 
         const component = new PopoverItem({
-            target: document.getElementById("popover-holder"),
+            target: target,
             props: {
                 options: options
             }
         })
 
-        document.getElementById(`popover-${options.id}`).focus();
+        document.getElementById(`popover-${options.id}`)?.focus();
 
         component.$on("close", close);
 
@@ -51,8 +55,11 @@ class Popover {
         const index = this.components.indexOf(item);
         this.components.splice(index, 1);
 
-        item.target.removeAttribute('aria-expanded');
-        item.target.dispatchEvent(new CustomEvent('popupClose'));
+        if (item.target) {
+            item.target.removeAttribute('aria-expanded');
+            item.target.dispatchEvent(new CustomEvent('popupClose'));
+        }
+
         item.component.$destroy();
     }
 
@@ -69,7 +76,7 @@ const popover = new Popover();
 
 const popoverTrigger = (node: HTMLElement, options: SveltePopoverOptions) => {
 
-    const createPopover = (event) => {
+    const createPopover = (event: MouseEvent) => {
         if (options.stopPropagation) event.stopPropagation();
         options.target = node;
         popover.show(options);

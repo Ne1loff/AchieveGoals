@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import {SkeletonPlaceholder} from "carbon-components-svelte";
+
     export let size: 'small' | 'middle' | 'big' | 'large' = 'middle';
     export let radius: string = '50%'
 
@@ -15,7 +17,11 @@
      class:large={size === 'large'}
      style="border-right: {radius}"
 >
-    <img {src} {alt}/>
+    {#if src}
+        <img {src} {alt}/>
+    {:else}
+        <SkeletonPlaceholder style="height: 100%; width: 100%"/>
+    {/if}
 </div>
 
 <style>

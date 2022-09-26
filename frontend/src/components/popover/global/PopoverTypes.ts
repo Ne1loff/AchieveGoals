@@ -25,7 +25,7 @@ interface SveltePopoverOptions {
 
 interface ComponentInfo {
     id: string,
-    target: HTMLElement,
+    target?: HTMLElement,
     component: SvelteComponent
 }
 

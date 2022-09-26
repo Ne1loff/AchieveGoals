@@ -18,8 +18,7 @@ const ru: Dictionary = {
     username: 'Имя пользователя',
     login: 'Логин',
     emailPatternErrorText: 'Пример почты: example@example.com',
-    passwordPatternErrorText: 'Минимальная длина пароля составляет 8 символов.' +
-        ' Пароль должен содержать по крайней мере одну цифру, прописную и строчную букву.',
+    passwordPatternErrorText: 'Минимальная длина пароля составляет 8 символов.',
     requiredErrorText: 'Пожалуйста, заполните это поле',
     passwordsNotMatch: 'Пароли не совпадают'
 } as const;

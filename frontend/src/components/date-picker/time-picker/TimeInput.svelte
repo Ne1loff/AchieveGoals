@@ -72,6 +72,7 @@
         padding: 10px;
         width: 80px;
         border: none;
+        border-radius: .25rem 0 0 .25rem;
         border-right: 1px solid var(--cds-button-secondary-hover);
         background-color: var(--cds-interactive-02);
         color: var(--cds-text-04);

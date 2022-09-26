@@ -8,12 +8,17 @@
     import {SettingsUrl} from "../../resources/basicFilter.config";
     import SettingsAccountTab from "./tabs/SettingsAccountTab.svelte";
     import SettingsGeneralTab from "./tabs/SettingsGeneralTab.svelte";
+    import SettingsFooter from "./SettingsFooter.svelte";
+    import type {onSettingsChange} from "./utils";
 
     export let props: { [k: string]: string };
 
-    let wasChange: boolean = false;
+    let wasChange: boolean;
 
     const navigateToHome = () => navigate(getProjectPath());
+    let onChange: onSettingsChange = {
+        accept: () => {}, reject: () => {}
+    };
 
 </script>
 
@@ -22,7 +27,7 @@
              on:close={navigateToHome}
              styleClasses={['settings-window', 'elevation-9']}
              --menu-container-hr-margin="0 -.75rem"
-             --own-modal-max-height="45rem"
+             --own-modal-max-height="40rem"
              --own-modal-min-height="30rem"
              --own-overlay-bg="#131313bf"
              --own-modal-container-header-padding=".5rem .5rem .5rem 1rem"
@@ -38,15 +43,13 @@
     </svelte:fragment>
     <svelte:fragment slot="content">
         {#if props?.tab === SettingsUrl.ACCOUNT}
-            <SettingsAccountTab bind:wasChange/>
-        {:else if props?.tab === SettingsUrl.ACCOUNT}
+            <SettingsAccountTab bind:wasChange bind:onChange/>
+        {:else if props?.tab === SettingsUrl.GENERAL}
             <SettingsGeneralTab/>
         {/if}
     </svelte:fragment>
     <svelte:fragment slot="footer">
-        {#if false}
-            just fun
-        {/if}
+        <SettingsFooter {onChange}/>
     </svelte:fragment>
 </ModalWindow>
 

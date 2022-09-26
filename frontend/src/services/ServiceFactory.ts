@@ -10,13 +10,13 @@ class ServiceFactory {
     private static _INSTANCE: ServiceFactory;
     private constructor() { }
 
-    private _localStorageService: LocalStorageService;
-    private _countryService: CountryService;
-    private _goalService: GoalService;
-    private _notificationService: NotificationService;
-    private _signUIOService: SignUIOService;
-    private _userService: UserService;
-    private _request: Request;
+    private _localStorageService?: LocalStorageService;
+    private _countryService?: CountryService;
+    private _goalService?: GoalService;
+    private _notificationService?: NotificationService;
+    private _signUIOService?: SignUIOService;
+    private _userService?: UserService;
+    private _request?: Request;
 
 
     static get INSTANCE(): ServiceFactory {

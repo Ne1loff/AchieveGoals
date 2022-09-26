@@ -14,7 +14,7 @@ export default class SignUIOService {
     }
 
     async logIn(login: Login): Promise<number> {
-        return this.request.post<number>('api/login', null, login, DataType.JSON)
+        return this.request.post<number>('api/login', login, DataType.JSON)
             .then((apiResponse) => {
                 this.userService.getCurrentUser();
                 return apiResponse.status;
@@ -22,12 +22,12 @@ export default class SignUIOService {
     }
 
     async signUp(registration: Registration): Promise<number> {
-        return this.request.post<number>('api/registration', null, registration, DataType.JSON)
+        return this.request.post<number>('api/registration', registration, DataType.JSON)
             .then((apiResponse) => apiResponse.status);
     }
 
     async logOut(): Promise<number> {
-        return this.request.post<number>('api/logout', null, {}, DataType.JSON)
+        return this.request.post<number>('api/logout', {}, DataType.JSON)
             .then((apiResponse) => {
                 return apiResponse.status;
             });

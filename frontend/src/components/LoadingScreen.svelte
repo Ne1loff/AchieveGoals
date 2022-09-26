@@ -30,5 +30,8 @@
         z-index: 1111;
     }
 
+    .loading-spinner {
+        user-select: none;
+    }
 
 </style>

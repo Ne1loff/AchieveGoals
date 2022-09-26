@@ -1,10 +1,12 @@
 const clickOutside = (node: HTMLElement) => {
 
-    const handleClick = event => {
-        if (node && !node.contains(event.target) && !event.defaultPrevented) {
-            node.dispatchEvent(
-                new CustomEvent('clickOutside')
-            )
+    const handleClick = (event: MouseEvent) => {
+        if (event.target instanceof HTMLElement) {
+            if (node && !node.contains(event.target) && !event.defaultPrevented) {
+                node.dispatchEvent(
+                    new CustomEvent('clickOutside')
+                )
+            }
         }
     }
 

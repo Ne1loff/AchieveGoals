@@ -2,14 +2,14 @@
 
     import AttractionsCalendar from "./attractions-calendar/AttractionsCalendar.svelte";
     import dayjs from "dayjs";
-    import {Button} from "carbon-components-svelte";
     import {ArrowLeft, ArrowRight} from "carbon-icons-svelte";
     import MonthYearComponent from "./date-picker/MonthYearComponent.svelte";
     import {onMount} from "svelte";
+    import Button from "../button/Button.svelte";
 
     export let value: Date = new Date();
     export let changeMonthDuration: number = 200;
-    export const disabledDates: Array<Date | { start?: Date, end?: Date }> = [{end: dayjs().add(-1, 'day').toDate()}];
+    export let disabledDates: Array<Date | { start?: Date, end?: Date }> = [{end: dayjs().add(-1, 'day').toDate()}];
     export let minDate: Date | null = null;
     export let maxDate: Date | null = null;
 
@@ -69,17 +69,21 @@
 
 <div class="calendar">
     <div class="calendar-header">
-        <Button icon={ArrowLeft}
-                iconDescription={dayjs(prev).format("MMMM")}
+        <Button iconDescription={dayjs(prev).format("MMMM")}
+                icon={ArrowLeft}
                 on:click={() => changeMonth(false)}
                 disabled={lastOnLeft}
-                size="small"/>
-        <MonthYearComponent bind:value={date} minValue={minDate} />
-        <Button icon={ArrowRight}
-                iconDescription={dayjs(next).format("MMMM")}
+                size="small"
+                --ag-bnt-padding="0 7px"
+        />
+        <MonthYearComponent bind:value={date} minValue={minDate}/>
+        <Button iconDescription={dayjs(next).format("MMMM")}
+                icon={ArrowRight}
                 on:click={() => changeMonth(true)}
                 disabled={lastOnRight}
-                size="small"/>
+                size="small"
+                --ag-bnt-padding="0 7px"
+        />
     </div>
     <div class="calendar-holder">
         <div class="month-holder">

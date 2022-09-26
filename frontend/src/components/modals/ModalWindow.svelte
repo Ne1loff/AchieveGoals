@@ -2,6 +2,8 @@
     import Icon from "@iconify/svelte";
     import Overlay from "./overlay/OverlayComponent.svelte";
     import {createEventDispatcher} from "svelte";
+    import Button from "../button/Button.svelte";
+    import {getClasses} from "../utils";
 
     export let style: string | { [key: string]: any } = undefined;
     export let styleClasses: string | string[] = undefined;
@@ -11,12 +13,6 @@
     export let showFooter: boolean = true;
 
     const dispatch = createEventDispatcher();
-
-    const getClasses = (): string => {
-        return (typeof styleClasses === 'string') ?
-            styleClasses : (Array.isArray(styleClasses)) ?
-                styleClasses.join(' ') : ''
-    }
 
     const getStyle = (): string => {
         return (typeof style === 'string') ?
@@ -36,11 +32,12 @@
     {#if useOverlay}
         <Overlay on:click={close}/>
     {/if}
-    <div class="modal-window {getClasses()}" style="{getStyle()}; flex-direction: {useViaSidebar ? 'row' : 'column'}">
+    <div class="modal-window {getClasses(styleClasses)}"
+         style="{getStyle()} flex-direction: {useViaSidebar ? 'row' : 'column'}">
         {#if useViaSidebar}
             <slot name="sidebar"/>
         {/if}
-        <div class="modal-container" >
+        <div class="modal-container">
             <header class="modal-header">
                 {#if $$slots.header}
                     <div class="modal-header-content">
@@ -48,9 +45,13 @@
                     </div>
                 {/if}
                 {#if !hideCloseBtn}
-                    <button class="modal-close-btn" on:click={close}>
-                        <Icon icon="carbon:close" width="28" color="var(--cds-icon-01)"/>
-                    </button>
+                    <Button kind="ghost"
+                            size="small"
+                            --ag-bnt-border-radius=".5rem"
+                            --ag-bnt-padding="0"
+                            on:click={close}>
+                        <Icon icon="carbon:close" width="28"/>
+                    </Button>
                 {/if}
             </header>
             {#if $$slots.title}
@@ -61,15 +62,13 @@
             {/if}
             {#if $$slots.content}
                 <hr/>
-                <div class="modal-content">
+                <div class="modal-content" style:height={showFooter ? 'calc(100% - (56px + 8px + 1px) * 2)' : ''}>
                     <slot name="content"></slot>
                 </div>
             {/if}
             {#if $$slots.footer && showFooter}
                 <hr/>
-                <footer class="modal-footer">
-                    <slot name="footer"></slot>
-                </footer>
+                <slot name="footer"></slot>
             {/if}
         </div>
     </div>
@@ -85,8 +84,12 @@
         --own-modal-container-header-padding: 0;
     }
 
-    .modal-header, .modal-title, .modal-content {
+    .modal-header:not(:last-child), .modal-title:not(:last-child), .modal-content:not(:last-child) {
         margin-bottom: .5rem;
+    }
+
+    .modal-content {
+        height: calc(100% - 56px - 8px - 1px);
     }
 
     .modal-header {
@@ -111,27 +114,15 @@
 
         padding: var(--own-modal-container-padding);
         margin: var(--own-modal-container-margin);
+
+
+        height: 100%;
     }
 
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-    }
-
-    .modal-close-btn {
-        width: 1.75rem;
-        height: 1.75rem;
-
-        padding: 0;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        background: inherit;
-        border: none;
-        border-radius: .5rem;
     }
 
     .modal-close-btn:hover {
@@ -154,6 +145,8 @@
 
         max-height: var(--own-modal-max-height);
         min-height: var(--own-modal-min-height);
+
+        height: var(--own-modal-max-height);
 
         z-index: 1000;
     }

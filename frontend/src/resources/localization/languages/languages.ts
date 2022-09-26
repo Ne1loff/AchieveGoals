@@ -1,13 +1,24 @@
+import {hasProperty} from "../../../utils/objects";
+import {writable} from "svelte/store";
+
 enum Languages {
-    RU = 'ru',
-    EN = 'en'
+    ru = 'ru',
+    en = 'en'
 }
 
-const getLanguage = (langName: string): Languages => {
-    for (let languagesKey in Languages) {
-        if (langName.includes(languagesKey.toLowerCase())) return Languages[languagesKey];
-    }
-    return Languages.EN;
+type Language = {
+    value: Languages,
+    name: string
 }
 
-export {Languages, getLanguage};
+const CurrentLanguage = writable<Languages>(Languages.en);
+
+const LanguagesNames: Language[] = [
+    {value: Languages.en, name: "English"},
+    {value: Languages.ru, name: "Русский"}
+];
+
+const getLanguage = (langName: string): string =>
+    hasProperty(Languages, langName) ? Languages[langName] : Languages.en;
+
+export {Languages, CurrentLanguage, LanguagesNames, getLanguage};

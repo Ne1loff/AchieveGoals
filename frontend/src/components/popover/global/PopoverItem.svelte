@@ -3,6 +3,7 @@
     import {validateOptions} from "./utils";
     import {clickOutside} from "../../../scripts/clickOutside";
     import {createEventDispatcher, onMount} from "svelte";
+    import {getClasses} from "../../utils";
 
     const dispatch = createEventDispatcher();
 
@@ -23,16 +24,6 @@
 
     const clickFromOutside = () => {
         if (!options.useOverlay) close();
-    }
-
-    const getClasses = (): string => {
-        if (!options.classStyle) return '';
-
-        if (Array.isArray(options.classStyle)) {
-            return options.classStyle.join(' ');
-        } else {
-            return options.classStyle;
-        }
     }
 
     const setStyle = () => {
@@ -246,7 +237,7 @@
     {#if options.useOverlay}
         <div class="overlay" on:click={clickFromOverlay}></div>
     {/if}
-    <div class="popover-item {getClasses()}"
+    <div class="popover-item {getClasses(options.classStyle)}"
          use:clickOutside
          on:clickOutside={clickFromOutside}
          bind:this={contentRef}

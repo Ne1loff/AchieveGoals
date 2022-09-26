@@ -1,5 +1,6 @@
 <script lang="ts">
     import {createEventDispatcher} from "svelte";
+    import Button from "./button/Button.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -44,9 +45,9 @@
         background: var(--own-menu-btn-background);
     }
 
-    .menu-btn:hover {
-        background: var(--own-menu-btn-hover-background, #ccc);
-    }
+    /*.menu-btn:hover {*/
+    /*    background: var(--own-menu-btn-hover-background, #ccc);*/
+    /*}*/
 
     .menu-btn--burger,
     .menu-btn--burger::before,
@@ -90,6 +91,11 @@
 
 </style>
 
-<div class="menu-btn" class:open on:click={onClick}>
-    <div class="menu-btn--burger"></div>
-</div>
+<Button on:click={onClick} kind="ghost" size="field"
+        --ag-bnt-border-radius=".5rem"
+        --ag-bnt-padding="1px 3px"
+>
+    <div class="menu-btn" class:open >
+        <div class="menu-btn--burger"></div>
+    </div>
+</Button>

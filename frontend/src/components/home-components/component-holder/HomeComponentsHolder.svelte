@@ -1,17 +1,12 @@
 <script lang="ts">
     import {Svrollbar} from "svrollbar";
-    import Icon from "@iconify/svelte";
-    import Accordion from "../../accordion/Accordion.svelte";
 
     export let withoutHeader: boolean = false;
-    export let collapsible: boolean = false;
-    export let collapsibleBtnTitle: string = 'Other';
 
     let viewport: Element;
     let contents: Element;
 
     let overflowTop: boolean = false;
-    let expanded: boolean;
 
     const scroll = () => (overflowTop = viewport.scrollTop > 0);
 </script>
@@ -27,43 +22,13 @@
                 </div>
             </header>
         {/if}
-        {#if collapsible}
-            <Accordion bind:open={expanded}>
-                <svelte:fragment slot="header" let:toggle>
-                    <div class="action-buttons">
-                        <button class="collapse-button"
-                                on:click={toggle}>
-                            <span>
-                                <span class="icon-holder" data-item-rotate={expanded ? '90' : '0'}>
-                                    <Icon icon="uil:angle-right-b"
-                                          width="24" height="24"
-                                          color="color: var(--cds-icon-01)"
-                                    />
-                                </span>
-                                <span>{collapsibleBtnTitle}</span>
-                            </span>
-                        </button>
-                    </div>
-                </svelte:fragment>
-                <svelte:fragment>
-                    <div class="content-wrapper">
-                        <div class="goals-content">
-                            <div class="content-inner" bind:this={contents}>
-                                <slot/>
-                            </div>
-                        </div>
-                    </div>
-                </svelte:fragment>
-            </Accordion>
-        {:else}
-            <div class="content-wrapper">
-                <div class="goals-content">
-                    <div class="content-inner" bind:this={contents}>
-                        <slot/>
-                    </div>
+        <div class="content-wrapper">
+            <div class="goals-content">
+                <div class="content-inner" bind:this={contents}>
+                    <slot/>
                 </div>
             </div>
-        {/if}
+        </div>
         <Svrollbar {viewport} {contents}/>
     </div>
 </div>
@@ -89,61 +54,10 @@
         --svrollbar-thumb-width: .5rem;
     }
 
-    .action-buttons {
-        position: relative;
-        width: 100%;
-        margin: .25rem 0;
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-
-        color: var(--cds-text-01);
-        background-color: inherit;
-    }
-
-    .icon-holder {
-        transition: transform .1s linear;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .icon-holder[data-item-rotate="90"] {
-        transform: rotate(90deg);
-    }
-
-    .action-buttons::after {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        content: "";
-        margin-left: 29px;
-
-        width: calc(100% - 29px);
-        border: 0;
-        border-bottom: 1px solid var(--cds-border-subtle);
-    }
-
-    .collapse-button {
-        flex-grow: 1;
-        height: 40px;
-    }
-
     .collapse-button span {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-    }
-
-    .collapse-button {
-        cursor: pointer;
-
-        border: none;
-        color: var(--cds-text-01);
-        background-color: inherit;
     }
 
     .holder {
@@ -210,7 +124,7 @@
         display: flex;
         justify-content: center;
 
-        min-height: 100%;
+        min-height: calc(100% - 81px);
 
         padding-bottom: 84px;
     }

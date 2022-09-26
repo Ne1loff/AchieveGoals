@@ -73,13 +73,13 @@ export function parseDateTime(string, format, defaultValue) {
                     result.setHours(parseInt(number[0]) + 12 * isPM);
                     break;
                 case 'M':
-                    result.setMinutes(number[0]);
+                    result.setMinutes(parseInt(number[0]));
                     break;
                 case 'S':
-                    result.setSeconds(number[0]);
+                    result.setSeconds(parseInt(number[0]));
                     break;
                 case 'd':
-                    result.setDate(number[0]);
+                    result.setDate(parseInt(number[0]));
                     break;
                 case 'm':
                     result.setMonth(number[0] - 1);
@@ -88,7 +88,7 @@ export function parseDateTime(string, format, defaultValue) {
                     result.setFullYear(century * 100 + parseInt(number[0]));
                     break;
                 case 'Y':
-                    result.setFullYear(number[0]);
+                    result.setFullYear(parseInt(number[0]));
                     break;
             }
             stringIdx += number[0].length;
@@ -123,7 +123,7 @@ export function formatDateTime(datetime, format) {
     }
 
     return format
-        .replace('%Y', datetime.getFullYear())
+        .replace('%Y', datetime.getFullYear().toString())
         .replace('%y', (datetime.getFullYear() % 100).toString().padStart(2, '0'))
         .replace('%m', (datetime.getMonth() + 1).toString().padStart(2, '0'))
         .replace('%d', datetime.getDate().toString().padStart(2, '0'))

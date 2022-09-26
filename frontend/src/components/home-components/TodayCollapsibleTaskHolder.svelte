@@ -4,8 +4,8 @@
     import SvgProgressBar from "../svg/SvgProgressBar.svelte";
     import GoalComponent from "../goal-card/GoalComponent.svelte";
     import Goal from "../../data/models/Goal";
+    import Button from "../button/Button.svelte";
 
-    export let contents: HTMLElement;
     export let goals: Goal[] = [];
 
     $:totalGoals = goals.length;
@@ -45,16 +45,17 @@
                 </span>
             </button>
             {#if completedGoals > 0 && expanded}
-                <button class="hide-completed-button">
+                <Button kind="ghost" size="small"
+                        --ag-bnt-border-radius=".5rem"
+                >
                     <span>Перенести</span>
-                </button>
+                </Button>
             {/if}
         </div>
     </svelte:fragment>
     <svelte:fragment>
         {#each goals as goal}
             <GoalComponent bind:goal withoutSubs
-                           --own-component-width="calc(100% - 55px)"
                            style="--own-component-border-width: calc(100% + 55px);
                            --own-component-border-right: 28px;"
             />
@@ -125,22 +126,12 @@
         justify-content: flex-start;
     }
 
-    .collapse-button, .hide-completed-button {
+    .collapse-button {
         cursor: pointer;
 
         border: none;
         color: var(--cds-text-01);
         background-color: inherit;
-    }
-
-    .hide-completed-button {
-        padding: .5rem;
-        min-width: 11rem;
-        border-radius: 5px;
-    }
-
-    .hide-completed-button:hover {
-        background-color: var(--cds-field-hover);
     }
 
 </style>

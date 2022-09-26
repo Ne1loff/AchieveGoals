@@ -152,15 +152,15 @@
     box-shadow: var(--own-elevation-24) !important;
 }
 
-html[theme=g80] .login-page {
+html[theme=g80] {
     --own-login-page-background: linear-gradient(to right, #6441a5, #2a0845);
 }
 
-html[theme=g90] .login-page {
+html[theme=g90] {
     --own-login-page-background: linear-gradient(to right, #6441a5, #2a0845);
 }
 
-html[theme=g100] .login-page {
+html[theme=g100] {
     --own-login-page-background: linear-gradient(to right, #6441a5, #2a0845);
 }
 
