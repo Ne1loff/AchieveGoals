@@ -9,14 +9,14 @@
     import SettingsAccountTab from "./tabs/SettingsAccountTab.svelte";
     import SettingsGeneralTab from "./tabs/SettingsGeneralTab.svelte";
     import SettingsFooter from "./SettingsFooter.svelte";
-    import type {onSettingsChange} from "./utils";
+    import type {Task} from "../utils";
 
     export let props: { [k: string]: string };
 
     let wasChange: boolean;
 
     const navigateToHome = () => navigate(getProjectPath());
-    let onChange: onSettingsChange = {
+    let onChange: Task = {
         accept: () => {}, reject: () => {}
     };
 

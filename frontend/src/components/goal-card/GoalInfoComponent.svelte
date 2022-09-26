@@ -55,7 +55,7 @@
             .then(() => {
                 componentIsReady = loadGoalAndParents();
                 if (!componentIsReady) {
-                    ServiceFactory.INSTANCE.notificationService.error(
+                    ServiceFactory.INSTANCE.toastService.error(
                         'Goal notfound!', `There is no target with id: ${props.id}`)
                 }
             });

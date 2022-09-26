@@ -8,7 +8,7 @@
     import Navbar from "../components/Navbar.svelte";
     import {l10n} from "../resources/localization/l10n";
     import SignUIOService from "../services/SignUIOService";
-    import NotificationService, {ErrorMessage} from "../services/NotificationService";
+    import ToastService, {ErrorMessage} from "../services/ToastService";
     import Login from "../data/models/Login";
     import ApiResponse from "../data/api/ApiResponse";
     import ApiError from "../data/api/ApiError";
@@ -25,7 +25,7 @@
 
     let userService: UserService;
     let signUIOService: SignUIOService;
-    let notificationService: NotificationService;
+    let notificationService: ToastService;
 
     let login: Login = new Login();
 
@@ -56,7 +56,7 @@
     onMount(() => {
         userService = ServiceFactory.INSTANCE.userService;
         signUIOService = ServiceFactory.INSTANCE.signUIOService;
-        notificationService = ServiceFactory.INSTANCE.notificationService;
+        notificationService = ServiceFactory.INSTANCE.toastService;
     });
 
 </script>

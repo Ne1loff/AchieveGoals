@@ -13,7 +13,7 @@
     import {onMount} from "svelte";
     import ApiResponse from "../data/api/ApiResponse";
     import ApiError from "../data/api/ApiError";
-    import NotificationService, {ErrorMessage} from "../services/NotificationService";
+    import ToastService, {ErrorMessage} from "../services/ToastService";
     import Login from "../data/models/Login";
     import Navbar from "../components/Navbar.svelte";
     import InputField from "../components/inputs/InputField.svelte";
@@ -24,7 +24,7 @@
 
     let countryService: CountryService;
     let signUIOService: SignUIOService;
-    let notificationService: NotificationService;
+    let notificationService: ToastService;
 
     let registration: Registration = new Registration();
     let confirmedPassword: string = '';
@@ -34,7 +34,7 @@
     onMount(() => {
         countryService = ServiceFactory.INSTANCE.countryService;
         signUIOService = ServiceFactory.INSTANCE.signUIOService;
-        notificationService = ServiceFactory.INSTANCE.notificationService;
+        notificationService = ServiceFactory.INSTANCE.toastService;
 
         loadCountries();
     });

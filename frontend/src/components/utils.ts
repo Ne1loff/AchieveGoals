@@ -27,4 +27,10 @@ const getClasses = (classes: string[] | string): string => {
     }
 }
 
+interface Task {
+    accept: () => void;
+    reject: () => void;
+}
+
 export {getClasses, getStyle};
+export type {Task};

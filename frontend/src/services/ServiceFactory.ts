@@ -1,6 +1,6 @@
 import CountryService from "./CountryService";
 import GoalService from "./GoalService";
-import NotificationService from "./NotificationService";
+import ToastService from "./ToastService";
 import SignUIOService from "./SignUIOService";
 import UserService from "./UserService";
 import Request from "./Request";
@@ -13,7 +13,7 @@ class ServiceFactory {
     private _localStorageService?: LocalStorageService;
     private _countryService?: CountryService;
     private _goalService?: GoalService;
-    private _notificationService?: NotificationService;
+    private _toastService?: ToastService;
     private _signUIOService?: SignUIOService;
     private _userService?: UserService;
     private _request?: Request;
@@ -43,8 +43,8 @@ class ServiceFactory {
         return this._userService ??= new UserService(this.request);
     }
 
-    get notificationService(): NotificationService {
-        return this._notificationService ??= new NotificationService();
+    get toastService(): ToastService {
+        return this._toastService ??= new ToastService();
     }
 
     get request(): Request {

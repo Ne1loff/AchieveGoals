@@ -62,10 +62,25 @@
     }
 
     const deleteGoal = () => {
-        goalService.deleteTask(goal.id)
-        .then(() => {
-            ServiceFactory.INSTANCE.notificationService.success('Success', 'Task was successfully deleted.')
-        })
+        let isCancel: boolean = false;
+        $GOALS = $GOALS.filter(it => it.id !== goal.id);
+        ServiceFactory.INSTANCE.toastService.dialog('Task was successfully deleted.',
+            {
+                accept: () => {
+                    if (isCancel) return;
+                    goalService.deleteTask(goal.id).then(() => {
+                        ServiceFactory.INSTANCE.toastService.success('Success', 'Task was successfully deleted.')
+                    });
+                },
+                reject: () => {
+                    isCancel = true;
+                    const goals = $GOALS;
+                    goals.push(goal);
+                    $GOALS = goals;
+                }
+            }
+        );
+
     }
 
     $: if (goal) {
