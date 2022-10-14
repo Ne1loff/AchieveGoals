@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {SvelteToast} from '@zerodevx/svelte-toast'
+
     import NotfoundPage from "./pages/NotfoundPage.svelte";
     import WelcomePage from "./pages/WelcomePage.svelte";
     import {Theme} from "carbon-components-svelte";
@@ -8,12 +8,20 @@
     import AuthPages from "./pages/setup/AuthPages.svelte";
     import AppHomePages from "./pages/setup/AppHomePages.svelte";
     import {Route, Router} from "svelte-routing";
+    import AgToasts from "./components/toasts/AgToasts.svelte";
+
+    // onMount(() => {
+    //     ServiceFactory.INSTANCE.toastService.success("test", 'test', new Date().toLocaleString(), 60 * 5 * 1000);
+    //     ServiceFactory.INSTANCE.toastService.dialog("test", {
+    //         accept: () => alert("test"),
+    //         reject: () => alert("reject")
+    //     }, 60 * 5 * 1000);
+    // });
 </script>
 
 <svelte:head>
     <link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/all.css"/>
 </svelte:head>
-<svelte:window on:pushstate={() => console.log(window.location)}/>
 <Theme persist persistKey="__carbon-theme"/>
 <Router>
     <Route path="/:lang" let:params>
@@ -25,7 +33,7 @@
     <Route path="/app/*">
         <Router>
             <AppHomePages/>
-            <Route path="settings/:tab" let:params>
+            <Route path="settings/:tab/*subTab" let:params>
                 <Settings props={params}/>
             </Route>
         </Router>
@@ -34,7 +42,7 @@
         <NotfoundPage/>
     </Route>
 </Router>
-<SvelteToast options={{ pausable: true }}/>
+<AgToasts/>
 <PopoverGlobal/>
 
 <style>

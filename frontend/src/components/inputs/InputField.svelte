@@ -1,12 +1,13 @@
 <script lang="ts">
 
-    import {onMount} from "svelte";
+    import {createEventDispatcher, onMount} from "svelte";
     import Icon from "@iconify/svelte";
     import {l10n} from "../../resources/localization/l10n";
     import Indicator from "../indicator/Indicator.svelte";
     import {getPasswordDifficult} from "./utils";
 
     export let value: string = '';
+    export let name: string | undefined = undefined;
     export let type: 'text' | 'password' | 'email' | 'number' | 'url' = 'text';
     export let label: string | undefined = undefined;
     export let placeholderText: string = ' ';
@@ -35,7 +36,7 @@
         inputEl.type = type;
         inputEl.required = required;
         if (disableAutocomplete) {
-            inputEl.removeAttribute('autocomplete');
+            inputEl.autocomplete = 'off';
         } else {
             inputEl.autocomplete = autocomplete ?? 'on';
             if (type === 'password' && newPass)
@@ -57,11 +58,15 @@
 
     let unfocused: boolean;
 
+    const dispatch = createEventDispatcher();
+
     $: patternError = (value && validate) ? !pattern?.test(value) ?? false : patternError;
     $: error = requiredError || patternError
     $: {
         if (type === 'password' && inputEl) inputEl.type = showPassword ? 'text' : 'password';
     }
+
+    $: dispatch('error', error);
 
     $: showPasDiff = showPasswordDifficult && !unfocused && type === 'password' && newPass && value.length > 3;
 </script>
@@ -76,6 +81,7 @@
            bind:value
            on:focusout={isRequired}
            on:focusin={() => unfocused = false}
+           {name}
            id={inputId}
            class="input_field"
            placeholder={placeholderText}/>
@@ -166,6 +172,7 @@
 
   .error-container {
     width: var(--custom-width);
+    margin-top: .25rem;
     display: flex;
     justify-content: start;
   }

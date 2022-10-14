@@ -73,6 +73,7 @@
                 <div class="input_box">
                     <InputField bind:value={login.login}
                                 placeholderText="Username/Email"
+                                autocomplete="username"
                                 label={l10n.login}
                                 forceError={error}
                                 --custom-height="45px"

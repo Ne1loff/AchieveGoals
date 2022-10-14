@@ -4,7 +4,7 @@ import type Goal from "../models/Goal";
 import {HomeUrl} from "../../resources/basicFilter.config";
 import type UserSettings from "../models/UserSettings";
 
-const USER = writable<User>(undefined);
+const USER = writable<User>();
 const GOALS = writable<Goal[]>([]);
 const ACTIVE_HOME_PAGE = writable<HomeUrl>(HomeUrl.GOALS);
 const USER_SETTINGS = writable<UserSettings>(undefined);

@@ -13,14 +13,42 @@
     import type {onSettingsChange} from "../utils";
     import Text from "../../text/Text.svelte";
     import {isTypeOf} from "../../../utils/objects";
+    import {FileUploaderButton} from "carbon-components-svelte";
+    import {SettingsSubUrl, SettingsUrl} from "../../../resources/basicFilter.config";
+    import {hrefs} from "../../../resources/config";
 
     export let wasChange: boolean;
     export let onChange: onSettingsChange;
 
 
-    const save = () => $USER = userCopy;
-    const cancel = () => userCopy = $USER?.clone();
+    const save = () => $USER = userCopy ?? $USER;
+    const cancel = () => {
+        userCopy = $USER?.clone();
+        showNewAvatar = false;
+        newAvatarSrc = undefined;
+    };
 
+    let showNewAvatar: boolean = false;
+    let newAvatarSrc: string | undefined;
+    const onAvatarChange = (event: CustomEvent) => {
+        const [file]: File = event.detail;
+
+        if (file) {
+            showNewAvatar = true;
+
+            const reader = new FileReader();
+            reader.addEventListener("load", function () {
+                if (typeof reader.result === "string") {
+                    newAvatarSrc = reader.result;
+
+                }
+            });
+            reader.readAsDataURL(file);
+
+            return;
+        }
+        showNewAvatar = false;
+    }
 
     let userCopy: User | undefined;
 
@@ -37,9 +65,13 @@
         onChange.reject = cancel;
     });
 
-    $:wasChange = userCopy ? $USER?.username !== userCopy?.username : false;
+    $:wasChange = (
+        $USER?.username !== userCopy?.username ||
+        !!newAvatarSrc
+    ) ?? false;
 </script>
 
+<!-- TODO: Try to add drag&drop for upload avatar -->
 <SettingsAbstractTab --ag-bnt-border-radius=".5rem">
     <SettingsInfoBlock>
         <div class="account-info">
@@ -47,14 +79,20 @@
             <div class="avatar">
                 <div class="picture">
                     <Avatar size="big"
-                            src={userCopy?.avatar} alt="Profile picture"/>
+                            src={showNewAvatar ? newAvatarSrc : userCopy?.avatar} alt="Profile picture"/>
                 </div>
                 <div class="picture-actions">
                     <div class="void">
                         &nbsp;
                     </div>
                     <div class="buttons spacing-small">
-                        <Button size="small" kind="secondary">Поменять фото</Button>
+                        <FileUploaderButton
+                                accept="image/*"
+                                kind="secondary"
+                                labelText="Поменять фото"
+                                disableLabelChanges
+                                on:change={onAvatarChange}
+                        />
                         <Button size="small" kind="danger-tertiary">Удалить фото</Button>
                     </div>
                     <div class="photo-size-info spacing-small">
@@ -91,13 +129,17 @@
                 </Text>
             </div>
             <div class="action" class:spacing-small={true}>
-                <Button size="small" kind="secondary">Изменить Email</Button>
+                <Button size="small" kind="secondary"
+                        href={`${hrefs.settings(SettingsUrl.ACCOUNT)}/${SettingsSubUrl.EMAIL}`}>Изменить Email
+                </Button>
             </div>
         </div>
         <div class="account-info">
             <h4>Пароль</h4>
             <div class="spacing-small">
-                <Button size="small" kind="secondary">Изменить пароль</Button>
+                <Button size="small" kind="secondary"
+                        href={`${hrefs.settings(SettingsUrl.ACCOUNT)}/${SettingsSubUrl.PASSWORD}`}>Изменить пароль
+                </Button>
             </div>
         </div>
     </SettingsInfoBlock>

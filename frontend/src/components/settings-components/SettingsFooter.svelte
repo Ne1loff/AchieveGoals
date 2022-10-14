@@ -9,8 +9,14 @@
 <footer class="settings-footer"
         style:--ag-bnt-margin=".75rem 0 0 10px"
 >
-    <Button size="small" kind="secondary" on:click={onChange.reject}>Отмена</Button>
-    <Button size="small" kind="danger" on:click={onChange.accept}>Изменить</Button>
+    <Button size="small" kind="secondary"
+            disabled={onChange.disableRejectBtn} on:click={onChange.reject}
+    >Отмена
+    </Button>
+    <Button size="small" kind="danger"
+            disabled={onChange.disableAcceptBtn} on:click={onChange.accept}
+    >Изменить
+    </Button>
 </footer>
 
 <style>

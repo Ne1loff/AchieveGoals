@@ -6,7 +6,7 @@
     import {hrefs} from "../resources/config";
 
     onMount(() => {
-        navigate(hrefs.home);
+        //navigate(hrefs.home);
     });
 </script>
 
