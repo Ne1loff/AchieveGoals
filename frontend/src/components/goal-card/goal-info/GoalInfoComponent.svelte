@@ -1,16 +1,19 @@
 <script lang="ts">
-    import ModalWindow from "../modals/ModalWindow.svelte";
-    import ProjectTaskHolder from "../home-components/ProjectTaskHolder.svelte";
+    import ModalWindow from "../../modals/ModalWindow.svelte";
     import {links, navigate} from "svelte-routing";
     import {Breadcrumb, BreadcrumbItem, OverflowMenu, OverflowMenuItem} from "carbon-components-svelte";
-    import {hrefs} from "../../resources/config";
+    import {hrefs} from "../../../resources/config";
     import {onMount} from "svelte";
-    import Goal, {Parent} from "../../data/models/Goal";
-    import {GOALS} from "../../data/storage/storage";
-    import ServiceFactory from "../../services/ServiceFactory";
-    import GoalEditorComponent from "./GoalEditorComponent.svelte";
-    import AppHeadTitle from "../AppHeadTitle.svelte";
-    import {getProjectPath} from "../../utils/location-utils";
+    import Goal, {Parent} from "../../../data/models/Goal";
+    import {GOALS} from "../../../data/storage/storage";
+    import ServiceFactory from "../../../services/ServiceFactory";
+    import AppHeadTitle from "../../AppHeadTitle.svelte";
+    import {getProjectPath} from "../../../utils/location-utils";
+    import GoalInfoHolder from "./GoalInfoHolder.svelte";
+    import SubtaskHolder from "./SubtaskHolder.svelte";
+    import GoalInfoSidePanel from "./side-panel/GoalInfoSidePanel.svelte";
+    import Button from "../../button/Button.svelte";
+    import Icon from "@iconify/svelte";
 
     export let props: { id: string };
 
@@ -42,6 +45,7 @@
         }
 
         const getChildren = () => {
+            if (!goal) return;
             return goals.filter((it) => it.gid === goal.id);
         }
 
@@ -72,12 +76,15 @@
 
 <AppHeadTitle text={goal?.title ?? ''}/>
 <ModalWindow on:close={navigateToHome} styleClasses={['goal-info', 'elevation-8']}
+             showFooter={false}
+             hideCloseBtn
              --menu-container-hr-margin="0 -.75rem"
              --own-modal-max-height="100vh"
              --own-modal-min-height="56rem"
+             --own-modal-padding="2rem"
              --own-overlay-bg="#131313bf"
 >
-    <div slot="header" use:links>
+    <div class="modal-header-content" slot="header" use:links let:close>
         {#if componentIsReady}
             <!--TODO: Написать свою реализацию Breadcrumb-->
             <Breadcrumb noTrailingSlash>
@@ -98,52 +105,64 @@
         {:else}
             <Breadcrumb noTrailingSlash skeleton count={2}/>
         {/if}
+        <Button kind="ghost"
+                size="small"
+                --ag-bnt-border-radius=".5rem"
+                --ag-bnt-padding="0"
+                on:click={close}>
+            <Icon icon="carbon:close" width="28"/>
+        </Button>
     </div>
-    <svelte:fragment slot="title">
+    <svelte:fragment slot="content">
         <div class="content">
             <div class="main-content">
-                <GoalEditorComponent {goal}/>
-                <ProjectTaskHolder goals={children}
-                                   withoutHeader
-                                   collapsible
-                                   goalProps={{withoutSubs: true}}
-                                   goalStyle={[
-                                 "--own-component-border-width: calc(100% + 8px);",
-                                 "--own-component-border-margin : 0 -38px 0 0;"
-                                 ]}
-                                   --holder-padding-right="38px"
-                                   --holder-padding-left="0"
-                />
+                <GoalInfoHolder bind:goal />
+                <SubtaskHolder goals={children} hideGoalCreator={parents.length === 4}/>
             </div>
             <div class="side-panel">
-
+                <GoalInfoSidePanel bind:goal />
             </div>
         </div>
     </svelte:fragment>
 </ModalWindow>
 
-<style>
+<style lang="scss">
 
-    :global(.goal-info) {
-        width: 54rem;
-        padding: .75rem;
+  :global(.goal-info) {
+    width: 54rem;
+    border-radius: 16px;
+    background-color: var(--cds-field);
+  }
 
-        border: 1px solid var(--cds-border-subtle);
-        border-radius: 16px;
+  .modal-header-content {
+    width: 100%;
+    height: 3rem;
+    margin-bottom: -.5rem;
 
-        background-color: var(--cds-field);
-    }
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 
-    .content {
-        display: flex;
-    }
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
 
-    .main-content {
-        flex-grow: 1;
-    }
+  .content {
+    display: flex;
+    height: 100%;
+  }
 
-    .side-panel {
-        width: 15rem;
-    }
+  .main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: .5rem .5rem .5rem 1.25rem;
+    gap: 1rem;
+  }
+
+  .side-panel {
+    width: 15rem;
+  }
 
 </style>

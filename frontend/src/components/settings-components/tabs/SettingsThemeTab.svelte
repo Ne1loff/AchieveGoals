@@ -3,8 +3,7 @@
     import SettingsAbstractTab from "./SettingsAbstractTab.svelte";
     import SettingsInfoBlock from "./SettingsInfoBlock.svelte";
     import {setLanguage} from "../../../resources/localization/l10n";
-    import ThemeSelect from "../../ThemeSelect.svelte";
-
+    import ThemesPreview from "../../theme/ThemesPreview.svelte";
 
     const changeLanguage = (value: CustomEvent) => {
         setLanguage(value.detail);
@@ -16,11 +15,15 @@
     <SettingsInfoBlock>
         <div class="general-info">
             <h4>Тема</h4>
-            <ThemeSelect/>
+            <ThemesPreview/>
         </div>
     </SettingsInfoBlock>
 </SettingsAbstractTab>
 
-<style>
+<style lang="scss">
+
+    h4 {
+      margin-bottom: .5rem;
+    }
 
 </style>

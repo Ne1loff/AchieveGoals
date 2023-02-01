@@ -73,7 +73,7 @@
     }
 
     .menu-btn--burger::after {
-        transform: translateY(calc(var(--own-menu-btn-size) * .25));
+        transform: translateY(calc(var(--own-menu-btn-size) * .25 * 1));
     }
 
     .menu-btn.open .menu-btn--burger {

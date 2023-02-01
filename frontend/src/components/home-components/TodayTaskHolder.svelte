@@ -8,7 +8,7 @@
     import {getDateTodayLastMin} from "../../utils/time-utils";
     import dayjs from "dayjs";
     import {GOALS} from "../../data/storage/storage";
-    import TodayCollapsibleTaskHolder from "./TodayCollapsibleTaskHolder.svelte";
+    import OverdueTaskHolder from "./OverdueTaskHolder.svelte";
     import Button from "../button/Button.svelte";
 
 
@@ -45,7 +45,7 @@
     </svelte:fragment>
     <svelte:fragment>
         <div class="section">
-            <TodayCollapsibleTaskHolder goals={overdueTasks}/>
+            <OverdueTaskHolder goals={overdueTasks}/>
         </div>
         <div class="section">
             {#each tasksForToday as goal}

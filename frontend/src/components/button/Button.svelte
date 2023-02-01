@@ -6,6 +6,7 @@
 <div class="ag">
     {#if $$slots.default}
         <Button {...$$props}
+                class="ag-btn"
                 on:click
                 on:mouseover
                 on:mouseenter
@@ -15,6 +16,7 @@
         </Button>
     {:else}
         <Button {...$$props}
+                class="ag-btn"
                 on:click
                 on:mouseover
                 on:mouseenter

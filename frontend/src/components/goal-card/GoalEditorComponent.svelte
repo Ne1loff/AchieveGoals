@@ -19,10 +19,10 @@
     const priorities = PRIORITIES;
 
     export let goal: Goal;
-    export let indent: 1 | 2 | 3 | 4 | 5 = 1;
+    export let indent: 0 | 1 | 2 | 3 | 4 | 5 = 0;
     export let saveButtonTitle: string = 'Сохранить';
 
-    let goalCopy: Goal;
+    let goalCopy: Goal | undefined;
     let goalStorage: Writable<Goal>;
     let priorityStorage: Writable<Priority>;
 
@@ -31,13 +31,15 @@
 
         goalStorage = writable(goalCopy);
         goalStorage.subscribe((g) => {
-            goalCopy.deadline = g.deadline;
+            if (goalCopy) goalCopy.deadline = g.deadline;
         });
 
         if (!priorityStorage) priorityStorage = writable(goalCopy.priority);
         else priorityStorage.set(goalCopy.priority);
 
-        priorityStorage.subscribe((p) => goalCopy.priority = p);
+        priorityStorage.subscribe((p) => {
+            if (goalCopy) goalCopy.priority = p;
+        });
     }
 
     const reset = () => {
@@ -50,6 +52,8 @@
         done();
     }
     const save = () => {
+        if (!goalCopy) return;
+
         goal = goalCopy;
         dispatch('save');
         done();
@@ -62,13 +66,13 @@
     }
 
     let saveBtnDisable: boolean;
-    $: saveBtnDisable = !(goalCopy?.title.length > 0 && !isNaN(goalCopy?.deadline.valueOf())) ?? true;
+    $: saveBtnDisable = !(goalCopy?.title.length > 0 && !isNaN(<number>goalCopy?.deadline.valueOf())) ?? true;
 
     onDestroy(() => dispatch('destroy'));
 
 </script>
 
-<div class="goal-editor" data-item-indent={indent > 5 || indent < 1 ? 1 : indent}>
+<div class="goal-editor" data-item-indent={indent > 5 || indent < 0 ? 0 : indent}>
     {#if goalCopy}
         <div class="set-goal-window-main">
             <div class="set-goal-window-main-inner">
@@ -136,6 +140,11 @@
 
     .goal-editor {
         margin: .5rem .875rem;
+    }
+
+    .goal-editor[data-item-indent="0"] {
+        width: 100%;
+        margin-left: 0;
     }
 
     .goal-editor[data-item-indent="1"] {
@@ -262,6 +271,10 @@
 
     .calendar_button_span {
         margin: 0 8px;
+    }
+
+    :global(.bx--btn-set) {
+        gap: .25rem;
     }
 
     :global(.bx--btn-set .bx--btn) {

@@ -5,8 +5,8 @@
     import Button from "../button/Button.svelte";
     import {getClasses} from "../utils";
 
-    export let style: string | { [key: string]: any } = undefined;
-    export let styleClasses: string | string[] = undefined;
+    export let style: string | { [key: string]: any };
+    export let styleClasses: string | string[];
     export let useOverlay: boolean = true;
     export let hideCloseBtn: boolean = false;
     export let useViaSidebar: boolean = false;
@@ -40,9 +40,7 @@
         <div class="modal-container">
             <header class="modal-header">
                 {#if $$slots.header}
-                    <div class="modal-header-content">
-                        <slot name="header"></slot>
-                    </div>
+                    <slot name="header" {close}/>
                 {/if}
                 {#if !hideCloseBtn}
                     <Button kind="ghost"
@@ -77,6 +75,7 @@
 <style>
 
     :root {
+        --own-modal-padding: 0;
         --own-modal-min-height: 0px;
         --own-modal-max-height: 0px;
         --own-modal-container-padding: 0;
@@ -89,7 +88,7 @@
     }
 
     .modal-content {
-        height: calc(100% - 56px - 8px - 1px);
+        flex-grow: 1;
     }
 
     .modal-header {
@@ -111,12 +110,11 @@
 
     .modal-container {
         flex-grow: 1;
+        display: flex;
+        flex-direction: column;
 
         padding: var(--own-modal-container-padding);
         margin: var(--own-modal-container-margin);
-
-
-        height: 100%;
     }
 
     .modal-header {
@@ -125,16 +123,14 @@
         align-items: center;
     }
 
-    .modal-close-btn:hover {
-        background-color: var(--cds-button-secondary-hover);
-    }
-
     .modal {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
+
+        padding: var(--own-modal-padding);
 
         display: flex;
         align-items: center;
@@ -146,7 +142,7 @@
         max-height: var(--own-modal-max-height);
         min-height: var(--own-modal-min-height);
 
-        height: var(--own-modal-max-height);
+        height: 100%;
 
         z-index: 1000;
     }

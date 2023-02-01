@@ -1,44 +1,16 @@
 <script lang="ts">
-
-    import Goal from "../../data/models/Goal";
-    import GoalEditorComponent from "./GoalEditorComponent.svelte";
+    import AbstractTaskCreator from "./AbstractTaskCreator.svelte";
     import Icon from "@iconify/svelte";
-    import {onMount} from "svelte";
-    import GoalService from "../../services/GoalService";
-    import ServiceFactory from "../../services/ServiceFactory";
+    import Goal from "../../data/models/Goal";
 
     export let taskStorage: Goal[];
-    export let title: string = "Добавить цель";
 
-    let goalService: GoalService;
-
-    let newTask: Goal | undefined = undefined;
-
-    const create = () => newTask = new Goal();
-    const cancel = () => newTask = undefined;
-
-    const save = () => {
-        if (!newTask) return;
-
-        const uniqIds = new Set(taskStorage.map(it => it.gid));
-        if (uniqIds.size === 1) newTask.gid = [...uniqIds][0];
-
-        goalService.createGoal(newTask)
-            .then((_) => {
-                create();
-            });
-    }
-
-    onMount(() => {
-        goalService = ServiceFactory.INSTANCE.goalService;
-    })
-
+    const title: string = "Добавить цель";
 </script>
 
-<div class:task-creator={true}>
-    {#if newTask}
-        <GoalEditorComponent bind:goal={newTask} on:save={save} on:cancel={cancel}/>
-    {:else}
+
+<AbstractTaskCreator {taskStorage}>
+    <svelte:fragment slot="create-button" let:create>
         <button class:creator-button={true} tabindex="1"
                 on:click={create}>
             <span class="button-icon">
@@ -46,54 +18,49 @@
             </span>
             <span class="button-title">{title}</span>
         </button>
-    {/if}
-</div>
+    </svelte:fragment>
+</AbstractTaskCreator>
 
-<style>
+<style lang="scss">
 
-    .task-creator {
-        margin-top: 2px;
-        z-index: 1;
-    }
+  .creator-button {
+    margin-left: 1.5rem;
+    padding-left: .5rem;
 
-    .creator-button {
-        margin-left: 1.5rem;
-        padding-left: .5rem;
+    width: calc(100% - 1.5rem);
+    height: 2rem;
 
-        width: calc(100% - 1.5rem);
-        height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
+    background: inherit;
+    color: var(--cds-text-placeholder);
+    border: none;
+    border-radius: 5px;
+  }
 
-        background: inherit;
-        color: var(--cds-text-placeholder);
-        border: none;
-        border-radius: 5px;
-    }
+  .creator-button:focus-visible {
+    outline: var(--cds-focus) solid 1px;
+    background-color: var(--cds-hover-ui);
+  }
 
-    .creator-button:focus-visible {
-        outline: var(--cds-focus) solid 1px;
-        background-color: var(--cds-hover-ui);
-    }
+  .creator-button:hover .button-icon {
+    background-color: var(--cds-danger);
+    color: white;
+  }
 
-    .creator-button:hover .button-icon {
-        background-color: var(--cds-danger);
-        color: white;
-    }
+  .creator-button:hover .button-title {
+    color: var(--cds-text-error);
+  }
 
-    .creator-button:hover .button-title {
-        color: var(--cds-text-error);
-    }
-
-    .button-icon {
-        margin-right: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        color: var(--cds-danger);
-    }
+  .button-icon {
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--cds-danger);
+  }
 
 </style>

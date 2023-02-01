@@ -11,6 +11,7 @@
     export let goals: Goal[] = [];
     export let goalProps: { [key: string]: any } = {};
     export let goalStyle: string[] = [];
+    export let hideGoalCreator: boolean = false;
 
     let showCompleted: boolean = false;
 
@@ -45,7 +46,9 @@
         {#each goals.filter(it => !it.isDone) as goal (goal.id)}
             <GoalComponent bind:goal {...goalProps} style={goalStyle.join('')}/>
         {/each}
-        <GoalCreator bind:taskStorage={goals}/>
+        {#if (!hideGoalCreator)}
+            <GoalCreator bind:taskStorage={goals}/>
+        {/if}
         {#if showCompleted}
             {#each goals.filter(it => it.isDone) as goal (goal.id)}
                 <GoalComponent bind:goal {...goalProps} style={goalStyle.join('')}/>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import ProjectTaskHolder from "../../components/home-components/ProjectTaskHolder.svelte";
-    import GoalInfoComponent from "../../components/goal-card/GoalInfoComponent.svelte";
+    import GoalInfoComponent from "../../components/goal-card/goal-info/GoalInfoComponent.svelte";
     import HomePage from "../HomePage.svelte";
     import ValFromParams from "../../components/ValFromParams.svelte";
     import {GOALS} from "../../data/storage/storage";

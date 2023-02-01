@@ -2,13 +2,13 @@
 
     import NotfoundPage from "./pages/NotfoundPage.svelte";
     import WelcomePage from "./pages/WelcomePage.svelte";
-    import {Theme} from "carbon-components-svelte";
     import PopoverGlobal from "./components/popover/global/PopoverGlobal.svelte";
     import Settings from "./components/settings-components/Settings.svelte";
     import AuthPages from "./pages/setup/AuthPages.svelte";
     import AppHomePages from "./pages/setup/AppHomePages.svelte";
     import {Route, Router} from "svelte-routing";
     import AgToasts from "./components/toasts/AgToasts.svelte";
+    import ThemeManager from "./components/theme/ThemeManager.svelte";
 
     // onMount(() => {
     //     ServiceFactory.INSTANCE.toastService.success("test", 'test', new Date().toLocaleString(), 60 * 5 * 1000);
@@ -22,7 +22,7 @@
 <svelte:head>
     <link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/all.css"/>
 </svelte:head>
-<Theme persist persistKey="__carbon-theme"/>
+<ThemeManager/>
 <Router>
     <Route path="/:lang" let:params>
         <WelcomePage/>

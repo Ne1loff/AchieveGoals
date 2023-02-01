@@ -16,6 +16,7 @@
     import HomeMenu from "../components/home-components/HomeMenu.svelte";
     import {popover} from "../components/popover/global/Popover";
     import HomeSideBar from "../components/home-components/sidebar/HomeSideBar.svelte";
+    import ThemeToggle from "../components/theme/ThemeToggle.svelte";
 
     export let params: { tab: string };
 
@@ -104,6 +105,7 @@
             />
         </div>
         <svelte:fragment slot="right">
+            <ThemeToggle/>
             <TopBarMenu dropdownComponent={{src: HomeMenu}}/>
         </svelte:fragment>
     </Navbar>

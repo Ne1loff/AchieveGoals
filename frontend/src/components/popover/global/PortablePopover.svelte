@@ -19,7 +19,7 @@
 
 </script>
 
-<div class="portal" bind:this={target}>
+<div class="portal" bind:this={target} aria-expanded={show}>
     <slot name="target" {toggle}/>
 </div>
 {#if show}
@@ -32,6 +32,12 @@
     </Portal>
 {/if}
 
-<style>
+<style lang="scss">
+
+    .portal {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
 </style>
