@@ -12,8 +12,8 @@ import javax.persistence.*
     value = ["createdAt", "updatedAt"],
     allowGetters = true
 )
-@Table(name = "goal_table")
-data class Goal(
+@Table(name = "task_table")
+data class Task(
 
     @Id
     @SequenceGenerator(
@@ -43,6 +43,9 @@ data class Goal(
 
     var priority: Int,
 
+    @OneToMany(fetch = FetchType.LAZY)
+    var labels: MutableList<TaskLabel>,
+
     @CreatedDate
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -59,7 +62,7 @@ data class Goal(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Goal
+        other as Task
 
         return id == other.id
     }

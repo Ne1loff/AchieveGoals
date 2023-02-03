@@ -17,7 +17,7 @@ export default class GoalService {
     }
 
     async getUserGoals(): Promise<Goal[]> {
-        return this.request.get<GoalDto[]>('api/goals/')
+        return this.request.get<GoalDto[]>('api/tasks/')
             .then((response) => {
 
                 if (!response.data) return [];
@@ -40,7 +40,7 @@ export default class GoalService {
     }
 
     async createGoal(data: Goal): Promise<Goal> {
-        return this.request.post<GoalDto>('api/goals/', data, DataType.JSON)
+        return this.request.post<GoalDto>('api/tasks/', data, DataType.JSON)
             .then((response) => {
 
                 if (!response.data) throw new ApiError();
@@ -56,7 +56,7 @@ export default class GoalService {
     }
 
     async deleteTask(id: number | string) {
-        return this.request.delete<void>(`api/goals/${id}`, undefined, DataType.JSON)
+        return this.request.delete<void>(`api/tasks/${id}`, undefined, DataType.JSON)
             .then(() => GOALS.update((goals) => goals.filter(it => it.id !== id)));
     }
 }

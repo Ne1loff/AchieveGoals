@@ -2,10 +2,11 @@ package com.example.achieve_goals.dto
 
 import java.util.*
 
-data class CreateGoalRequest(
-    val id: Long?,
+data class TaskDTO(
 
-    val title: String,
+    val id: Long,
+
+    val title: String?,
 
     val description: String?,
 
@@ -13,11 +14,15 @@ data class CreateGoalRequest(
 
     val gid: Long?,
 
-    val priority: Int,
+    val root: Long,
+
+    val priority: Int?,
+
+    val labels: List<Long>,
 
     val createdAt: Date?,
 
     val updatedAt: Date?,
 
-    val deadline: Date
+    val deadline: Date?
 )

@@ -1,28 +1,25 @@
 package com.example.achieve_goals.entities
 
 import org.hibernate.Hibernate
-import java.util.*
-import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "country")
-data class Locality(
-
+@Table(name = "task_label_table")
+data class TaskLabel(
     @Id
+    @GeneratedValue
     val id: Long,
-
-    val name: String,
-
-    @Column(name = "crt_date")
-    val createData: Date
+    val uid: Long,
+    var name: String
 ) {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Locality
+        other as TaskLabel
 
         return id == other.id
     }
@@ -31,6 +28,7 @@ data class Locality(
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , name = $name , create_data = $createData )"
+        return this::class.simpleName + "(id = $id , uid = $uid , name = $name )"
     }
+
 }
