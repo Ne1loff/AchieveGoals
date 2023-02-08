@@ -28,7 +28,6 @@
     let showPassword: boolean;
     let passNotMatch;
     $: passNotMatch = !isEqualsStrings(newPassword, confirmedPassword);
-    $: console.log(passNotMatch);
 
     const save = () => $USER = userCopy ?? $USER;
     const cancel = () => {

@@ -20,8 +20,6 @@
 
     let wasChange: boolean = false;
 
-    $:console.log(props);
-
     const navigateToHome = () => navigate(getProjectPath());
     let onChange: onSettingsChange = {
         accept: () => {}, reject: () => {},

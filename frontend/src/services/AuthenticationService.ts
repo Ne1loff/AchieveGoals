@@ -4,7 +4,7 @@ import type Registration from "../data/models/Registration";
 import type UserService from "./UserService";
 import {DataType} from "../data/enums/_enums";
 
-export default class SignUIOService {
+export default class AuthenticationService {
     private request: Request;
     private userService: UserService;
 

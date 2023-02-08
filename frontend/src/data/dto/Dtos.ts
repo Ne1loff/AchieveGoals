@@ -1,10 +1,11 @@
-class GoalDto {
+class TaskDto {
     id: number = 0;
     title: string = '';
     description: string = '';
     isDone: boolean = false;
     gid?: number;
     priority: number = 0;
+    labels: number[] = [];
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
     deadline: Date = new Date();
@@ -21,4 +22,4 @@ class UserDto {
     avatar: string = '';
 }
 
-export {GoalDto, UserDto};
+export {TaskDto, UserDto};

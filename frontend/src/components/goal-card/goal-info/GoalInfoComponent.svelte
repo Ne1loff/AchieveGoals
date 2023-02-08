@@ -4,8 +4,8 @@
     import {Breadcrumb, BreadcrumbItem, OverflowMenu, OverflowMenuItem} from "carbon-components-svelte";
     import {hrefs} from "../../../resources/config";
     import {onMount} from "svelte";
-    import Goal, {Parent} from "../../../data/models/Goal";
-    import {GOALS} from "../../../data/storage/storage";
+    import Task, {Parent} from "../../../data/models/Task";
+    import {TASKS} from "../../../data/storage/storage";
     import ServiceFactory from "../../../services/ServiceFactory";
     import AppHeadTitle from "../../AppHeadTitle.svelte";
     import {getProjectPath} from "../../../utils/location-utils";
@@ -18,15 +18,15 @@
     export let props: { id: string };
 
     let parents: { id: number | string, title: string }[] = [];
-    let children: Goal[] = [];
-    let goal: Goal | undefined = undefined;
+    let children: Task[] = [];
+    let goal: Task | undefined;
 
     const navigateToHome = () => navigate(getProjectPath());
 
     let componentIsReady: boolean = false;
 
     const loadGoalAndParents = (): boolean => {
-        const goals = $GOALS;
+        const goals = $TASKS;
         goal = goals.find((it) => it.id === Number(props.id));
 
         let ok: boolean = false;
@@ -35,7 +35,7 @@
             ok = true;
             const parent = goals.find((it) => it.id === gid);
 
-            if (parent === undefined) {
+            if (!parent) {
                 return [];
             } else if (parent.gid) {
                 return [...getParents(parent.gid), {id: parent.id, title: parent.title}];
@@ -45,7 +45,7 @@
         }
 
         const getChildren = () => {
-            if (!goal) return;
+            if (!goal) return [];
             return goals.filter((it) => it.gid === goal.id);
         }
 
@@ -55,7 +55,7 @@
     }
 
     const loadData = (_: {}) => {
-        ServiceFactory.INSTANCE.goalService.getUserGoals()
+        ServiceFactory.INSTANCE.taskService.getUserGoals()
             .then(() => {
                 componentIsReady = loadGoalAndParents();
                 if (!componentIsReady) {
@@ -86,7 +86,7 @@
 >
     <div class="modal-header-content" slot="header" use:links let:close>
         {#if componentIsReady}
-            <!--TODO: Написать свою реализацию Breadcrumb-->
+            <!-- TODO: Написать свою реализацию Breadcrumb-->
             <Breadcrumb noTrailingSlash>
                 <BreadcrumbItem href={hrefs.home}>Goals</BreadcrumbItem>
                 {#if parents.length > 0}
@@ -120,7 +120,7 @@
                 <SubtaskHolder goals={children} hideGoalCreator={parents.length === 4}/>
             </div>
             <div class="side-panel">
-                <GoalInfoSidePanel bind:goal />
+                <GoalInfoSidePanel bind:task={goal}/>
             </div>
         </div>
     </svelte:fragment>

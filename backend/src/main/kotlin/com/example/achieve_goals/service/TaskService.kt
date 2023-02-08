@@ -125,20 +125,22 @@ class TaskService(
             tasks.add(goal)
         }
 
+        taskRepository.saveAll(tasks)
         return tasks.map(mapper::toDto).toMutableList()
     }
 
     @Transactional
-    fun deleteGoalById(id: Long, userId: Long) {
+    fun deleteGoalById(id: Long, userId: Long): Long {
         if (taskRepository.existsTaskByIdAndUid(id, userId))
             taskRepository.deleteById(id)
         else
             throw GoalNotFoundException()
 
+        return id
     }
 
     @Transactional
-    fun deleteGoal(ids: List<Long>, userId: Long) {
+    fun deleteGoals(ids: List<Long>, userId: Long): List<Long> {
 
         for (id in ids) {
             if (taskRepository.existsTaskByIdAndUid(id, userId))
@@ -147,6 +149,7 @@ class TaskService(
                 throw GoalNotFoundException()
         }
 
+        return ids;
     }
 
 }

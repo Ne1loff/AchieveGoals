@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import {Button, ButtonSet} from "carbon-components-svelte";
-    import Goal, {Priority} from "../../data/models/Goal";
+    import Task, {Priority} from "../../data/models/Task";
     import Icon from "@iconify/svelte";
     import TextArea from "../inputs/TextArea.svelte";
     import dayjs from "dayjs";
@@ -18,12 +18,12 @@
 
     const priorities = PRIORITIES;
 
-    export let goal: Goal;
+    export let goal: Task;
     export let indent: 0 | 1 | 2 | 3 | 4 | 5 = 0;
     export let saveButtonTitle: string = 'Сохранить';
 
-    let goalCopy: Goal | undefined;
-    let goalStorage: Writable<Goal>;
+    let goalCopy: Task | undefined;
+    let goalStorage: Writable<Task>;
     let priorityStorage: Writable<Priority>;
 
     const setupStorages = () => {

@@ -43,26 +43,20 @@ class TaskController(
     }
 
     @PutMapping
-    fun updateGoal(@RequestBody goalsDTO: List<TaskDTO>, auth: Authentication): ResponseEntity<HttpStatus> {
+    fun updateGoal(@RequestBody goalsDTO: List<TaskDTO>, auth: Authentication): ResponseEntity<Collection<TaskDTO>> {
         val user = auth.getUserEntity()
-        taskService.updateGoal(goalsDTO, user.id)
-
-        return ResponseEntity.accepted().build()
+        return ResponseEntity.ok(taskService.updateGoal(goalsDTO, user.id))
     }
 
     @DeleteMapping("{id}")
-    fun deleteTaskById(@PathVariable id: Long, auth: Authentication): ResponseEntity<HttpStatus> {
+    fun deleteTaskById(@PathVariable id: Long, auth: Authentication): ResponseEntity<Long> {
         val user = auth.getUserEntity()
-        taskService.deleteGoalById(id, user.id)
-
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok(taskService.deleteGoalById(id, user.id))
     }
 
     @DeleteMapping
-    fun deleteGoal(@RequestBody ids: List<Long>, auth: Authentication): ResponseEntity<HttpStatus> {
+    fun deleteGoal(@RequestBody ids: List<Long>, auth: Authentication): ResponseEntity<Collection<Long>> {
         val user = auth.getUserEntity()
-        taskService.deleteGoal(ids, user.id)
-
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok(taskService.deleteGoals(ids, user.id))
     }
 }

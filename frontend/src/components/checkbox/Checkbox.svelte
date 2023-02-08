@@ -158,7 +158,7 @@
         bind:this={self}
         class="checkbox {$$props.class}"
         class:-changeBg={changeBg}
-        class:-checked={checked || !canChange}
+        class:-checked={checked}
         style="width: {size};height: {size};">
     <input id={labelId} type="checkbox" {name}
            on:focusin

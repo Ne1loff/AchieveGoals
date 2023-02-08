@@ -1,8 +1,7 @@
-<script>
+<script lang="ts">
 
-    export let params;
-    export let value;
+    export let params: any;
+    export let value: any;
 
     $:value = params;
-
 </script>

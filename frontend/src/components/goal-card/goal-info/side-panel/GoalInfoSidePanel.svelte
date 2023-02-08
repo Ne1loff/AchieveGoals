@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import SidePanelCell from "./SidePanelCell.svelte";
-    import Goal from "../../../../data/models/Goal";
+    import Task from "../../../../data/models/Task";
     import InlineCalendar from "../../../date-picker/InlineCalendar.svelte";
     import Icon from "@iconify/svelte";
     import {getColorFromDayDiff} from "../../utils";
@@ -12,21 +12,22 @@
     import PriorityMenu from "../../PriorityMenu.svelte";
     import Tag from "../../../tag/Tag.svelte";
     import {hrefs} from "../../../../resources/config";
+    import type TaskLabel from "../../../../data/models/TaskLabel.ts";
+    import LabelSelector from "../../../label/LabelSelector.svelte";
 
     const priorities = PRIORITIES;
 
-    export let goal: Goal;
+    export let task: Task;
 
-    let labels: { id: number, name: string }[] = [
-        {id: 321, name: "Backend"},
-        {id: 312, name: "Frontend"},
-        {id: 132, name: "UI"},
-        {id: 123, name: "Unity"}
-    ];
+    $: {
+        if (task) labels = task.labels;
+    }
+
+    let labels: TaskLabel[] = [];
     const removeLabel = (id: number) => {
         labels = labels.filter(it => it.id !== id);
+        task.labels = labels;
     };
-
 
 </script>
 
@@ -35,14 +36,14 @@
         <SidePanelCell title="Проект">
             <svelte:fragment slot="content">
                 <div class="cell-button">
-                    {#if goal}
+                    {#if task}
                         <PortablePopover options={{
                                 stopPropagation: true,
                                 classStyle: 'elevation-6'
                             }}>
                             <ActionButton slot="target" let:toggle on:click={toggle} disabled>
                                 <div class="cell-details"
-                                     style="color: {getColorFromDayDiff(goal.deadline)}">
+                                     style="color: {getColorFromDayDiff(task.deadline)}">
                                     <div class="info-tags-icon">
                                         <Icon class="action-icons" icon="carbon:circle-solid"
                                               width="16" height="16"/>
@@ -56,7 +57,7 @@
                                     </div>
                                 </div>
                             </ActionButton>
-                            <InlineCalendar slot="content" goalId={goal.id} withTime/>
+                            <InlineCalendar slot="content" goalId={task.id} withTime/>
                         </PortablePopover>
                     {:else}
                         <ActionButton skeleton/>
@@ -67,20 +68,20 @@
         <SidePanelCell title="Срок выполнения">
             <svelte:fragment slot="content">
                 <div class="cell-button">
-                    {#if goal}
+                    {#if task}
                         <PortablePopover options={{
                                 stopPropagation: true,
                                 classStyle: 'elevation-6'
                             }}>
                             <ActionButton slot="target" let:toggle on:click={toggle}>
                                 <div class="cell-details"
-                                     style="color: {getColorFromDayDiff(goal.deadline)}">
+                                     style="color: {getColorFromDayDiff(task.deadline)}">
                                     <div class="info-tags-icon">
                                         <Icon class="action-icons" icon="carbon:calendar"
                                               width="20" height="20"/>
                                     </div>
                                     <div class="info-tags-text">
-                                        {dayjs(goal.deadline).format('DD MMM YY')}
+                                        {dayjs(task.deadline).format('DD MMM YY')}
                                     </div>
                                     <div class="info-tags-icon">
                                         <Icon icon="carbon:chevron-down" width="24" height="24"
@@ -88,7 +89,7 @@
                                     </div>
                                 </div>
                             </ActionButton>
-                            <InlineCalendar slot="content" goalId={goal.id} withTime/>
+                            <InlineCalendar slot="content" goalId={task.id} withTime/>
                         </PortablePopover>
                     {:else}
                         <ActionButton skeleton/>
@@ -99,20 +100,20 @@
         <SidePanelCell title="Приоритет">
             <svelte:fragment slot="content">
                 <div class="cell-button">
-                    {#if goal}
+                    {#if task}
                         <PortablePopover options={{
                                 stopPropagation: true,
                                 classStyle: 'elevation-6'
                             }}>
                             <ActionButton slot="target" let:toggle on:click={toggle}>
                                 <div class="cell-details"
-                                     style="color: {getColorFromDayDiff(goal.deadline)}">
+                                     style="color: {getColorFromDayDiff(task.deadline)}">
                                     <div class="info-tags-icon">
-                                        <Icon icon={priorities[goal.priority - 1].icon}
-                                              width="20px" color={priorities[goal.priority - 1].color}/>
+                                        <Icon icon={priorities[task.priority - 1].icon}
+                                              width="20px" color={priorities[task.priority - 1].color}/>
                                     </div>
                                     <div class="info-tags-text">
-                                        P{goal.priority}
+                                        P{task.priority}
                                     </div>
                                     <div class="info-tags-icon">
                                         <Icon icon="carbon:chevron-down" width="24" height="24"
@@ -120,7 +121,7 @@
                                     </div>
                                 </div>
                             </ActionButton>
-                            <PriorityMenu slot="content" bind:selected={goal.priority}/>
+                            <PriorityMenu slot="content" bind:selected={task.priority}/>
                         </PortablePopover>
                     {:else}
                         <ActionButton skeleton/>
@@ -130,14 +131,14 @@
         </SidePanelCell>
         <SidePanelCell clickableLabel --cell-title-padding="0">
             <svelte:fragment slot="title">
-                {#if goal}
+                {#if task}
                     <PortablePopover options={{
                                 stopPropagation: true,
                                 classStyle: 'elevation-6'
                             }}>
-                        <ActionButton slot="target" let:toggle on:click={toggle} disabled>
+                        <ActionButton slot="target" let:toggle on:click={toggle}>
                             <div class="cell-details"
-                                 style="color: {getColorFromDayDiff(goal.deadline)}">
+                                 style="color: {getColorFromDayDiff(task.deadline)}">
                                 <div class="info-tags-text">
                                     Метки
                                 </div>
@@ -147,7 +148,7 @@
                                 </div>
                             </div>
                         </ActionButton>
-                        <PriorityMenu slot="content" bind:selected={goal.priority}/>
+                        <LabelSelector slot="content" bind:task/>
                     </PortablePopover>
                 {:else}
                     <ActionButton skeleton/>
@@ -155,30 +156,34 @@
             </svelte:fragment>
             <svelte:fragment slot="content">
                 <div class="labels-holder">
-                    {#each labels as label}
-                        <!--TODO: -->
-                        <Tag interactive filter
-                             type="blue"
-                             title="Убрать метку"
-                             disabled
-                             href={hrefs.task(label.id)}
-                             on:close={() => removeLabel(label.id)}>
-                            {label.name}
-                        </Tag>
-                    {/each}
+                    {#if task}
+                        {#each labels as label}
+                            <Tag interactive filter
+                                 type="blue"
+                                 title="Убрать метку"
+                                 href={hrefs.task(label.id)}
+                                 on:close={() => removeLabel(label.id)}>
+                                {label.name}
+                            </Tag>
+                        {/each}
+                    {:else}
+                        {#each Array(3) as index}
+                            <Tag skeleton/>
+                        {/each}
+                    {/if}
                 </div>
             </svelte:fragment>
         </SidePanelCell>
         <SidePanelCell clickableLabel --cell-title-padding="0">
             <svelte:fragment slot="title">
-                {#if goal}
+                {#if task}
                     <PortablePopover options={{
                                 stopPropagation: true,
                                 classStyle: 'elevation-6'
                             }}>
                         <ActionButton slot="target" let:toggle on:click={toggle} disabled>
                             <div class="cell-details"
-                                 style="color: {getColorFromDayDiff(goal.deadline)}">
+                                 style="color: {getColorFromDayDiff(task.deadline)}">
                                 <div class="info-tags-text">
                                     Напоминания
                                 </div>
@@ -188,7 +193,7 @@
                                 </div>
                             </div>
                         </ActionButton>
-                        <PriorityMenu slot="content" bind:selected={goal.priority}/>
+                        <PriorityMenu slot="content" bind:selected={task.priority}/>
                     </PortablePopover>
                 {:else}
                     <ActionButton skeleton/>
@@ -218,6 +223,10 @@
 
       & .labels-holder {
         margin-top: .25rem;
+
+        & :global(.bx--skeleton) {
+          background-color: var(--cds-field-02) !important;
+        }
       }
     }
 

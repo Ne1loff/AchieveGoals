@@ -1,13 +1,13 @@
 <script lang="ts">
 
     import GoalCheckbox from "../GoalCheckbox.svelte";
-    import Goal from "../../../data/models/Goal";
+    import Task from "../../../data/models/Task";
     import {PRIORITY_COLORS} from "../../../resources/constants";
     import GoalEditorComponent from "../GoalEditorComponent.svelte";
     import Icon from "@iconify/svelte";
 
     const priorityColors = PRIORITY_COLORS;
-    export let goal: Goal;
+    export let goal: Task;
 
     let editing: boolean = false;
     const edit = () => {

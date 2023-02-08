@@ -1,11 +1,13 @@
 package com.example.achieve_goals.service
 
+import com.example.achieve_goals.dto.ChangePasswordRequest
 import com.example.achieve_goals.dto.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
 import com.example.achieve_goals.dto.UserSettingsDto
 import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.entities.UserAvatar
 import com.example.achieve_goals.entities.UserSettings
+import com.example.achieve_goals.exceptions.badRequest.IncorrectDataException
 import com.example.achieve_goals.exceptions.badRequest.InvalidLoginOrPasswordException
 import com.example.achieve_goals.exceptions.conflict.EmailConflictException
 import com.example.achieve_goals.exceptions.conflict.UsernameConflictException
@@ -154,14 +156,12 @@ class UserService(
         }
     }
 
-    fun changeUserPassword(id: Long, oldPassword: String, newPassword: String): Boolean {
+    fun changeUserPassword(id: Long, passwordDTO: ChangePasswordRequest) {
         val user = userRepository.findUserById(id) ?: throw UserNotFoundException()
-        if (passwordEncoder.matches(oldPassword, user.password)) {
-            user.passwordHash = passwordEncoder.encode(newPassword)
-            userRepository.save(user)
-            return true
-        }
-        return false
+        if (!passwordEncoder.matches(passwordDTO.oldPassword, user.password)) throw IncorrectDataException()
+
+        user.passwordHash = passwordEncoder.encode(passwordDTO.newPassword)
+        userRepository.save(user)
     }
 
     fun getKeyFromLocalityName(name: String): Long? {

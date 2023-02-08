@@ -1,9 +1,9 @@
 <script lang="ts">
     import MenuButton from '../components/MenuButton.svelte'
     import Navbar from "../components/Navbar.svelte";
-    import Goal from "../data/models/Goal";
+    import Task from "../data/models/Task";
     import {onDestroy, onMount} from "svelte";
-    import GoalService from "../services/GoalService";
+    import TaskService from "../services/TaskService";
     import ApiError from "../data/api/ApiError";
     import ToastService, {ErrorMessage} from "../services/ToastService";
     import ApiResponse from "../data/api/ApiResponse";
@@ -22,13 +22,13 @@
 
     let pageIsReady = false;
 
-    let goalService: GoalService;
+    let goalService: TaskService;
     let userService: UserService;
     let notificationService: ToastService;
     let localStorageService: LocalStorageService;
 
     let open: boolean = true;
-    let goals: Goal[] = [];
+    let goals: Task[] = [];
     let sideBarWasOpen: boolean;
     let wasCheck: boolean = false;
 
@@ -74,12 +74,12 @@
     }
 
     onMount(() => {
-        goalService = ServiceFactory.INSTANCE.goalService;
+        goalService = ServiceFactory.INSTANCE.taskService;
         userService = ServiceFactory.INSTANCE.userService;
         notificationService = ServiceFactory.INSTANCE.toastService;
         localStorageService = ServiceFactory.INSTANCE.localStorageService;
         goalService.getUserGoals()
-            .then((response: Goal[]) => goals = response)
+            .then((response: Task[]) => goals = response)
             .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error!!));
         setUp();
     });

@@ -9,6 +9,7 @@ const hrefs = {
     home: '/app/goals',
     basicFilter: (filter: HomeUrl) => `/app/${filter}`,
     task: (id: number | string) => `${getProjectPath()}/task/${id}`,
+    label: (id: number) => `/app/label/${id}`,
     teams: '/user/teams',
     settings: (tab: SettingsUrl) => `/app/settings/${tab}`,
     mobile: '/application',

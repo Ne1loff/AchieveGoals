@@ -1,9 +1,9 @@
 <script lang="ts">
-    import CollapsibleTaskHolder from "./CollapsibleTaskHolder.svelte";
-    import Button from "../button/Button.svelte";
-    import Goal from "../../data/models/Goal";
+    import CollapsibleTaskHolder from "../CollapsibleTaskHolder.svelte";
+    import Button from "../../button/Button.svelte";
+    import Task from "../../../data/models/Task";
 
-    export let goals: Goal[] = [];
+    export let goals: Task[] = [];
 
 </script>
 <CollapsibleTaskHolder {goals} title="Просрочено">

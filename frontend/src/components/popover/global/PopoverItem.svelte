@@ -41,7 +41,6 @@
 
         const {innerWidth, innerHeight} = window;
 
-
         // position
         const calcLeft = targetBound.x - contentBound.width;
         const calcRight = targetBound.x + targetBound.width;

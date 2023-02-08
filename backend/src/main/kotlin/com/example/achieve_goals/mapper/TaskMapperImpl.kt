@@ -7,20 +7,24 @@ import org.springframework.stereotype.Component
 
 @Component
 class TaskMapperImpl : TaskMapper {
-    override fun toDto(task: Task): TaskDTO {
+    override fun toDto(entity: Task): TaskDTO {
         return TaskDTO(
-            id = task.id,
-            title = task.title,
-            description = task.description,
-            isDone = task.isDone,
-            gid = task.gid,
-            root= task.root,
-            priority= task.priority,
-            labels = task.labels.map { it.id },
-            createdAt = task.createdAt,
-            updatedAt = task.updatedAt,
-            deadline = task.deadline
+            id = entity.id,
+            title = entity.title,
+            description = entity.description,
+            isDone = entity.isDone,
+            gid = entity.gid,
+            root = entity.root,
+            priority = entity.priority,
+            labels = entity.labels.map { it.id },
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt,
+            deadline = entity.deadline
         )
+    }
+
+    override fun toEntity(dto: TaskDTO): Task {
+        TODO("Not yet implemented")
     }
 
     override fun subTaskParentDtoFromGoal(task: Task): SubTaskParentDTO {

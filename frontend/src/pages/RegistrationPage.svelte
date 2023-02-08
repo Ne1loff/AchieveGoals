@@ -8,7 +8,7 @@
     import Svelecte from 'svelecte';
     import type Country from "../data/models/Country";
     import CountryService from "../services/CountryService";
-    import SignUIOService from "../services/SignUIOService";
+    import AuthenticationService from "../services/AuthenticationService";
     import Registration from "../data/models/Registration";
     import {onMount} from "svelte";
     import ApiResponse from "../data/api/ApiResponse";
@@ -23,7 +23,7 @@
     import {hrefs} from "../resources/config";
 
     let countryService: CountryService;
-    let signUIOService: SignUIOService;
+    let signUIOService: AuthenticationService;
     let notificationService: ToastService;
 
     let registration: Registration = new Registration();

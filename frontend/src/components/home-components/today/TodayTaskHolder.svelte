@@ -1,25 +1,25 @@
 <script lang="ts">
     import Icon from "@iconify/svelte";
-    import Goal from "../../data/models/Goal";
-    import AppHeadTitle from "../AppHeadTitle.svelte";
-    import GoalComponent from "../goal-card/GoalComponent.svelte";
-    import GoalCreator from "../goal-card/GoalCreator.svelte";
-    import HomeComponentsHolder from "./component-holder/HomeComponentsHolder.svelte";
-    import {getDateTodayLastMin} from "../../utils/time-utils";
+    import Task from "../../../data/models/Task";
+    import AppHeadTitle from "../../AppHeadTitle.svelte";
+    import GoalComponent from "../../goal-card/GoalComponent.svelte";
+    import GoalCreator from "../../goal-card/GoalCreator.svelte";
+    import HomeComponentsHolder from "../component-holder/HomeComponentsHolder.svelte";
+    import {getDateTodayLastMin} from "../../../utils/time-utils";
     import dayjs from "dayjs";
-    import {GOALS} from "../../data/storage/storage";
+    import {TASKS} from "../../../data/storage/storage";
     import OverdueTaskHolder from "./OverdueTaskHolder.svelte";
-    import Button from "../button/Button.svelte";
+    import Button from "../../button/Button.svelte";
 
 
     let todayDayjs = dayjs(getDateTodayLastMin());
     let yesterdayDayjs = todayDayjs.add(-1, 'day');
 
-    let overdueTasks: Goal[];
-    let tasksForToday: Goal[];
+    let overdueTasks: Task[];
+    let tasksForToday: Task[];
 
-    $: overdueTasks = $GOALS.filter((it) => it.deadline <= yesterdayDayjs.toDate());
-    $: tasksForToday = $GOALS.filter((it) =>
+    $: overdueTasks = $TASKS.filter((it) => it.deadline <= yesterdayDayjs.toDate());
+    $: tasksForToday = $TASKS.filter((it) =>
         it.deadline <= todayDayjs.toDate() && it.deadline > yesterdayDayjs.toDate());
 
 </script>

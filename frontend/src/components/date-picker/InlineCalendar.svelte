@@ -2,20 +2,20 @@
     import Calendar from "./Calendar.svelte";
     import dayjs from "dayjs";
     import Time from "./time-picker/Time.svelte";
-    import Goal from "../../data/models/Goal";
-    import {GOALS} from "../../data/storage/storage";
+    import Task from "../../data/models/Task";
+    import {TASKS} from "../../data/storage/storage";
 
-    export let goalId: number = undefined;
-    const goal: Goal = goalId ? $GOALS.find((it) => it.id === goalId) : undefined;
+    export let goalId: number;
+    const goal: Task = goalId ? $TASKS.find((it) => it.id === goalId) : undefined;
 
     export let value: Date = goal ? goal.deadline : new Date();
     export let minDate: Date = dayjs().add(-1, 'day').toDate();
     export let withTime: boolean = false;
 
     const updateGoals = () => {
-        const goals = $GOALS;
+        const goals = $TASKS;
         goals[goals.indexOf(goal)] = goal;
-        $GOALS = goals;
+        $TASKS = goals;
     }
 
     $:{

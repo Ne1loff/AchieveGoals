@@ -29,16 +29,33 @@
     />
 {:else if (filter)}
     {#if (interactive)}
-        <InteractiveFilterTag {type} {title} {href} {disabled} {icon}>
+        <InteractiveFilterTag {type} {title} {href} {disabled} {icon}
+                              on:click
+                              on:close
+                              on:mouseover
+                              on:mouseenter
+                              on:mouseleave
+        >
             <slot/>
         </InteractiveFilterTag>
     {:else}
-        <FilterTag {type} {title} {disabled} {icon}>
+        <FilterTag {type} {title} {disabled} {icon}
+                   on:close
+                   on:click
+                   on:mouseover
+                   on:mouseenter
+                   on:mouseleave
+        >
             <slot/>
         </FilterTag>
     {/if}
 {:else if (interactive)}
-    <InteractiveTag {type} {href} {disabled} {icon}>
+    <InteractiveTag {type} {href} {disabled} {icon}
+                    on:click
+                    on:mouseover
+                    on:mouseenter
+                    on:mouseleave
+    >
         <slot/>
     </InteractiveTag>
 {:else}

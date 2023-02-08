@@ -1,20 +1,28 @@
 import CountryService from "./CountryService";
-import GoalService from "./GoalService";
+import TaskService from "./TaskService";
 import ToastService from "./ToastService";
-import SignUIOService from "./SignUIOService";
+import AuthenticationService from "./AuthenticationService";
 import UserService from "./UserService";
 import Request from "./Request";
 import LocalStorageService from "./LocalStorageService";
+import TaskLabelService from "./TaskLabelService";
 
 class ServiceFactory {
     private static _INSTANCE: ServiceFactory;
-    private constructor() { }
+
+    private constructor() {
+    }
 
     private _localStorageService?: LocalStorageService;
     private _countryService?: CountryService;
-    private _goalService?: GoalService;
+    private _taskService?: TaskService;
+
+    get taskService(): TaskService {
+        return this._taskService ??= new TaskService(this.request);
+    }
     private _toastService?: ToastService;
-    private _signUIOService?: SignUIOService;
+
+    private _taskLabelService?: TaskLabelService;
     private _userService?: UserService;
     private _request?: Request;
 
@@ -31,12 +39,14 @@ class ServiceFactory {
         return this._countryService ??= new CountryService(this.request);
     }
 
-    get goalService(): GoalService {
-        return this._goalService ??= new GoalService(this.request);
+    get taskLabelService(): TaskLabelService {
+        return this._taskLabelService ??= new TaskLabelService(this.request);
     }
 
-    get signUIOService(): SignUIOService {
-        return this._signUIOService ??= new SignUIOService(this.request, this.userService);
+    private _signUIOService?: AuthenticationService;
+
+    get signUIOService(): AuthenticationService {
+        return this._signUIOService ??= new AuthenticationService(this.request, this.userService);
     }
 
     get userService(): UserService {

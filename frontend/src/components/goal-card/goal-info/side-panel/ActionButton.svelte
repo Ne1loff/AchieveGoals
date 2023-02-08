@@ -29,11 +29,35 @@
     width: 100%;
     height: 100%;
 
+    min-height: 1.75rem;
+
     background: inherit;
     border-radius: var(--ag-bnt-border-radius);
 
     display: flex;
     align-items: center;
+
+    &.bx--skeleton {
+      position: relative;
+      padding: 0;
+      border: none;
+      background: var(--cds-field-02);
+      box-shadow: none;
+      pointer-events: none;
+
+      &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        -webkit-animation: 3s ease-in-out skeleton infinite;
+        animation: 3s ease-in-out skeleton infinite;
+        background: var(--cds-skeleton-02, #c6c6c6);
+        content: "";
+        will-change: transform-origin, transform, opacity;
+      }
+    }
 
     &:hover {
       background: var(--cds-background-active);

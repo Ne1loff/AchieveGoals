@@ -4,11 +4,11 @@
     import SvgProgressBar from "../svg/SvgProgressBar.svelte";
     import GoalComponent from "../goal-card/GoalComponent.svelte";
     import GoalCreator from "../goal-card/GoalCreator.svelte";
-    import Goal from "../../data/models/Goal";
+    import Task from "../../data/models/Task";
 
     export let contents: HTMLElement;
 
-    export let goals: Goal[] = [];
+    export let goals: Task[] = [];
     export let goalProps: { [key: string]: any } = {};
     export let goalStyle: string[] = [];
 

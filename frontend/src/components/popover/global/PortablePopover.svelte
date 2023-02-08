@@ -12,9 +12,21 @@
     let show: boolean = false;
     const toggle = () => show = !show;
 
+    const getChildrenWithDisplayNonContents = (target: Element): { result: boolean, element: Element } => {
+        const displayStyle = window.getComputedStyle(target).display;
+        if (displayStyle !== "contents") return {result: true, element: target};
+
+        for (let child of target.children) {
+            const result = getChildrenWithDisplayNonContents(child);
+            if (result.result) return result;
+        }
+
+        return {result: false, element: target};
+    }
+
     onMount(() => {
         options.fromComponent = true;
-        options.target = target;
+        options.target = <HTMLElement>getChildrenWithDisplayNonContents(target).element;
     });
 
 </script>
@@ -34,10 +46,8 @@
 
 <style lang="scss">
 
-    .portal {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
+  .portal {
+    display: contents;
+  }
 
 </style>

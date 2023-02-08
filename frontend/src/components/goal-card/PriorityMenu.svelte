@@ -3,11 +3,11 @@
     import {PRIORITIES} from "../../resources/constants";
     import Icon from "@iconify/svelte";
     import type {Writable} from "svelte/types/runtime/store";
-    import type {Priority} from "../../data/models/Goal";
+    import type {Priority} from "../../data/models/Task";
 
-    export let selected: number = undefined;
+    export let selected: number;
     export let useStorage: boolean = false;
-    export let storage: Writable<Priority> = undefined;
+    export let storage: Writable<Priority>;
 
     let priorities = PRIORITIES;
 

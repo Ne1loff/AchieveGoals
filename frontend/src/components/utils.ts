@@ -27,10 +27,10 @@ const getClasses = (classes: string[] | string): string => {
     }
 }
 
-interface Task {
+interface Action {
     accept: () => void;
     reject: () => void;
 }
 
 export {getClasses, getStyle};
-export type {Task};
+export type {Action};

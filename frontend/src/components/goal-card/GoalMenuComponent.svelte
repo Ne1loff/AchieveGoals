@@ -4,8 +4,8 @@
     import Icon from "@iconify/svelte";
     import dayjs from "dayjs";
     import {popoverTrigger} from "../popover/global/Popover";
-    import Goal from "../../data/models/Goal";
-    import {GOALS} from "../../data/storage/storage";
+    import Task from "../../data/models/Task";
+    import {TASKS} from "../../data/storage/storage";
     import {PRIORITIES} from "../../resources/constants";
     import {createEventDispatcher} from "svelte";
 
@@ -14,7 +14,7 @@
 
     const dispatch = createEventDispatcher();
 
-    const goal: Goal = $GOALS.find((it) => it.id === goalId);
+    const goal: Task = $TASKS.find((it) => it.id === goalId);
 
     const dates = {
         today: new Date(),
@@ -25,12 +25,10 @@
     }
 
     const updateGoals = () => {
-        const goals = $GOALS;
+        const goals = $TASKS;
         goals[goals.indexOf(goal)] = goal;
-        $GOALS = goals;
+        $TASKS = goals;
     }
-
-    $: console.log(indent);
 
     const edit = () => dispatch('edit');
     const createOver = () => dispatch('create-over');

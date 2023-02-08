@@ -1,6 +1,7 @@
 package com.example.achieve_goals.repository
 
 import com.example.achieve_goals.entities.Task
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -8,8 +9,10 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TaskRepository : JpaRepository<Task, Long> {
 
+
     fun getTasksByGid(gid: Long): MutableList<Task>
 
+    @EntityGraph(attributePaths = ["labels"])
     fun getTasksByUidOrderByCreatedAt(uid: Long): MutableList<Task>
 
     fun getTasksByRoot(root: Long): MutableList<Task>
@@ -18,7 +21,9 @@ interface TaskRepository : JpaRepository<Task, Long> {
 
     fun existsTaskByIdAndUid(id: Long, uid: Long): Boolean
 
+    @EntityGraph(attributePaths = ["labels"])
     fun getTaskById(id: Long): Task?
+
 
     @Query(value = "SELECT * FROM task_table WHERE id in ?1", nativeQuery = true)
     fun getTasksByIds(ids: Collection<Long>): MutableList<Task>

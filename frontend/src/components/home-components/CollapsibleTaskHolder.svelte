@@ -3,21 +3,23 @@
     import Icon from "@iconify/svelte";
     import SvgProgressBar from "../svg/SvgProgressBar.svelte";
     import GoalComponent from "../goal-card/GoalComponent.svelte";
-    import Goal from "../../data/models/Goal";
+    import Task from "../../data/models/Task";
 
-
-    export let goals: Goal[] = [];
+    export let goals: Task[] = [];
+    export let completedGoals: Task[];
     export let title: string;
     export let showOnlyUncompleted: boolean = false;
 
-    let uncompletedGoals: Goal[];
-    let completedGoals: Goal[];
+    let uncompletedGoals: Task[];
+    let totalGoalsLength: number;
+    let completedGoalsLength: number;
 
-    $:totalGoalsLength = goals.length;
-    $:uncompletedGoals = goals.filter(it => !it.isDone);
-    $:completedGoals = goals.filter(it => it.isDone);
-    $:completedGoalsLength = completedGoals.length;
-
+    $:{
+        totalGoalsLength = goals.length;
+        uncompletedGoals = goals.filter(it => !it.isDone);
+        completedGoals = goals.filter(it => it.isDone);
+        completedGoalsLength = completedGoals.length;
+    }
 
     let expanded: boolean = true;
 
@@ -58,21 +60,21 @@
         </div>
     </svelte:fragment>
     <svelte:fragment>
-            {#if (showOnlyUncompleted)}
-                {#each uncompletedGoals as goal}
-                    <GoalComponent bind:goal withoutSubs
-                                   style="--own-component-border-width: calc(100% + 55px);
+        {#if (showOnlyUncompleted)}
+            {#each uncompletedGoals as goal (goal.id)}
+                <GoalComponent bind:goal withoutSubs
+                               style="--own-component-border-width: calc(100% + 55px);
                            --own-component-border-right: 28px;"
-                    />
-                {/each}
-            {:else}
-                {#each goals as goal}
-                    <GoalComponent bind:goal withoutSubs
-                                   style="--own-component-border-width: calc(100% + 55px);
+                />
+            {/each}
+        {:else}
+            {#each goals as goal (goal.id)}
+                <GoalComponent bind:goal withoutSubs
+                               style="--own-component-border-width: calc(100% + 55px);
                            --own-component-border-right: 28px;"
-                    />
-                {/each}
-            {/if}
+                />
+            {/each}
+        {/if}
         <slot name="after-main-goals" {completedGoals}/>
     </svelte:fragment>
 </Accordion>

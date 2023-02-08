@@ -7,7 +7,7 @@
     import InputField from "../components/inputs/InputField.svelte";
     import Navbar from "../components/Navbar.svelte";
     import {l10n} from "../resources/localization/l10n";
-    import SignUIOService from "../services/SignUIOService";
+    import AuthenticationService from "../services/AuthenticationService";
     import ToastService, {ErrorMessage} from "../services/ToastService";
     import Login from "../data/models/Login";
     import ApiResponse from "../data/api/ApiResponse";
@@ -24,7 +24,7 @@
     }
 
     let userService: UserService;
-    let signUIOService: SignUIOService;
+    let signUIOService: AuthenticationService;
     let notificationService: ToastService;
 
     let login: Login = new Login();
@@ -94,6 +94,7 @@
                     />
                 </div>
                 <CheckboxLine position={'left'} bind:checked={login.rememberMe} labelText={l10n.rememberMe}
+
                               activeContainer
                               --line-padding="6px 15px 6px 15px"
                 />

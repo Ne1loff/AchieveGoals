@@ -10,7 +10,7 @@ function hasProperty<T extends object>(obj: T, key: PropertyKey): key is keyof T
     return key in obj;
 }
 
-function isTypeOf<T extends object>(obj: any): obj is T {
+function isTypeOf<T extends any>(obj: any): obj is T {
     return obj !== undefined;
 }
 

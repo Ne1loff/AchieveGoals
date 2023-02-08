@@ -1,9 +1,9 @@
 <script lang="ts">
     import AbstractTaskCreator from "./AbstractTaskCreator.svelte";
     import Icon from "@iconify/svelte";
-    import Goal from "../../data/models/Goal";
+    import Task from "../../data/models/Task";
 
-    export let taskStorage: Goal[];
+    export let taskStorage: Task[];
 
     const title: string = "Добавить цель";
 </script>

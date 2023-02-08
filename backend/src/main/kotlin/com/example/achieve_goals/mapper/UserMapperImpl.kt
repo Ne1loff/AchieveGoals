@@ -48,4 +48,12 @@ class UserMapperImpl : UserMapper {
             autoDarkTheme = userSettings.autoDarkTheme
         )
     }
+
+    override fun toDto(entity: User): UserDTO {
+        TODO("Not yet implemented")
+    }
+
+    override fun toEntity(dto: UserDTO): User {
+        TODO("Not yet implemented")
+    }
 }

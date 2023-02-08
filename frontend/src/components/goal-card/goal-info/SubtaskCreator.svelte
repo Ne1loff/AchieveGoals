@@ -2,9 +2,9 @@
     import AbstractTaskCreator from "../AbstractTaskCreator.svelte";
     import Button from "../../button/Button.svelte";
     import Icon from "@iconify/svelte";
-    import Goal from "../../../data/models/Goal";
+    import Task from "../../../data/models/Task";
 
-    export let taskStorage: Goal[];
+    export let taskStorage: Task[];
 </script>
 
 <AbstractTaskCreator {taskStorage}>

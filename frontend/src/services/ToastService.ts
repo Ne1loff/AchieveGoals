@@ -3,7 +3,7 @@ import NotificationComponent from "../components/toasts/NotificationComponent.sv
 import {NotificationType} from "../data/enums/_enums";
 import type ApiError from "../data/api/ApiError";
 import DialogComponent from "../components/toasts/DialogComponent.svelte";
-import type {Task} from "../components/utils";
+import type {Action} from "../components/utils";
 
 class ErrorMessage {
     title?: string;
@@ -112,7 +112,7 @@ export default class ToastService {
         this.error(errorMessage.title, errorMessage.subtitle, errorMessage.caption, errorMessage.duration)
     }
 
-    dialog(text: string, {accept, reject}: Task, duration?: number) {
+    dialog(text: string, {accept, reject}: Action, duration?: number) {
         ToastService.showDialog(accept, reject, text, duration);
     }
 

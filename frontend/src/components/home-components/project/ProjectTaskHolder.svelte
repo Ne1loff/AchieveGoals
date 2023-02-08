@@ -1,14 +1,14 @@
 <script lang="ts">
     import OverflowMenuVertical from "carbon-icons-svelte/lib/OverflowMenuVertical.svelte";
     import Icon from "@iconify/svelte";
-    import Goal from "../../data/models/Goal";
-    import AppHeadTitle from "../AppHeadTitle.svelte";
-    import GoalComponent from "../goal-card/GoalComponent.svelte";
-    import GoalCreator from "../goal-card/GoalCreator.svelte";
-    import HomeComponentsHolder from "./component-holder/HomeComponentsHolder.svelte";
-    import Button from "../button/Button.svelte";
+    import Task from "../../../data/models/Task";
+    import AppHeadTitle from "../../AppHeadTitle.svelte";
+    import GoalComponent from "../../goal-card/GoalComponent.svelte";
+    import GoalCreator from "../../goal-card/GoalCreator.svelte";
+    import HomeComponentsHolder from "../component-holder/HomeComponentsHolder.svelte";
+    import Button from "../../button/Button.svelte";
 
-    export let goals: Goal[] = [];
+    export let goals: Task[] = [];
     export let goalProps: { [key: string]: any } = {};
     export let goalStyle: string[] = [];
     export let hideGoalCreator: boolean = false;

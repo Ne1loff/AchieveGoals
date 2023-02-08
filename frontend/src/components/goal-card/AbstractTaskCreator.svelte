@@ -1,17 +1,17 @@
 <script lang="ts">
 
-    import Goal from "../../data/models/Goal";
+    import Task from "../../data/models/Task";
     import GoalEditorComponent from "./GoalEditorComponent.svelte";
     import {onMount} from "svelte";
-    import GoalService from "../../services/GoalService";
+    import TaskService from "../../services/TaskService";
     import ServiceFactory from "../../services/ServiceFactory";
 
-    export let taskStorage: Goal[];
+    export let taskStorage: Task[];
 
-    let goalService: GoalService;
-    let newTask: Goal | undefined;
+    let goalService: TaskService;
+    let newTask: Task | undefined;
 
-    const create = () => newTask = new Goal();
+    const create = () => newTask = new Task();
     const cancel = () => newTask = undefined;
 
     const save = () => {
@@ -27,7 +27,7 @@
     }
 
     onMount(() => {
-        goalService = ServiceFactory.INSTANCE.goalService;
+        goalService = ServiceFactory.INSTANCE.taskService;
     })
 
 </script>

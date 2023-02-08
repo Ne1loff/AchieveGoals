@@ -2,17 +2,17 @@
     import dayjs from 'dayjs';
     import Icon from "@iconify/svelte";
     import MenuContainer from "../modals/MenuContainer.svelte";
-    import Goal from "../../data/models/Goal";
+    import Task from "../../data/models/Task";
     import InlineCalendar from "../date-picker/InlineCalendar.svelte";
-    import {GOALS} from "../../data/storage/storage";
+    import {TASKS} from "../../data/storage/storage";
     import type {Writable} from "svelte/types/runtime/store";
     import {onDestroy} from "svelte";
 
     export let goalId: number = undefined;
-    export let goalStorage: Writable<Goal> = undefined;
+    export let goalStorage: Writable<Task> = undefined;
     export let useGlobalStore: boolean = true;
 
-    const goal: Goal = useGlobalStore ? $GOALS.find((it) => it.id === goalId) : $goalStorage;
+    const goal: Task = useGlobalStore ? $TASKS.find((it) => it.id === goalId) : $goalStorage;
 
     const daysName = (dayNum) => {
         let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -28,9 +28,9 @@
 
     const updateGoals = () => {
         if (useGlobalStore) {
-            const goals = $GOALS;
+            const goals = $TASKS;
             goals[goals.indexOf(goal)] = goal;
-            $GOALS = goals;
+            $TASKS = goals;
         } else {
             $goalStorage = goal;
         }

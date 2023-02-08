@@ -94,17 +94,17 @@
             <Icon class="input_box_icon"
                   icon="{showPassword ? IconWhenText : IconWhenPass }"/>
         </div>
-    {/if}
-    {#if showPasDiff}
-        <div class="pass-indicator">
-            <Indicator count={5}
-                       currentStep={getPasswordDifficult(value)}
-                       colors={['#FF0000', '#FFA500', '#FFD700', '#ADFF2F', '#32CD32']}
-                       secondary="inherit"
-                       size={{h: '.5rem', w: 'calc(var(--custom-width) / 5)'}}
-                       radius="6px"
-                       singleText/>
-        </div>
+        {#if showPasDiff}
+            <div class="pass-indicator">
+                <Indicator count={5}
+                           currentStep={getPasswordDifficult(value)}
+                           colors={['#FF0000', '#FFA500', '#FFD700', '#ADFF2F', '#32CD32']}
+                           secondary="inherit"
+                           size={{h: '.5rem', w: 'calc(var(--custom-width) / 5)'}}
+                           radius="6px"
+                           singleText/>
+            </div>
+        {/if}
     {/if}
 </div>
 {#if error && (patternErrorMessage || requiredErrorMessage)}

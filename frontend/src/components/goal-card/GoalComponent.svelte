@@ -3,9 +3,9 @@
     import {onDestroy, onMount} from 'svelte';
     import dayjs from 'dayjs';
     import {PRIORITY_COLORS} from "../../resources/constants";
-    import Goal from '../../data/models/Goal'
+    import Task from '../../data/models/Task'
     import InlineCalendar from "../date-picker/InlineCalendar.svelte";
-    import {GOALS} from "../../data/storage/storage";
+    import {TASKS} from "../../data/storage/storage";
     import GoalCheckbox from "./GoalCheckbox.svelte";
     import Scheduler from "./SchedulerComponent.svelte";
     import GoalMenu from "./GoalMenuComponent.svelte";
@@ -17,11 +17,11 @@
     import AnimationContainer from "./AnimationContainer.svelte";
     import PortablePopover from "../popover/global/PortablePopover.svelte";
     import type {Unsubscriber} from "svelte/store";
-    import GoalService from "../../services/GoalService";
+    import TaskService from "../../services/TaskService";
     import ServiceFactory from "../../services/ServiceFactory";
 
     export let style: string = "";
-    export let goal: Goal;
+    export let goal: Task;
     export let indent: 1 | 2 | 3 | 4 | 5 = 1;
     export let withoutSubs: boolean = false;
     export let animationDurationIn: number = 200;
@@ -31,9 +31,9 @@
     let animDurationIn: number = animationDurationIn;
     let animDurationOut: number = animationDurationOut;
 
-    let goalService: GoalService;
+    let goalService: TaskService;
 
-    let subs: Goal[] = [];
+    let subs: Task[] = [];
 
     const priorityColors = PRIORITY_COLORS;
     let showSubtasks = false;
@@ -43,16 +43,16 @@
 
     let createOver: boolean = false;
     let createUnder: boolean = false;
-    let newGoal: Goal;
+    let newGoal: Task;
 
     const createGoalOver = () => {
         createOver = true;
-        newGoal = new Goal();
+        newGoal = new Task();
         newGoal.gid = goal.gid;
     }
     const createGoalUnder = () => {
         createUnder = true;
-        newGoal = new Goal();
+        newGoal = new Task();
         newGoal.gid = goal.id;
     }
 
@@ -66,7 +66,7 @@
 
     const deleteGoal = () => {
         let isCancel: boolean = false;
-        $GOALS = $GOALS.filter(it => it.id !== goal.id); // TODO: Multiple deleted.
+        $TASKS = $TASKS.filter(it => it.id !== goal.id); // TODO: Multiple deleted.
         ServiceFactory.INSTANCE.toastService.dialog('Task was successfully deleted.',
             {
                 accept: () => {
@@ -77,8 +77,8 @@
                 },
                 reject: () => {
                     isCancel = true;
-                    $GOALS.push(goal)
-                    $GOALS = $GOALS;
+                    $TASKS.push(goal)
+                    $TASKS = $TASKS;
                 }
             }
         );
@@ -94,10 +94,10 @@
 
     onMount(() => {
         if (!withoutSubs) {
-            subs = $GOALS.filter(it => it.gid === goal.id);
-            unsubscribe = GOALS.subscribe((g) => subs = g.filter(it => it.gid === goal.id));
+            subs = $TASKS.filter(it => it.gid === goal.id);
+            unsubscribe = TASKS.subscribe((g) => subs = g.filter(it => it.gid === goal.id));
         }
-        goalService = ServiceFactory.INSTANCE.goalService;
+        goalService = ServiceFactory.INSTANCE.taskService;
     });
 
     onDestroy(() => {

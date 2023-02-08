@@ -7,8 +7,8 @@ import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.entities.UserSettings
 
 
-interface UserMapper {
-    fun userFromRegistrationRequest(newUser: RegistrationRequest) : User
-    fun dtoFromUser(user: User, locality: String, avatar: String?) : UserDTO
+interface UserMapper : Mapper<User, UserDTO> {
+    fun userFromRegistrationRequest(newUser: RegistrationRequest): User
+    fun dtoFromUser(user: User, locality: String, avatar: String?): UserDTO
     fun dtoFromUserSettings(userSettings: UserSettings): UserSettingsDto
 }

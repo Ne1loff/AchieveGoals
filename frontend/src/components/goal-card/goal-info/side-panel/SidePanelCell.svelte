@@ -1,6 +1,7 @@
 <script lang="ts">
     export let title: string;
     export let clickableLabel: boolean = false;
+    export let withoutHr: boolean = false;
 </script>
 
 <div class="cell-container">
@@ -17,7 +18,9 @@
         </div>
     {/if}
 </div>
-<hr/>
+{#if !withoutHr}
+    <hr/>
+{/if}
 
 
 <style lang="scss">

@@ -5,7 +5,6 @@ import com.example.achieve_goals.dto.label.TaskLabelRequest
 import com.example.achieve_goals.entities.TaskLabel
 import com.example.achieve_goals.service.TaskLabelService
 import com.example.achieve_goals.utils.getUserEntity
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
@@ -29,26 +28,20 @@ class TaskLabelController(
     }
 
     @PostMapping
-    fun createLabel(auth: Authentication, @RequestBody labelDto: TaskLabelRequest): ResponseEntity<HttpStatus> {
+    fun createLabel(auth: Authentication, @RequestBody labelDto: TaskLabelRequest): ResponseEntity<TaskLabelRequest> {
         val user = auth.getUserEntity()
-        taskLabelService.createLabel(labelDto, user.id)
-
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok(taskLabelService.createLabel(labelDto, user.id))
     }
 
     @PutMapping
-    fun editLabel(auth: Authentication, @RequestBody labelDto: TaskLabelRequest): ResponseEntity<HttpStatus> {
+    fun editLabel(auth: Authentication, @RequestBody labelDto: TaskLabelRequest): ResponseEntity<TaskLabelRequest> {
         val user = auth.getUserEntity()
-        taskLabelService.editLabel(labelDto, user.id)
-
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok(taskLabelService.editLabel(labelDto, user.id))
     }
 
     @DeleteMapping("{id}")
-    fun deleteLabel(auth: Authentication, @PathVariable id: Long): ResponseEntity<HttpStatus> {
+    fun deleteLabel(auth: Authentication, @PathVariable id: Long): ResponseEntity<Long> {
         val user = auth.getUserEntity()
-        taskLabelService.deleteLabel(id, user.id)
-
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok(taskLabelService.deleteLabel(id, user.id))
     }
 }

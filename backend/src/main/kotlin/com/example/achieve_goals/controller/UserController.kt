@@ -22,7 +22,7 @@ class UserController(
 ) {
 
     @PostMapping("registration")
-    fun registration(@RequestBody newUser: RegistrationRequest): ResponseEntity<Any> {
+    fun registration(@RequestBody newUser: RegistrationRequest): ResponseEntity<HttpStatus> {
         val user = userService.saveUser(newUser)
         userService.setupUserSettings(user)
         return ResponseEntity
@@ -40,23 +40,20 @@ class UserController(
     fun changePassword(
         auth: Authentication,
         @RequestBody passwordDTO: ChangePasswordRequest
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<HttpStatus> {
         val user = auth.getUserEntity()
-        return if (userService.changeUserPassword(user.id, passwordDTO.oldPassword, passwordDTO.newPassword))
-            ResponseEntity.ok().build()
-        else
-            ResponseEntity.badRequest().build()
+        userService.changeUserPassword(user.id, passwordDTO)
+        return ResponseEntity.ok().build()
     }
 
     @GetMapping("user/avatar")
     fun getUserAvatar(auth: Authentication): ResponseEntity<String> {
         val user = auth.getUserEntity()
-        return ResponseEntity.ok()
-            .body(userService.getUserAvatarLink(user.id))
+        return ResponseEntity.ok(userService.getUserAvatarLink(user.id))
     }
 
     @PutMapping("user/avatar")
-    fun updateAvatar(@RequestParam("avatar") avatar: MultipartFile, auth: Authentication): ResponseEntity<Any> {
+    fun updateAvatar(@RequestParam("avatar") avatar: MultipartFile, auth: Authentication): ResponseEntity<HttpStatus> {
         val user = auth.getUserEntity()
         val fileExtension = FilenameUtils.getExtension(avatar.originalFilename)
 
@@ -67,7 +64,7 @@ class UserController(
     }
 
     @DeleteMapping("user/avatar")
-    fun deleteUserAvatar(auth: Authentication): ResponseEntity<Any> {
+    fun deleteUserAvatar(auth: Authentication): ResponseEntity<HttpStatus> {
         val user = auth.getUserEntity()
 
         user.userPhoto?.let {
@@ -80,7 +77,7 @@ class UserController(
     }
 
     @PutMapping("user")
-    fun updateUserInfo(@RequestBody userDTO: UserDTO, auth: Authentication): ResponseEntity<Any> {
+    fun updateUserInfo(@RequestBody userDTO: UserDTO, auth: Authentication): ResponseEntity<HttpStatus> {
         val user = auth.getUserEntity()
         userService.updateUser(userDTO, user.id)
 
