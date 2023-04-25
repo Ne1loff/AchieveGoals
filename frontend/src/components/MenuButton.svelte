@@ -1,5 +1,6 @@
 <script lang="ts">
     import {createEventDispatcher} from "svelte";
+    import Button from "./button/Button.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -18,7 +19,7 @@
         --own-menu-btn-size: 2rem;
         --own-menu-btn-transition-time: .3s;
         --own-menu-btn-border: 3px solid #000;
-        --own-menu-btn-border-radius: 4px;
+        --own-menu-btn-border-radius: 8px;
         --own-menu-btn-background: transparent;
         --own-menu-btn-hover-background: #e1e1e1;
 
@@ -44,9 +45,9 @@
         background: var(--own-menu-btn-background);
     }
 
-    .menu-btn:hover {
-        background: var(--own-menu-btn-hover-background, #ccc);
-    }
+    /*.menu-btn:hover {*/
+    /*    background: var(--own-menu-btn-hover-background, #ccc);*/
+    /*}*/
 
     .menu-btn--burger,
     .menu-btn--burger::before,
@@ -72,7 +73,7 @@
     }
 
     .menu-btn--burger::after {
-        transform: translateY(calc(var(--own-menu-btn-size) * .25));
+        transform: translateY(calc(var(--own-menu-btn-size) * .25 * 1));
     }
 
     .menu-btn.open .menu-btn--burger {
@@ -90,6 +91,11 @@
 
 </style>
 
-<div class="menu-btn" class:open on:click={onClick}>
-    <div class="menu-btn--burger"></div>
-</div>
+<Button on:click={onClick} kind="ghost" size="field"
+        --ag-bnt-border-radius=".5rem"
+        --ag-bnt-padding="1px 3px"
+>
+    <div class="menu-btn" class:open >
+        <div class="menu-btn--burger"></div>
+    </div>
+</Button>

@@ -1,11 +1,20 @@
 <script lang="ts">
-    import {Select, SelectItem, Theme} from "carbon-components-svelte";
+    import {Select, SelectItem} from "carbon-components-svelte";
     import {THEMES} from "../resources/constants";
+    import ThemeManager, {CarbonTheme} from "./theme/ThemeManager.ts";
+    import {onMount} from "svelte";
 
-    let activeTheme: string = THEMES[0].value;
+    let themeManager: ThemeManager
+    let activeTheme: CarbonTheme;
+    $: if (themeManager && activeTheme) themeManager.setTheme(activeTheme);
+
+
+    onMount(() => {
+      themeManager = ThemeManager.getInstance();
+      activeTheme = themeManager.getCurrentTheme();
+    })
 </script>
 
-<Theme bind:theme={activeTheme} persist persistKey="__carbon-theme"/>
 <Select bind:selected={activeTheme}>
     {#each THEMES as theme}
         <SelectItem value={theme.value} text={theme.text}/>

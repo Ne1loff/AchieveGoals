@@ -2,7 +2,9 @@ package com.example.achieve_goals.mapper
 
 import com.example.achieve_goals.dto.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
+import com.example.achieve_goals.dto.UserSettingsDto
 import com.example.achieve_goals.entities.User
+import com.example.achieve_goals.entities.UserSettings
 import org.springframework.stereotype.Component
 
 @Component
@@ -33,5 +35,25 @@ class UserMapperImpl : UserMapper {
             country = locality,
             avatar = avatar
         )
+    }
+
+    override fun dtoFromUserSettings(userSettings: UserSettings): UserSettingsDto {
+        return UserSettingsDto(
+            uid = userSettings.uid,
+            language = userSettings.language,
+            startedPage = userSettings.startedPage,
+            timeFormat = userSettings.timeFormat,
+            dateFormat = userSettings.dateFormat,
+            theme = userSettings.theme,
+            autoDarkTheme = userSettings.autoDarkTheme
+        )
+    }
+
+    override fun toDto(entity: User): UserDTO {
+        TODO("Not yet implemented")
+    }
+
+    override fun toEntity(dto: UserDTO): User {
+        TODO("Not yet implemented")
     }
 }

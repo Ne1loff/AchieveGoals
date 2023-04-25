@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse
 class WebSecurityConfig(
     private val userService: UserService,
     private val passwordEncoder: PasswordEncoder,
+    private val rememberMeServices: RememberMeServices,
     @Value("\${app.devMode:false}") private val devMode: Boolean
 ) : WebSecurityConfigurerAdapter() {
 
@@ -31,25 +33,23 @@ class WebSecurityConfig(
             "style-src 'self' https://fonts.googleapis.com; " +
             "font-src 'self' https://fonts.gstatic.com"
 
-    override fun configure(auth: AuthenticationManagerBuilder?) {
-        auth?.userDetailsService(userService)?.passwordEncoder(passwordEncoder)
+    override fun configure(auth: AuthenticationManagerBuilder) {
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder)
         super.configure(auth)
     }
 
-    override fun configure(http: HttpSecurity?) {
+    override fun configure(http: HttpSecurity) {
 
-        if (!devMode) http!!.headers { headers: HeadersConfigurer<HttpSecurity?> ->
-            headers.contentSecurityPolicy(
-                csrfPolicy
-            )
+        if (!devMode) http.headers { headers: HeadersConfigurer<HttpSecurity?> ->
+            headers.contentSecurityPolicy(csrfPolicy)
         }
 
         http
-            ?.addFilterAt(
+            .addFilterAt(
                 customUsernamePasswordAuthenticationFilter(),
                 UsernamePasswordAuthenticationFilter::class.java
             )
-            ?.authorizeRequests { authorize ->
+            .authorizeRequests { authorize ->
                 authorize
                     .antMatchers("/api/login").permitAll()
                     .antMatchers("/api/registration").permitAll()
@@ -57,10 +57,12 @@ class WebSecurityConfig(
                     .antMatchers("/api/docs/**").permitAll()
                     .antMatchers("/api/admin/**").hasAuthority(Roles.ADMIN)
                     .antMatchers("/api/**").hasAnyAuthority(Roles.ADMIN, Roles.USER)
-                    .antMatchers("/**").permitAll()
+                    .and().rememberMe().rememberMeServices(rememberMeServices)
+
             }
-            ?.logout { logout: LogoutConfigurer<HttpSecurity?> ->
+            .logout { logout: LogoutConfigurer<HttpSecurity> ->
                 logout
+                    .deleteCookies("JSESSIONID")
                     .logoutRequestMatcher { request: HttpServletRequest ->
                         request.requestURI == "/api/logout" && request.method == HttpMethod.POST.name
                     }
@@ -71,24 +73,24 @@ class WebSecurityConfig(
                         response.writer.print(jsonHttpOkResponse())
                     }
             }
-            ?.formLogin()?.disable()
-            ?.csrf()?.disable()
-            ?.exceptionHandling()
-            ?.authenticationEntryPoint { _: HttpServletRequest?,
-                                         response: HttpServletResponse,
-                                         _: AuthenticationException? ->
+            .formLogin().disable()
+            .csrf().disable()
+            .exceptionHandling()
+            .authenticationEntryPoint { _: HttpServletRequest?,
+                                        response: HttpServletResponse,
+                                        _: AuthenticationException? ->
                 response.status = HttpStatus.FORBIDDEN.value()
                 response.sendError(response.status, "You don't have permission!")
             }
     }
 
     fun customUsernamePasswordAuthenticationFilter(): CustomUsernamePasswordAuthenticationFilter {
-        val filter = CustomUsernamePasswordAuthenticationFilter()
+        val filter = CustomUsernamePasswordAuthenticationFilter(rememberMeServices)
         filter.setAuthenticationManager(authenticationManagerBean())
         filter.setAuthenticationFailureHandler { _: HttpServletRequest,
                                                  response: HttpServletResponse,
                                                  _: AuthenticationException ->
-            response.status = HttpStatus.UNAUTHORIZED.value()
+            response.status = HttpStatus.BAD_REQUEST.value()
             response.sendError(response.status, "Invalid login or password")
         }
         filter.setAuthenticationSuccessHandler { _: HttpServletRequest,

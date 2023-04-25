@@ -1,36 +1,40 @@
 <script lang="ts">
     import MenuButton from '../components/MenuButton.svelte'
     import Navbar from "../components/Navbar.svelte";
-    import Sidebar from "../components/Sidebar.svelte";
-    import Icon from "@iconify/svelte";
-    import Goal from "../data/models/Goal";
-    import {onMount} from "svelte";
-    import GoalService from "../services/GoalService";
+    import Task from "../data/models/Task";
+    import {onDestroy, onMount} from "svelte";
+    import TaskService from "../services/TaskService";
     import ApiError from "../data/api/ApiError";
-    import NotificationService, {ErrorMessage} from "../services/NotificationService";
+    import ToastService, {ErrorMessage} from "../services/ToastService";
     import ApiResponse from "../data/api/ApiResponse";
     import ServiceFactory from "../services/ServiceFactory";
-    import ThemeSelect from "../components/ThemeSelect.svelte";
     import LocalStorageService from "../services/LocalStorageService";
     import UserService from "../services/UserService";
     import {USER} from "../data/storage/storage";
     import LoadingScreen from "../components/LoadingScreen.svelte";
+    import TopBarMenu from "../components/TopBarMenu.svelte";
+    import HomeMenu from "../components/home-components/HomeMenu.svelte";
+    import {popover} from "../components/popover/global/Popover";
+    import HomeSideBar from "../components/home-components/sidebar/HomeSideBar.svelte";
+    import ThemeToggle from "../components/theme/ThemeToggle.svelte";
+
+    export let params: { tab: string };
 
     let pageIsReady = false;
 
-    let goalService: GoalService;
+    let goalService: TaskService;
     let userService: UserService;
-    let notificationService: NotificationService;
+    let notificationService: ToastService;
     let localStorageService: LocalStorageService;
 
-    let open: boolean;
-    let goals: Goal[] = [];
+    let open: boolean = true;
+    let goals: Task[] = [];
     let sideBarWasOpen: boolean;
     let wasCheck: boolean = false;
 
     $: {
-        if (sideBarWasOpen !== undefined && localStorageService && $USER !== null) {
-            localStorageService.setSideBarWasOpen($USER.id, sideBarWasOpen)
+        if (localStorageService && $USER) {
+            localStorageService.setSideBarWasOpen($USER.id!!, sideBarWasOpen)
         }
     }
 
@@ -50,31 +54,40 @@
     };
 
     const setUp = () => {
-        if ($USER === null) {
+        if (!$USER) {
             userService.getCurrentUser().then(() => {
+                if ($USER?.id) {
+                    sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
+                    open = sideBarWasOpen;
+                    handleResize();
+                    setInterval(() => pageIsReady = true, 200);
+                }
+            });
+        } else {
+            if ($USER.id) {
                 sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
                 open = sideBarWasOpen;
                 handleResize();
                 setInterval(() => pageIsReady = true, 200);
-            });
-        } else {
-            sideBarWasOpen = localStorageService.getSideBarWasOpenOrTrue($USER.id);
-            open = sideBarWasOpen;
-            handleResize();
-            setInterval(() => pageIsReady = true, 200);
+            }
         }
     }
 
     onMount(() => {
-        goalService = ServiceFactory.INSTANCE.goalService;
+        goalService = ServiceFactory.INSTANCE.taskService;
         userService = ServiceFactory.INSTANCE.userService;
-        notificationService = ServiceFactory.INSTANCE.notificationService;
+        notificationService = ServiceFactory.INSTANCE.toastService;
         localStorageService = ServiceFactory.INSTANCE.localStorageService;
         goalService.getUserGoals()
-            .then((response: Goal[]) => goals = response)
-            .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error));
+            .then((response: Task[]) => goals = response)
+            .catch((apiResponse: ApiResponse<ApiError>) => onError(apiResponse.error!!));
         setUp();
     });
+
+    onDestroy(() => {
+        popover.destroyAll();
+        notificationService.closeAll();
+    })
 
 </script>
 
@@ -90,28 +103,22 @@
                         --own-burger-color="var(--cds-icon-01)"
                         --own-menu-btn-hover-background="var(--cds-layer-hover)"
             />
-            <div class="nav-bar-title">
-                <span>Achieve Goals</span>
-            </div>
         </div>
         <svelte:fragment slot="right">
-            <ThemeSelect/>
-            <Icon width="2rem" height="2rem" icon="bxs:user-circle"/>
+            <ThemeToggle/>
+            <TopBarMenu dropdownComponent={{src: HomeMenu}}/>
         </svelte:fragment>
     </Navbar>
     <div class="main-page">
-        <Sidebar bind:open
-                 --own-sidebar-background="var(--cds-layer)">
-            <div slot="bottom" class="footer"></div>
-        </Sidebar>
+        <HomeSideBar {open} {params}/>
         <div class="main-content-wrapper" class:full-size={!open}>
-            <div class="main-content elevation-6">
+            <div class="main-content">
                 <slot name="content"></slot>
             </div>
         </div>
     </div>
 </div>
-
+<slot/>
 
 <style lang="scss">
 
@@ -221,15 +228,19 @@
     padding: .5rem 1rem 1rem .25rem;
     box-sizing: border-box;
 
+    margin-left: 16rem;
+
     display: flex;
     flex-direction: row;
     flex-grow: 1;
 
-    transition: padding-left var(--own-sidebar-transition-time) ease-in-out;
+    transition: padding-left calc(var(--own-sidebar-transition-time) / 2) cubic-bezier(.4, 0, .2, 1),
+    margin-left var(--own-sidebar-transition-time) cubic-bezier(.4, 0, .2, 1);
   }
 
   .main-content-wrapper.full-size {
     padding: .5rem 1rem 1rem 1rem;
+    margin-left: 0;
   }
 
   .main-content {
@@ -239,7 +250,7 @@
     background: var(--cds-ui-background);
     overflow: hidden;
 
-    border-radius: 10px;
+    border-radius: 16px;
   }
 
 

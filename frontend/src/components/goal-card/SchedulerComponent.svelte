@@ -1,10 +1,18 @@
 <script lang="ts">
     import dayjs from 'dayjs';
     import Icon from "@iconify/svelte";
-    import SchedulerModal from "../modals/SchedulerModal.svelte";
-    import Goal from "../../data/models/Goal";
-    import InlineCalendar from "./date-picker/InlineCalendar.svelte";
-    import {GOALS} from "../../data/storage/storage";
+    import MenuContainer from "../modals/MenuContainer.svelte";
+    import Task from "../../data/models/Task";
+    import InlineCalendar from "../date-picker/InlineCalendar.svelte";
+    import {TASKS} from "../../data/storage/storage";
+    import type {Writable} from "svelte/types/runtime/store";
+    import {onDestroy} from "svelte";
+
+    export let goalId: number = undefined;
+    export let goalStorage: Writable<Task> = undefined;
+    export let useGlobalStore: boolean = true;
+
+    const goal: Task = useGlobalStore ? $TASKS.find((it) => it.id === goalId) : $goalStorage;
 
     const daysName = (dayNum) => {
         let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -18,25 +26,26 @@
         nextWeek: dayjs().add(7, 'day').toDate()
     }
 
-    export let goal: Goal;
-    export let fromGoalCard = false;
-
-    $:{
-        if (goal) {
-            let goals = $GOALS;
+    const updateGoals = () => {
+        if (useGlobalStore) {
+            const goals = $TASKS;
             goals[goals.indexOf(goal)] = goal;
-            $GOALS = goals;
+            $TASKS = goals;
+        } else {
+            $goalStorage = goal;
         }
     }
+
+    onDestroy(updateGoals);
 
 </script>
 
 
-<SchedulerModal on:close bind:fromGoalCard>
+<MenuContainer --menu-container-border-radius="16px">
     <div class="scheduler-title" slot="header">
         <span>{dayjs(goal.deadline).format('DD dd HH:mm')}</span>
     </div>
-    <div class="scheduler-suggestion" slot="suggestion">
+    <div class="scheduler-suggestion" slot="content">
         <button class="scheduler-suggestion-item" on:click={() => goal.deadline = dates.today}>
                         <span class="scheduler-suggestion-item-icon">
                             <Icon icon="bi:calendar" style="width: 18px; height: 18px; color: #058527;"/>
@@ -69,13 +78,10 @@
             <span class="scheduler-suggestion-item-weekend">{daysName(dayjs().add(1, 'week').day())}</span>
         </button>
     </div>
-    <div class="scheduler-date-picker" slot="date">
-        <InlineCalendar bind:value={goal.deadline}/>
+    <div class="scheduler-date-picker" slot="footer">
+        <InlineCalendar bind:value={goal.deadline} withTime --calendar-padding=".125rem"/>
     </div>
-    <div slot="time">
-        <!--        <TimeComponent bind:value={goal.deadline}/>-->
-    </div>
-</SchedulerModal>
+</MenuContainer>
 
 
 <style>
@@ -89,7 +95,9 @@
         align-items: center;
         justify-content: flex-start;
 
-        padding: 8px 10px;;
+        padding: 8px 10px;
+
+        font-size: var(--cds-body-long-02-font-size);
     }
 
     .scheduler-suggestion {
@@ -115,6 +123,11 @@
         color: var(--cds-text-01);
 
         width: 100%;
+    }
+
+    .scheduler-suggestion-item:focus-visible {
+        outline: var(--cds-focus) solid 1px;
+        background-color: var(--cds-hover-ui);
     }
 
     .scheduler-suggestion-item:hover {

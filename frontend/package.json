@@ -36,9 +36,11 @@
   },
   "dependencies": {
     "@iconify/svelte": "^2.2.1",
+    "@okrad/svelte-progressbar": "^1.11.3",
     "dayjs": "^1.11.1",
     "flatpickr": "^4.6.13",
     "sirv-cli": "^2.0.0",
+    "svelte-input-mask": "^1.1.0",
     "svelte-notifications": "^0.9.93",
     "svelte-routing": "^1.6.0",
     "svrollbar": "^0.12.0"

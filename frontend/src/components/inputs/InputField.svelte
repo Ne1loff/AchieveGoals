@@ -1,26 +1,33 @@
 <script lang="ts">
 
-    import {onMount} from "svelte";
+    import {createEventDispatcher, onMount} from "svelte";
     import Icon from "@iconify/svelte";
     import {l10n} from "../../resources/localization/l10n";
+    import Indicator from "../indicator/Indicator.svelte";
+    import {getPasswordDifficult} from "./utils";
 
-    export let value: string;
+    export let value: string = '';
+    export let name: string | undefined = undefined;
     export let type: 'text' | 'password' | 'email' | 'number' | 'url' = 'text';
-    export let label: string = undefined;
+    export let label: string | undefined = undefined;
     export let placeholderText: string = ' ';
     export let newPass: boolean = false;
     export let showPassword: boolean = false;
     export let validate: boolean = false;
     export let required: boolean = false;
-    export let pattern: RegExp = undefined;
+    export let pattern: RegExp = /.*/;
     export let forceError: boolean = false;
     export let requiredErrorMessage: string = l10n.requiredErrorText;
-    export let patternErrorMessage: string = undefined;
+    export let patternErrorMessage: string | undefined = undefined;
+    export let skeleton: boolean = false;
+    export let autocomplete: string = 'on';
+    export let disableAutocomplete: boolean = false;
+    export let showPasswordDifficult: boolean = false;
 
     export let IconWhenPass = 'akar-icons:eye-closed';
     export let IconWhenText = 'akar-icons:eye-open';
 
-    let error: boolean = false;
+    let error: boolean;
     let requiredError: boolean = false;
     let patternError: boolean = false;
 
@@ -28,8 +35,14 @@
         if (pattern) validate = true;
         inputEl.type = type;
         inputEl.required = required;
-        if (type === 'password')
-            inputEl.autocomplete = newPass ? 'new-password' : 'on';
+        if (disableAutocomplete) {
+            inputEl.autocomplete = 'off';
+        } else {
+            inputEl.autocomplete = autocomplete ?? 'on';
+            if (type === 'password' && newPass)
+                inputEl.autocomplete = 'new-password';
+        }
+        if (skeleton) inputEl.tabIndex = -1;
     });
 
     let inputEl: HTMLInputElement;
@@ -40,26 +53,39 @@
             requiredError = value === '';
             patternError = requiredError ? false : patternError;
         }
+        unfocused = true;
     }
 
-    $: patternError = (value && validate && pattern !== undefined) ? !pattern.test(value) : patternError;
-    $: error = requiredError || patternError;
+    let unfocused: boolean;
+
+    const dispatch = createEventDispatcher();
+
+    $: patternError = (value && validate) ? !pattern?.test(value) ?? false : patternError;
+    $: error = requiredError || patternError
     $: {
         if (type === 'password' && inputEl) inputEl.type = showPassword ? 'text' : 'password';
     }
 
+    $: dispatch('error', error);
+
+    $: showPasDiff = showPasswordDifficult && !unfocused && type === 'password' && newPass && value.length > 3;
 </script>
 
-
-<div class="input_container" class:error={error || forceError}>
+<div class="input_container"
+     class:error={error || forceError}
+     class:bx--skeleton={skeleton}
+     class:bx--text-input={skeleton}
+     class:ag--pas-diff={showPasDiff}
+>
     <input bind:this={inputEl}
            bind:value
            on:focusout={isRequired}
+           on:focusin={() => unfocused = false}
+           {name}
            id={inputId}
            class="input_field"
-           placeholder={placeholderText}
-           autocomplete="on">
-    {#if label}
+           placeholder={placeholderText}/>
+    {#if label && !skeleton}
         <label for={inputId} class="input_label">{label}</label>
     {/if}
     {#if type === 'password'}
@@ -68,25 +94,38 @@
             <Icon class="input_box_icon"
                   icon="{showPassword ? IconWhenText : IconWhenPass }"/>
         </div>
+        {#if showPasDiff}
+            <div class="pass-indicator">
+                <Indicator count={5}
+                           currentStep={getPasswordDifficult(value)}
+                           colors={['#FF0000', '#FFA500', '#FFD700', '#ADFF2F', '#32CD32']}
+                           secondary="inherit"
+                           size={{h: '.5rem', w: 'calc(var(--custom-width) / 5)'}}
+                           radius="6px"
+                           singleText/>
+            </div>
+        {/if}
     {/if}
 </div>
-{#if error}
+{#if error && (patternErrorMessage || requiredErrorMessage)}
     <div class="error-container">
         <span class="error-message">
-            {patternError ? patternErrorMessage : requiredError ? requiredErrorMessage : ''}
+            {patternError && patternErrorMessage ? patternErrorMessage : requiredError ? requiredErrorMessage ?? '' : ''}
         </span>
     </div>
 {/if}
 
+
 <style lang="scss">
 
   :root {
-    --custom-background-color: #fff;
+    --custom-background-color: inerhit;
     --custom-height: 22px;
     --custom-width: 100%;
     --custom-margin: 0;
     --custom-border-color: #dddfe2;
     --custom-transparent-duration: 200ms;
+    --own-input-error-color: #fa4d56;
   }
 
   .input_container {
@@ -94,10 +133,10 @@
 
     background: var(--custom-background-color);
     width: var(--custom-width);
-    max-height: var(--custom-height);
+    height: var(--custom-height);
     margin: var(--custom-margin);
 
-    padding: 12px 14px;
+    padding: 4px 8px;
     font-size: 17px;
     border: 1px solid var(--custom-border-color);
     border-radius: 6px;
@@ -107,14 +146,44 @@
     justify-content: space-between;
   }
 
+  .input_container.ag--pas-diff {
+    height: calc(var(--custom-height) + .5rem);
+    padding-bottom: .75rem;
+  }
+
+  .pass-indicator {
+    position: absolute;
+    width: calc(100% - 2px);
+
+    overflow: hidden;
+
+    bottom: 2px;
+    left: 1px;
+  }
+
+  .input_container:focus-within {
+    outline: 2px solid var(--cds-focus, #0f62fe);
+    outline-offset: -2px;
+  }
+
+  .input_container.bx--skeleton {
+    overflow: hidden;
+  }
+
   .error-container {
     width: var(--custom-width);
+    margin-top: .25rem;
     display: flex;
     justify-content: start;
   }
 
   .error-message {
     color: var(--own-input-error-color);
+  }
+
+  .input_container:focus-within.error {
+    border-color: var(--custom-border-color);
+    color: inherit;
   }
 
   .input_container.error {

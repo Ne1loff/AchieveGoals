@@ -17,7 +17,7 @@ data class Locality(
     val name: String,
 
     @Column(name = "crt_date")
-    val create_data: Date
+    val createData: Date
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -31,6 +31,6 @@ data class Locality(
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , name = $name , create_data = $create_data )"
+        return this::class.simpleName + "(id = $id , name = $name , create_data = $createData )"
     }
 }

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "module": "ESNext"
+    "module": "ESNext",
+    "strict": true
   },
   "extends": "@tsconfig/svelte/tsconfig.json",
   "include": ["src/**/*"],

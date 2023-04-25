@@ -1,17 +1,19 @@
 import {NotificationType} from "../data/enums/_enums";
+import {SettingsSubUrl, SettingsUrl} from "./basicFilter.config";
+import {hrefs} from "./config";
 
-const FILTERS = [
+const PRIORITIES = [
     {
-        priority: 1, active: false, icon: "bi:flag-fill", color: "#de4c4a"
+        priority: 1, icon: "bi:flag-fill", color: "#de4c4a"
     },
     {
-        priority: 2, active: false, icon: "bi:flag-fill", color: "#f49c18"
+        priority: 2, icon: "bi:flag-fill", color: "#f49c18"
     },
     {
-        priority: 3, active: false, icon: "bi:flag-fill", color: "#3077e1"
+        priority: 3, icon: "bi:flag-fill", color: "#3077e1"
     },
     {
-        priority: 4, active: false, icon: "bi:flag", color: ""
+        priority: 4, icon: "bi:flag-fill", color: "#808080"
     },
 ];
 
@@ -50,4 +52,58 @@ const ICONS = {
 
 } as const;
 
-export {FILTERS, PRIORITY_COLORS, THEMES, ICONS}
+const SETTING_BUTTONS = [
+    {
+        obj: SettingsUrl.ACCOUNT,
+        title: 'Аккаунт',
+        icon: 'ic:outline-account-circle',
+        href: hrefs.settings(SettingsUrl.ACCOUNT)
+    },
+    {
+        obj: SettingsUrl.GENERAL,
+        title: 'Основные',
+        icon: 'carbon:settings',
+        href: hrefs.settings(SettingsUrl.GENERAL)
+    },
+    {
+        obj: SettingsUrl.THEME,
+        title: 'Тема',
+        icon: 'carbon:color-palette',
+        href: hrefs.settings(SettingsUrl.THEME)
+    },
+    {
+        obj: SettingsUrl.PRODUCTIVITY,
+        title: 'Продуктивность',
+        icon: 'carbon:growth',
+        href: hrefs.settings(SettingsUrl.PRODUCTIVITY)
+    },
+    {
+        obj: SettingsUrl.REMINDERS,
+        title: 'Напоминания',
+        icon: 'carbon:alarm',
+        href: hrefs.settings(SettingsUrl.REMINDERS)
+    },
+    {
+        obj: SettingsUrl.NOTIFICATIONS,
+        title: 'Уведомления',
+        icon: 'akar-icons:bell',
+        href: hrefs.settings(SettingsUrl.NOTIFICATIONS)
+    }
+]
+
+const SETTINGS_SUB_TABS = [
+    {
+        obj: SettingsSubUrl.EMAIL,
+        title: 'Изменить Email-адрес',
+        icon: 'akar-icons:bell',
+        href: `${hrefs.settings(SettingsUrl.NOTIFICATIONS)}/${SettingsSubUrl.EMAIL}`
+    },
+    {
+        obj: SettingsSubUrl.PASSWORD,
+        title: 'Изменить пароль',
+        icon: 'akar-icons:bell',
+        href: `${hrefs.settings(SettingsUrl.NOTIFICATIONS)}/${SettingsSubUrl.PASSWORD}`
+    }
+]
+
+export {PRIORITIES, PRIORITY_COLORS, THEMES, ICONS, SETTING_BUTTONS, SETTINGS_SUB_TABS}

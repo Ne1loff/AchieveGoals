@@ -22,9 +22,10 @@
 <script>
     const DEFAULT_ZINDEX = 1000;
     import Content from './Content.svelte';
+    import {createEventDispatcher} from 'svelte';
+
     let targetRef;
 
-    import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 
     const onOpen = () => {
@@ -33,7 +34,7 @@
 
     export let action = 'click';
     export let zIndex = DEFAULT_ZINDEX;
-    export let arrow = true;
+    export let arrow = false;
     export let placement = 'auto';
     export let arrowColor = 'var(--cds-field)';
     export let overlayColor = 'rgba(0, 0, 0, 0.02)';

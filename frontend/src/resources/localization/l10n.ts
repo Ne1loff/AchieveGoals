@@ -1,23 +1,29 @@
 import type {Dictionary} from "./languages/config";
 import {en} from "./languages/en";
 import {ru} from "./languages/ru";
-import {Languages} from "./languages/languages";
+import {CurrentLanguage, Languages} from "./languages/languages";
 
 import dayjs from "dayjs";
 
 import 'dayjs/locale/ru';
 import 'dayjs/locale/en';
+import {hasProperty} from "../../utils/objects";
 
 const languages = {
-    en: en,
-    ru: ru
-} as const;
-
-const setLanguage = (lang: Languages) => {
-    l10n = languages[lang];
-    dayjs.locale(lang === Languages.RU ? 'ru' : 'en');
+    [Languages.en]: en,
+    [Languages.ru]: ru
 };
 
-let l10n: Dictionary = languages[Languages.EN];
+const setLanguage = (lang: string) => {
+    if (hasProperty(languages, lang)) {
+        l10n = languages[lang];
+
+        CurrentLanguage.set(lang);
+        dayjs.locale(lang);
+        document.documentElement.setAttribute('lang', lang);
+    }
+}
+
+let l10n: Dictionary = languages[Languages.en];
 
 export {l10n, setLanguage};

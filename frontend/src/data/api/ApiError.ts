@@ -1,14 +1,14 @@
 export default class ApiError {
 
-    status?: number = null;
+    status?: number;
 
-    error?: string = null;
+    error?: string;
 
-    message?: string = null;
+    message?: string;
 
-    timestamp?: Date = null;
+    timestamp?: Date;
 
-    path?: string = null;
+    path?: string;
 
     constructor(message?: string, status?: number, error?: string,  timestamp?: Date, path?: string) {
         this.status = status;

@@ -1,13 +1,12 @@
 package com.example.achieve_goals.controller
 
-import com.example.achieve_goals.dto.RegistrationRequest
 import com.example.achieve_goals.dto.ChangePasswordRequest
+import com.example.achieve_goals.dto.RegistrationRequest
 import com.example.achieve_goals.dto.UserDTO
-import com.example.achieve_goals.entities.User
 import com.example.achieve_goals.exceptions.notFound.FileNotFoundException
-import com.example.achieve_goals.exceptions.notFound.UserNotFoundException
 import com.example.achieve_goals.service.MinioService
 import com.example.achieve_goals.service.UserService
+import com.example.achieve_goals.utils.getUserEntity
 import org.apache.commons.io.FilenameUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,79 +22,65 @@ class UserController(
 ) {
 
     @PostMapping("registration")
-    fun registration(@RequestBody newUser: RegistrationRequest): ResponseEntity<Any> {
+    fun registration(@RequestBody newUser: RegistrationRequest): ResponseEntity<HttpStatus> {
+        val user = userService.saveUser(newUser)
+        userService.setupUserSettings(user)
         return ResponseEntity
-            .status(if (userService.saveUser(newUser)) HttpStatus.CREATED else HttpStatus.CONFLICT)
+            .status(HttpStatus.CREATED)
             .build()
     }
 
     @GetMapping("user")
     fun getCurrentUser(auth: Authentication): UserDTO {
-        val principal = auth.principal
-        if (principal is User) {
-            return userService.getUserById(principal.id)
-        }
-        throw UserNotFoundException()
+        val user = auth.getUserEntity()
+        return userService.getUserById(user.id)
     }
 
     @PutMapping("user/changePassword")
     fun changePassword(
         auth: Authentication,
         @RequestBody passwordDTO: ChangePasswordRequest
-    ): ResponseEntity<Any> {
-        val principal = auth.principal
-        if (principal is User) {
-            return if (userService.changeUserPassword(principal.id, passwordDTO.oldPassword, passwordDTO.newPassword))
-                ResponseEntity.ok().build()
-            else
-                ResponseEntity.badRequest().build()
-        }
-        throw UserNotFoundException()
+    ): ResponseEntity<HttpStatus> {
+        val user = auth.getUserEntity()
+        userService.changeUserPassword(user.id, passwordDTO)
+        return ResponseEntity.ok().build()
     }
 
     @GetMapping("user/avatar")
     fun getUserAvatar(auth: Authentication): ResponseEntity<String> {
-        val principal = auth.principal
-        if (principal is User) {
-            return ResponseEntity.ok()
-                .body(userService.getUserAvatarLink(principal.id))
-        }
-        throw UserNotFoundException()
+        val user = auth.getUserEntity()
+        return ResponseEntity.ok(userService.getUserAvatarLink(user.id))
     }
 
     @PutMapping("user/avatar")
-    fun updateAvatar(@RequestParam("avatar") avatar: MultipartFile, auth: Authentication): ResponseEntity<Any> {
-        val principal = auth.principal
+    fun updateAvatar(@RequestParam("avatar") avatar: MultipartFile, auth: Authentication): ResponseEntity<HttpStatus> {
+        val user = auth.getUserEntity()
         val fileExtension = FilenameUtils.getExtension(avatar.originalFilename)
-        if (principal is User) {
-            minioService.uploadPhoto(principal.id, avatar.inputStream, fileExtension)
-            userService.uploadUserAvatar(principal.id, avatar.inputStream, fileExtension)
-            return ResponseEntity.ok().build()
-        }
-        throw UserNotFoundException()
+
+        minioService.uploadPhoto(user.id, avatar.inputStream, fileExtension)
+        userService.uploadUserAvatar(user.id, avatar.inputStream, fileExtension)
+
+        return ResponseEntity.ok().build()
     }
 
     @DeleteMapping("user/avatar")
-    fun deleteUserAvatar(auth: Authentication): ResponseEntity<Any> {
-        val principal = auth.principal
-        if (principal is User) {
-            if (principal.userPhoto != null) {
-                userService.deleteUserPhoto(principal.id)
-                minioService.deletePhoto(principal.userPhoto!!.id, principal.userPhoto!!.fileExtension)
-                return ResponseEntity.ok().build()
-            }
-            throw FileNotFoundException()
+    fun deleteUserAvatar(auth: Authentication): ResponseEntity<HttpStatus> {
+        val user = auth.getUserEntity()
+
+        user.userPhoto?.let {
+            userService.deleteUserPhoto(user.id)
+            minioService.deletePhoto(it.id, it.fileExtension)
+            return ResponseEntity.ok().build()
         }
-        throw UserNotFoundException()
+
+        throw FileNotFoundException()
     }
 
     @PutMapping("user")
-    fun updateUserInfo(@RequestBody userDTO: UserDTO, auth: Authentication): ResponseEntity<Any> {
-        val principal = auth.principal
-        if (principal is User) {
-            userService.updateUser(userDTO, principal.id)
-            return ResponseEntity.ok().build()
-        }
-        throw UserNotFoundException()
+    fun updateUserInfo(@RequestBody userDTO: UserDTO, auth: Authentication): ResponseEntity<HttpStatus> {
+        val user = auth.getUserEntity()
+        userService.updateUser(userDTO, user.id)
+
+        return ResponseEntity.ok().build()
     }
 }

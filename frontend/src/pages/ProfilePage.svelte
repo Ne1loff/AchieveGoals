@@ -1,6 +1,7 @@
 <script lang="ts">
     import {navigate} from "svelte-routing";
     import Icon from "@iconify/svelte"
+    import {hrefs} from "../resources/config";
 
     let inputTypeBool = [false, false, false];
 
@@ -83,7 +84,7 @@
                     if (response.status === 200)
                         return response.json()
                     else {
-                        navigate('/login')
+                        navigate(hrefs.login)
                     }
                 })
                 .then(commit => {
@@ -198,7 +199,7 @@
                 userViaChanges = JSON.parse(JSON.stringify(user))
             }).catch((err) => {
             alert(err)
-            navigate('/login')
+            navigate(hrefs.login)
         })
     }
 

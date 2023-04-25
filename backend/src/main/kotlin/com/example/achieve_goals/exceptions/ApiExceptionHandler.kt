@@ -13,39 +13,33 @@ import java.time.ZonedDateTime
 @ControllerAdvice
 class ApiExceptionHandler {
 
-    @ExceptionHandler(value = [(ApiNotfoundException::class)])
-    fun handleApiNotfoundException(exception: ApiNotfoundException): ResponseEntity<Any> {
-        val httpStatus = HttpStatus.NOT_FOUND
-        val apiException = ApiException(
+    private fun createErrorResponse(exception: Exception, httpStatus: HttpStatus): ApiException {
+        return ApiException(
             message = exception.message,
             status = httpStatus.value(),
             error = httpStatus.reasonPhrase,
             timestamp = ZonedDateTime.now(ZoneId.of("Z"))
         )
+    }
+
+    @ExceptionHandler(value = [(ApiNotfoundException::class)])
+    fun handleApiNotfoundException(exception: ApiNotfoundException): ResponseEntity<Any> {
+        val httpStatus = HttpStatus.NOT_FOUND
+        val apiException = createErrorResponse(exception, httpStatus)
         return ResponseEntity(apiException, HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler(value = [(ApiBadRequestException::class)])
     fun handleApiBadRequestException(exception: ApiBadRequestException): ResponseEntity<Any> {
         val httpStatus = HttpStatus.BAD_REQUEST
-        val apiException = ApiException(
-            message = exception.message,
-            status = httpStatus.value(),
-            error = httpStatus.reasonPhrase,
-            timestamp = ZonedDateTime.now(ZoneId.of("Z"))
-        )
+        val apiException = createErrorResponse(exception, httpStatus)
         return ResponseEntity(apiException, httpStatus)
     }
 
     @ExceptionHandler(value = [(ApiConflictException::class)])
     fun handleApiConflictException(exception: ApiConflictException): ResponseEntity<Any> {
         val httpStatus = HttpStatus.CONFLICT
-        val apiException = ApiException(
-            message = exception.message,
-            status = httpStatus.value(),
-            error = httpStatus.reasonPhrase,
-            timestamp = ZonedDateTime.now(ZoneId.of("Z"))
-        )
+        val apiException = createErrorResponse(exception, httpStatus)
         return ResponseEntity(apiException, httpStatus)
     }
 }

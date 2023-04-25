@@ -1,50 +1,49 @@
 <script lang="ts">
-    import {SvelteToast} from '@zerodevx/svelte-toast'
-    import {Route, Router} from "svelte-routing";
-    import LoginPage from "./pages/LoginPage.svelte";
-    import RegistrationPage from "./pages/RegistrationPage.svelte";
-    import HomePage from "./pages/HomePage.svelte";
+
     import NotfoundPage from "./pages/NotfoundPage.svelte";
-    import MainPage from "./pages/MainPage.svelte";
-    import GoalsHolder from "./components/homeComponents/GoalsHolder.svelte";
-    import {Theme} from "carbon-components-svelte";
+    import WelcomePage from "./pages/WelcomePage.svelte";
+    import PopoverGlobal from "./components/popover/global/PopoverGlobal.svelte";
+    import Settings from "./components/settings-components/Settings.svelte";
+    import AuthPages from "./pages/setup/AuthPages.svelte";
+    import AppHomePages from "./pages/setup/AppHomePages.svelte";
+    import {Route, Router} from "svelte-routing";
+    import AgToasts from "./components/toasts/AgToasts.svelte";
+    import ThemeManager from "./components/theme/ThemeManager.svelte";
+
+    // onMount(() => {
+    //     ServiceFactory.INSTANCE.toastService.success("test", 'test', new Date().toLocaleString(), 60 * 5 * 1000);
+    //     ServiceFactory.INSTANCE.toastService.dialog("test", {
+    //         accept: () => alert("test"),
+    //         reject: () => alert("reject")
+    //     }, 60 * 5 * 1000);
+    // });
 </script>
 
 <svelte:head>
     <link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/all.css"/>
 </svelte:head>
-<Theme persist persistKey="__carbon-theme"/>
+<ThemeManager/>
 <Router>
-    <Route path="/">
-        <MainPage/>
+    <Route path="/:lang" let:params>
+        <WelcomePage/>
     </Route>
-    <Route path="/login">
-        <LoginPage/>
+    <Route path="/auth/:page" let:params>
+        <AuthPages {params}/>
     </Route>
-    <Route path="/registration">
-        <RegistrationPage/>
-    </Route>
-    <Route path="/home/*">
-        <HomePage>
-            <svelte:fragment slot="content">
-                <Router>
-                    <Route path="goals/*">
-                        <GoalsHolder/>
-                        <!--        <Route path="/home/goals/:id" let:params><Route/>    -->
-                    </Route>
-                </Router>
-            </svelte:fragment>
-        </HomePage>
-    </Route>
-    <Route path="/user/profile">
-        <!--        <ProfilePage/>-->
+    <Route path="/app/*">
+        <Router>
+            <AppHomePages/>
+            <Route path="settings/:tab/*subTab" let:params>
+                <Settings props={params}/>
+            </Route>
+        </Router>
     </Route>
     <Route path="/*">
         <NotfoundPage/>
     </Route>
 </Router>
-<SvelteToast options={{ pausable: true }}/>
-<div id="popoverContainer"></div>
+<AgToasts/>
+<PopoverGlobal/>
 
 <style>
 
